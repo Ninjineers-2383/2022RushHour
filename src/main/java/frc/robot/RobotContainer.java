@@ -5,8 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightAdjust;
+import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -24,11 +27,17 @@ public class RobotContainer {
 
   private final LimelightAdjust m_limelightAdjust = new LimelightAdjust(limelight);
 
+  private final Joystick m_driverController = new Joystick(0);
+
+  private final LauncherSubsystem m_launcher = new LauncherSubsystem();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
     CommandScheduler.getInstance().setDefaultCommand(limelight, m_limelightAdjust);
+    m_launcher.setDefaultCommand(new LauncherCommand(m_launcher, 
+    () -> (m_driverController.getTrigger() ? m_driverController.getRawAxis(3): 0)));
   }
 
   /**
