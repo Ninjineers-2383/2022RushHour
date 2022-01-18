@@ -27,7 +27,7 @@ public class RobotContainer {
 
   private final LimelightAdjust m_limelightAdjust = new LimelightAdjust(limelight);
 
-  private final Joystick m_driverController = new Joystick(0);
+  private final XboxController m_driverController = new XboxController(0);
 
   private final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
@@ -37,7 +37,7 @@ public class RobotContainer {
     configureButtonBindings();
     CommandScheduler.getInstance().setDefaultCommand(limelight, m_limelightAdjust);
     m_launcher.setDefaultCommand(new LauncherCommand(m_launcher, 
-    () -> (m_driverController.getTrigger() ? m_driverController.getRawAxis(3): 0)));
+    () -> (m_driverController.getRightBumper() ? 1: 0)));
   }
 
   /**
