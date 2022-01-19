@@ -4,15 +4,21 @@
 
 package frc.robot;
 
+import java.sql.Driver;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.commands.TurretCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightAdjust;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,17 +33,26 @@ public class RobotContainer {
 
   private final LimelightAdjust m_limelightAdjust = new LimelightAdjust(limelight);
 
-  private final XboxController m_driverController = new XboxController(0);
+  final XboxController m_driverController = new XboxController(0);
 
-  private final LauncherSubsystem m_launcher = new LauncherSubsystem();
+  public final LauncherSubsystem m_launcher = new LauncherSubsystem();
+
+  private final TurretSubsystem m_turret = new TurretSubsystem();
+
+  public boolean launcherOn = false;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
     CommandScheduler.getInstance().setDefaultCommand(limelight, m_limelightAdjust);
+    SmartDashboard.putNumber("Velocity", 0.0);
+
     m_launcher.setDefaultCommand(new LauncherCommand(m_launcher, 
-    () -> (m_driverController.getRightBumper() ? 1: 0)));
+    () -> (launcherOn) ? SmartDashboard.getNumber("Velocity", 0.0): 0));
+
+    m_turret.setDefaultCommand(new TurretCommand(m_turret,
+    () -> m_driverController.getLeftTriggerAxis() * 0.5 - m_driverController.getRightTriggerAxis() * 0.5));
   }
 
   /**

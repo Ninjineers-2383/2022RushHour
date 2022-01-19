@@ -20,6 +20,10 @@ public class LauncherSubsystem extends SubsystemBase {
     public LauncherSubsystem() {
       launcherMaster = new WPI_TalonFX(RobotMap.LAUNCHER_MASTER_PORT);
       launcherFollower = new WPI_TalonFX(RobotMap.LAUNCHER_FOLLOWER_PORT);
+      
+      launcherMaster.setInverted(true);
+      launcherFollower.setInverted(true);
+      
       launcherFollower.follow(launcherMaster);
     }
 
@@ -35,6 +39,6 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public void spin(double velocity) {
-        launcherMaster.set(ControlMode.PercentOutput, velocity);
+        launcherMaster.set(ControlMode.Velocity, velocity);
     }
 }

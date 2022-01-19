@@ -5,5 +5,7 @@ public final class Constants {
     public final class RobotMap {
         public final static int LAUNCHER_MASTER_PORT = 1;
         public final static int LAUNCHER_FOLLOWER_PORT = 2;
+
+        public final static int TURRET_PORT = 3;
     }
 }
