@@ -13,22 +13,25 @@ import frc.robot.Constants;
 public class LimelightSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public LimelightSubsystem() {
-    tolerance = Constants.limelight_tolerance;
+    tolerance = Constants.LIMELIGHT_AIM_TOLERANCE;
   }
 
+  boolean valid = false;
   double x;
-  double tolerance;
+  double tolerance = 5;
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tv = table.getEntry("tv");
     NetworkTableEntry tx = table.getEntry("tx");
     NetworkTableEntry ty = table.getEntry("ty");
     NetworkTableEntry ta = table.getEntry("ta");
 
     //read values periodically
     x = tx.getDouble(0.0);
+    valid = tv.getDouble(1) != 0;
     double y = ty.getDouble(0.0);
     double area = ta.getDouble(0.0);
 
@@ -40,13 +43,17 @@ public class LimelightSubsystem extends SubsystemBase {
 
   //returns direction to move ring turret; i.e. if right is returned, turret must turn right.
   public String direction() {
-    if (x < -tolerance) {
-      return "left";
+    if (!valid) {
+      return "Not Found";
+
+    } else {
+      if (x < -tolerance) {
+        return "Left";
+      } else if (x > tolerance) {
+        return "Right";
+      }
+      return "Locked On";
     }
-    if (x > tolerance) {
-      return "right";
-    }
-    return "none";
   }
 
   @Override

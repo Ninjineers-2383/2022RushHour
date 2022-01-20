@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public class LauncherSubsystem extends SubsystemBase {
@@ -20,7 +21,9 @@ public class LauncherSubsystem extends SubsystemBase {
     public LauncherSubsystem() {
       launcherMaster = new WPI_TalonFX(RobotMap.LAUNCHER_MASTER_PORT);
       launcherFollower = new WPI_TalonFX(RobotMap.LAUNCHER_FOLLOWER_PORT);
-      
+      launcherMaster.setNeutralMode(NeutralMode.Coast);
+      launcherFollower.setNeutralMode(NeutralMode.Coast);
+
       launcherMaster.setInverted(true);
       launcherFollower.setInverted(true);
       
@@ -39,6 +42,10 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public void spin(double velocity) {
+      if (velocity == 0) {
+        launcherMaster.set(ControlMode.PercentOutput, 0);
+      } else {
         launcherMaster.set(ControlMode.Velocity, velocity);
+      }
     }
 }

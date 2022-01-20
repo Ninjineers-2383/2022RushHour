@@ -4,10 +4,7 @@
 
 package frc.robot;
 
-import java.sql.Driver;
-
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.TurretSubsystem;
@@ -17,8 +14,8 @@ import frc.robot.commands.LimelightAdjust;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import edu.wpi.first.wpilibj2.command.button.*;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,33 +23,37 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
+
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final LimelightSubsystem limelight = new LimelightSubsystem();
-
-  private final LimelightAdjust m_limelightAdjust = new LimelightAdjust(limelight);
 
   final XboxController m_driverController = new XboxController(0);
 
   public final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
   private final TurretSubsystem m_turret = new TurretSubsystem();
+  
+  public static double direction = 0;
 
-  public boolean launcherOn = false;
+  public static boolean launch = false;
+
+  public boolean launcherEnabled = false;
+
+  private Button launchButton = new Button(() -> m_driverController.getRightBumper());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    CommandScheduler.getInstance().setDefaultCommand(limelight, m_limelightAdjust);
-    SmartDashboard.putNumber("Velocity", 0.0);
+    SmartDashboard.putNumber("Velocity", 1000.0);
+    SmartDashboard.putNumber("Direction", direction);
+    
+    limelight.setDefaultCommand(new LimelightAdjust(limelight));
+    m_turret.setDefaultCommand(new TurretCommand(m_turret, () -> 0));
+    m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> 0));
 
-    m_launcher.setDefaultCommand(new LauncherCommand(m_launcher, 
-    () -> (launcherOn) ? SmartDashboard.getNumber("Velocity", 0.0): 0));
-
-    m_turret.setDefaultCommand(new TurretCommand(m_turret,
-    () -> m_driverController.getLeftTriggerAxis() * 0.5 - m_driverController.getRightTriggerAxis() * 0.5));
   }
 
   /**
@@ -61,7 +62,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  
+  private void configureButtonBindings() {
+    //launchButton.toggleWhenPressed(new TurretCommand (m_turret, () -> 0.5));
+    launchButton.whenHeld( new ParallelCommandGroup(
+      new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Velocity", 0.0)), 
+      (new TurretCommand(m_turret, () -> direction))));
+    
+    //launchButton.whenHeld(new ParallelCommandGroup());
+
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -70,6 +80,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_limelightAdjust;
+    return null;
   }
 }
