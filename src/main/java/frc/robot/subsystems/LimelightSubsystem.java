@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -16,9 +17,12 @@ public class LimelightSubsystem extends SubsystemBase {
     tolerance = Constants.LIMELIGHT_AIM_TOLERANCE;
   }
 
-  boolean valid = false;
-  double x;
-  double tolerance = 5;
+  private boolean valid = false;
+  private double x;
+  private double y;
+  private double tolerance = 22;
+  private MedianFilter fx = new MedianFilter(5);
+  private MedianFilter fy = new MedianFilter(1000);
 
   @Override
   public void periodic() {
@@ -30,15 +34,39 @@ public class LimelightSubsystem extends SubsystemBase {
     NetworkTableEntry ta = table.getEntry("ta");
 
     //read values periodically
-    x = tx.getDouble(0.0);
+    x = fx.calculate(tx.getDouble(0.0));
     valid = tv.getDouble(1) != 0;
-    double y = ty.getDouble(0.0);
+    y = fy.calculate(ty.getDouble(0.0));
     double area = ta.getDouble(0.0);
 
     //post to smart dashboard periodically
     SmartDashboard.putNumber("LimelightX", x);
     SmartDashboard.putNumber("LimelightY", y);
     SmartDashboard.putNumber("LimelightArea", area);
+    SmartDashboard.putNumber("findDistance() value", findDistance());
+  }
+
+  public double getX() {
+    return x;
+  }
+
+  public double negativeX() {
+    if(x > 0) {
+      x = x * -1;
+      return x;
+    } else {
+      return x;
+    }
+  }
+
+  public double getY() {
+    return y;
+  }
+
+  public double findDistance() {
+    double t = Math.toRadians(Constants.LIMELIGHT_ANGLE + y);
+    //return t;
+    return (Constants.LIMELIGHT_HEIGHT_DIFFERENCE/Math.tan(t));
   }
 
   //returns direction to move ring turret; i.e. if right is returned, turret must turn right.

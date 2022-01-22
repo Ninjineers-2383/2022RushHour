@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.TurretSubsystem;
@@ -17,13 +16,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and button mappings) should be declared here.
- */
-
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
@@ -34,12 +26,8 @@ public class RobotContainer {
   public final LauncherSubsystem m_launcher = new LauncherSubsystem();
 
   private final TurretSubsystem m_turret = new TurretSubsystem();
-  
-  public static double direction = 0;
 
-  public static boolean launch = false;
-
-  public boolean launcherEnabled = false;
+  private final LimelightAdjust m_adjust = new LimelightAdjust(limelight);
 
   private Button launchButton = new Button(() -> m_driverController.getRightBumper());
 
@@ -48,36 +36,25 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     SmartDashboard.putNumber("Velocity", 1000.0);
-    SmartDashboard.putNumber("Direction", direction);
+    SmartDashboard.putNumber("Direction", m_adjust.getTurretPower());
     
-    limelight.setDefaultCommand(new LimelightAdjust(limelight));
+    limelight.setDefaultCommand(m_adjust);
     m_turret.setDefaultCommand(new TurretCommand(m_turret, () -> 0));
     m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> 0));
 
   }
-
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   
   private void configureButtonBindings() {
-    //launchButton.toggleWhenPressed(new TurretCommand (m_turret, () -> 0.5));
-    launchButton.whenHeld( new ParallelCommandGroup(
-      new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Velocity", 0.0)), 
-      (new TurretCommand(m_turret, () -> direction))));
-    
-    //launchButton.whenHeld(new ParallelCommandGroup());
 
+    launchButton.whenHeld( new ParallelCommandGroup(
+      new LauncherCommand (m_launcher, () -> 0 /* -108 * limelight.getY() + 11000 */), 
+      (new TurretCommand(m_turret, () -> m_adjust.getTurretPower()))));
+    // was 24.05x + 10500
+
+    //launchButton.whenHeld(new LauncherCommand (m_launcher, () -> (24.05 * (limelight.findDistance()) + 10500)));
+    //launchButton.whenHeld(new LauncherCommand (m_launcher, () -> (-110 * limelight.getY() + 11067)));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return null;

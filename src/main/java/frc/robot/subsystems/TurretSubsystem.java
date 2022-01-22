@@ -16,6 +16,7 @@ public class TurretSubsystem extends SubsystemBase{
     public TurretSubsystem() {
         turret = new TalonSRX(RobotMap.TURRET_PORT);
         turret.setInverted(false);
+        turret.setSelectedSensorPosition(0);
     }
 
     public void turn(Double power) {

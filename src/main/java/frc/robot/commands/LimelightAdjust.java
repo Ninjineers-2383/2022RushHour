@@ -1,17 +1,15 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.LimelightSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
-import frc.robot.subsystems.TurretSubsystem;
 
 public class LimelightAdjust extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final LimelightSubsystem limelight;
+
+  public double turretPower = 0;
   
 
   /**
@@ -22,6 +20,10 @@ public class LimelightAdjust extends CommandBase {
   public LimelightAdjust(LimelightSubsystem subsystem) {
     limelight = subsystem;
     addRequirements(subsystem);
+  }
+
+  public double getTurretPower() {
+    return turretPower;
   }
 
   @Override
@@ -39,23 +41,40 @@ public class LimelightAdjust extends CommandBase {
     //if limelight is within tolerance, break from adjust
     if(dir.equals("Locked On")) {
       //System.out.println("Turret not adjusted.");
-      RobotContainer.direction = 0;
-      RobotContainer.launch = true;
-      return;
-    } 
+      // if (limelight.getX() > Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
+      //   turretPower = -0.02;
+      // } else if (limelight.getX() < Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
+      //   turretPower = 0.02;
+      // }
+      // return;
+        // if((limelight.getX() > 8)&&(limelight.getX() < -8)) {
+        //   turretPower = 
+        //   if((limelight.getX() > 3) || (limelight.getX() < -3)) {
+        //     turretPower = ((limelight.getX()*limelight.getX()) - 6*(limelight.getX()) + 9)/(200);
+        //   } else {
+        //     turretPower = 0;
+        //   }
+        // }
+        if((limelight.getX() > 1) || (limelight.getX() < -1)) {
+          double sig = (Math.pow(Math.E, 0.1*((limelight.getX()/2)+24)));
+          turretPower = 1/(1 + sig);
+          SmartDashboard.putNumber("Aiming", turretPower);
+          SmartDashboard.putNumber("Turret Jerking Off", sig);
+        } else {
+          turretPower = 0;
+          SmartDashboard.putNumber("Ready to shoot", turretPower);
+        }
+    }
     else if(dir.equals("Left")) {
-      RobotContainer.direction = 1;
-      RobotContainer.launch = true;
+      turretPower = 0.35;
       //System.out.println("Turret adjusted left.");
     } 
     else if(dir.equals("Right")) {
-      RobotContainer.direction = -1;
-      RobotContainer.launch = true;
+      turretPower = -0.35;
      //System.out.println("Turret adjusted right.");
     } 
     else if(dir.equals("Not Found")) {
-      RobotContainer.direction = TurretCommand.range * Constants.SEEKING_POWER;
-      RobotContainer.launch = false;
+      turretPower = TurretCommand.range * Constants.SEEKING_POWER;
     }
   }
 
