@@ -4,27 +4,31 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.LauncherSubsystem;
+import frc.robot.subsystems.DriveTrainSubsystem;
+
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** An example command thata uses an example subsystem. */
-public class LauncherCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final LauncherSubsystem m_subsystem;
 
-  private final DoubleSupplier m_speed;
+/** An example command that uses an example subsystem. */
+public class DriveTrainCommand extends CommandBase {
+  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  private final DriveTrainSubsystem driveTrainSubsystem;
+  private DoubleSupplier throttle;
+  private DoubleSupplier turn;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed) {
-    m_subsystem = subsystem;
-    m_speed = speed;
+  public DriveTrainCommand(DriveTrainSubsystem subsystem, DoubleSupplier throttle, DoubleSupplier turn) {
+    driveTrainSubsystem = subsystem;
+    this.throttle = throttle;
+    this.turn = turn;
     // Use addRequirements() here to declare subsystem dependencies.
+    
     addRequirements(subsystem);
   }
 
@@ -35,11 +39,7 @@ public class LauncherCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      m_subsystem.spin(m_speed.getAsDouble());
-  }
-
-  public double speed() {
-    return m_speed.getAsDouble();
+    driveTrainSubsystem.arcade(throttle.getAsDouble(), turn.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.

@@ -1,7 +1,7 @@
 package frc.robot;
 
 public final class Constants {
-    public final static double LIMELIGHT_AIM_TOLERANCE = 22; // 16 on each side, 32 total
+    public final static double LIMELIGHT_AIM_TOLERANCE = 18; // 16 on each side, 32 total
     public final static int TURRET_INBOUNDS = 33000;
     public final static double SEEKING_POWER = 0.7;
     public final static double LIMELIGHT_ANGLE = 33; //measured in degrees
@@ -14,5 +14,7 @@ public final class Constants {
         public final static int LAUNCHER_FOLLOWER_PORT = 2;
 
         public final static int TURRET_PORT = 3;
+        public final static int RIGHT_PORT = 4;
+        public final static int LEFT_PORT = 5;
     }
 }

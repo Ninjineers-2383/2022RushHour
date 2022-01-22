@@ -31,23 +31,25 @@ public class RobotContainer {
 
   private Button launchButton = new Button(() -> m_driverController.getRightBumper());
 
+  //private Button JoystickX = new Button(() -> m_driverController.)
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    SmartDashboard.putNumber("Velocity", 1000.0);
+    SmartDashboard.putNumber("Launcher Velocity", 1000.0);
     SmartDashboard.putNumber("Direction", m_adjust.getTurretPower());
     
     limelight.setDefaultCommand(m_adjust);
     m_turret.setDefaultCommand(new TurretCommand(m_turret, () -> 0));
-    m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> 0));
+    m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 1000.0)));
 
   }
   
   private void configureButtonBindings() {
 
     launchButton.whenHeld( new ParallelCommandGroup(
-      new LauncherCommand (m_launcher, () -> 0 /* -108 * limelight.getY() + 11000 */), 
+      new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000), 
       (new TurretCommand(m_turret, () -> m_adjust.getTurretPower()))));
     // was 24.05x + 10500
 

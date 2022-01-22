@@ -20,7 +20,7 @@ public class LimelightSubsystem extends SubsystemBase {
   private boolean valid = false;
   private double x;
   private double y;
-  private double tolerance = 22;
+  private double tolerance = 18;
   private MedianFilter fx = new MedianFilter(5);
   private MedianFilter fy = new MedianFilter(1000);
 

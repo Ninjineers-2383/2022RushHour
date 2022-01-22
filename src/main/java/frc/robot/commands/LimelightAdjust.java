@@ -37,6 +37,7 @@ public class LimelightAdjust extends CommandBase {
   //adjust turret
   private void adjust() {
     String dir = limelight.direction();
+    double sig = (Math.pow(Math.E, -0.15*(((limelight.getX())/2)-10)));
     SmartDashboard.putString("Turret Intended Direction",dir);
     //if limelight is within tolerance, break from adjust
     if(dir.equals("Locked On")) {
@@ -55,14 +56,16 @@ public class LimelightAdjust extends CommandBase {
         //     turretPower = 0;
         //   }
         // }
-        if((limelight.getX() > 1) || (limelight.getX() < -1)) {
-          double sig = (Math.pow(Math.E, 0.1*((limelight.getX()/2)+24)));
+        if((limelight.getX() < -2)) {
           turretPower = 1/(1 + sig);
-          SmartDashboard.putNumber("Aiming", turretPower);
-          SmartDashboard.putNumber("Turret Jerking Off", sig);
-        } else {
+          SmartDashboard.putNumber("Turret Power", turretPower);
+        } else if((limelight.getX() > 2)) {
+          turretPower = -1/(1 + sig);
+          SmartDashboard.putNumber("Turret Power", turretPower);
+        }
+        else {
           turretPower = 0;
-          SmartDashboard.putNumber("Ready to shoot", turretPower);
+          SmartDashboard.putNumber("Turret Power", turretPower);
         }
     }
     else if(dir.equals("Left")) {
