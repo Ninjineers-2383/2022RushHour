@@ -6,8 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.RobotMap;
@@ -15,23 +14,27 @@ import frc.robot.Constants.RobotMap;
 
 public class DriveTrainSubsystem extends SubsystemBase {
 
-  WPI_TalonSRX   rightMotor    = new WPI_TalonSRX(RobotMap.RIGHT_DRIVE_PORT);
-  //WPI_VictorSPX   leftMasterMotor     = new WPI_VictorSPX(RobotMap.LEFT_MASTER_PORT);
-  WPI_VictorSPX leftMotor   = new WPI_VictorSPX(RobotMap.LEFT_DRIVE_PORT);
-
+  WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
+  WPI_TalonFX rightFollowerMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
+  WPI_TalonFX leftMasterMotor   = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
+  WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
+  
   private DifferentialDrive drive;
 
   /** Creates a new ExampleSubsystem. */
   public DriveTrainSubsystem() {
-    rightMotor  .setInverted(false);
-    leftMotor   .setInverted(false);
+    rightMasterMotor  .setInverted(false);
+    leftMasterMotor   .setInverted(false);
+    rightFollowerMotor.setInverted(false);
+    leftFollowerMotor .setInverted(false);
 
-    drive = new DifferentialDrive(leftMotor, rightMotor);
+    drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
     
   }
 
   public void arcade(double power, double turn){
-    drive.arcadeDrive(power, turn * 0.9);   //0.83 for team 1
+    // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
+    drive.arcadeDrive(power, turn * 0.9);
   }
 
   @Override

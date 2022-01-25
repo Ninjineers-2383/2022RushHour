@@ -11,11 +11,7 @@ public class LimelightAdjust extends CommandBase {
 
   public double turretPower = 0;
   
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  // Lie
   public LimelightAdjust(LimelightSubsystem subsystem) {
     limelight = subsystem;
     

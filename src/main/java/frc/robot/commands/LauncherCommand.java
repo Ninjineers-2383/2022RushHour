@@ -12,15 +12,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /** An example command thata uses an example subsystem. */
 public class LauncherCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  // Defines instance of the launcher subsystem from LauncherSubsystem.java
   private final LauncherSubsystem m_subsystem;
 
   private final DoubleSupplier m_speed;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
+  // In this case, a launcher command that takes in the launcher subsystem and runs launcher subsystem actions.
   public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
     m_speed = speed;
@@ -35,10 +33,12 @@ public class LauncherCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      m_subsystem.spin(m_speed.getAsDouble());
+    // see LauncherSubsystem.java for more details on how spin() method works
+    m_subsystem.spin(m_speed.getAsDouble());
   }
 
   public double speed() {
+    // a public method that returns the speed as a double
     return m_speed.getAsDouble();
   }
 

@@ -12,6 +12,8 @@ public class KickerCommand extends CommandBase {
     private final KickerSubsystem m_subsystem;
     private final DoubleSupplier m_speed;
 
+    // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
+    // In this case, a kicker command that takes in the kicker subsystem and runs kicker subsystem actions.
     public KickerCommand(KickerSubsystem subsystem, DoubleSupplier speed) {
         m_subsystem = subsystem;
         m_speed = speed;
@@ -24,6 +26,7 @@ public class KickerCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        // See KickerSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
         m_subsystem.kick(m_speed.getAsDouble());
         //m_subsystem.kickV(m_speed.getAsDouble());

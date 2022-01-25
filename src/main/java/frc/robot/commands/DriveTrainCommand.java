@@ -39,6 +39,7 @@ public class DriveTrainCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // See DriveTrainSubsystem.java for more details how the arcade() method works.
     driveTrainSubsystem.arcade(throttle.getAsDouble(), turn.getAsDouble());
   }
 
