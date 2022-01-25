@@ -21,5 +21,7 @@ public final class Constants {
         public final static int LEFT_FOLLOWER_DRIVE_PORT = 7;
 
         public final static int KICKER_PORT = 8;
+
+        public final static int CHIMNEY_PORT = 9;
     }
 }

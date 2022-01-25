@@ -15,7 +15,10 @@ public class KickerSubsystem extends SubsystemBase {
     
     // Kicker subsystem defined
     public KickerSubsystem() {
+
         kicker = new TalonSRX(RobotMap.KICKER_PORT);
+        kicker.setInverted(true);
+        
     }
 
     // method that returns a double of kicker power.

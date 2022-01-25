@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -27,6 +28,11 @@ public class DriveTrainSubsystem extends SubsystemBase {
     leftMasterMotor   .setInverted(false);
     rightFollowerMotor.setInverted(false);
     leftFollowerMotor .setInverted(false);
+
+    rightMasterMotor  .setNeutralMode(NeutralMode.Coast);
+    rightFollowerMotor.setNeutralMode(NeutralMode.Coast);
+    leftMasterMotor   .setNeutralMode(NeutralMode.Coast);
+    leftFollowerMotor .setNeutralMode(NeutralMode.Coast);
 
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
     
