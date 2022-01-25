@@ -6,7 +6,7 @@ public final class Constants {
     public final static double SEEKING_POWER = 0.7;
     public final static double LIMELIGHT_ANGLE = 33; //measured in degrees
     public final static double LIMELIGHT_FOV = 45.7;
-    public final static double LIMELIGHT_HEIGHT_DIFFERENCE = 103 - (42.0625); // height difference between limelight camera and limelight tape
+    public final static double LIMELIGHT_HEIGHT_DIFFERENCE = 103 - (42.25); // height difference between limelight camera and limelight tape
 
     public final class RobotMap {
         
