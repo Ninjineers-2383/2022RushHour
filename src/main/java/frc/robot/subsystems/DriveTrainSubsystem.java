@@ -6,20 +6,18 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.RobotMap;
 
 
 public class DriveTrainSubsystem extends SubsystemBase {
 
-  WPI_TalonSRX   rightMotor    = new WPI_TalonSRX(RobotMap.RIGHT_PORT);
+  WPI_TalonSRX   rightMotor    = new WPI_TalonSRX(RobotMap.RIGHT_DRIVE_PORT);
   //WPI_VictorSPX   leftMasterMotor     = new WPI_VictorSPX(RobotMap.LEFT_MASTER_PORT);
-  WPI_VictorSPX leftMotor   = new WPI_VictorSPX(RobotMap.LEFT_PORT);
+  WPI_VictorSPX leftMotor   = new WPI_VictorSPX(RobotMap.LEFT_DRIVE_PORT);
 
   private DifferentialDrive drive;
 

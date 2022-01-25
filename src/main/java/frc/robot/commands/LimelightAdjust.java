@@ -11,7 +11,6 @@ public class LimelightAdjust extends CommandBase {
 
   public double turretPower = 0;
   
-
   /**
    * Creates a new ExampleCommand.
    *
@@ -19,6 +18,7 @@ public class LimelightAdjust extends CommandBase {
    */
   public LimelightAdjust(LimelightSubsystem subsystem) {
     limelight = subsystem;
+    
     addRequirements(subsystem);
   }
 
@@ -41,21 +41,6 @@ public class LimelightAdjust extends CommandBase {
     SmartDashboard.putString("Turret Intended Direction",dir);
     //if limelight is within tolerance, break from adjust
     if(dir.equals("Locked On")) {
-      //System.out.println("Turret not adjusted.");
-      // if (limelight.getX() > Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
-      //   turretPower = -0.02;
-      // } else if (limelight.getX() < Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
-      //   turretPower = 0.02;
-      // }
-      // return;
-        // if((limelight.getX() > 8)&&(limelight.getX() < -8)) {
-        //   turretPower = 
-        //   if((limelight.getX() > 3) || (limelight.getX() < -3)) {
-        //     turretPower = ((limelight.getX()*limelight.getX()) - 6*(limelight.getX()) + 9)/(200);
-        //   } else {
-        //     turretPower = 0;
-        //   }
-        // }
         if((limelight.getX() < -2)) {
           turretPower = 1/(1 + sig);
           SmartDashboard.putNumber("Turret Power", turretPower);
