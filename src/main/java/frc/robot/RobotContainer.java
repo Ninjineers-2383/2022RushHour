@@ -12,6 +12,8 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
+import frc.robot.commands.ChimneyCommand;
+import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.commands.LimelightAdjust;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.DriveTrainCommand;
@@ -21,6 +23,7 @@ import frc.robot.subsystems.KickerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class RobotContainer {
 
@@ -39,6 +42,8 @@ public class RobotContainer {
 
   private final DriveTrainSubsystem m_drivetrain = new DriveTrainSubsystem();
 
+  private final ChimneySubsystem m_chimney = new ChimneySubsystem();
+
   private Button launchButton = new Button(() -> m_driverController.getRightBumper());
 
   private Button kickerButton = new Button(() -> m_driverController.getLeftBumper());
@@ -46,6 +51,8 @@ public class RobotContainer {
   private DoubleSupplier throttle = () -> m_driverController.getLeftY();
 
   private DoubleSupplier turn = () -> m_driverController.getRightX();
+
+  private DoubleSupplier chimneyPower = () -> m_driverController.getLeftTriggerAxis() - m_driverController.getRightTriggerAxis();
 
   //private Button JoystickX = new Button(() -> m_driverController.)
 
@@ -72,20 +79,23 @@ public class RobotContainer {
     // launcher default command. See LauncherCommand.java for more details on how it works.
     m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
 
+    m_chimney.setDefaultCommand(new ChimneyCommand(m_chimney, chimneyPower));    
   }
   
   private void configureButtonBindings() {
     
     // kicker button configured for testing purposes
-    kickerButton.whenHeld(new KickerCommand(m_kicker, () -> 0.5));
+    kickerButton.whenHeld(new KickerCommand(m_kicker, () -> 0.75));
 
     /* parallel command that runs the limelight adjust method that moves the turret
      and revs up the launcher command to a velocity specified in the LauncherCommand.java file. 
      Runs the kicker when target is locked on */
-    // launchButton.whenHeld( new ParallelCommandGroup(
-    //   new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000), 
-    //   (new TurretCommand(m_turret, () -> m_adjust.getTurretPower())),
-    //   (new KickerCommand(m_kicker, () -> m_kicker.getKickerPower()))));
+    // launchButton.whenHeld(new ParallelCommandGroup(
+    //   new TurretCommand(m_turret, () -> m_adjust.getTurretPower()),
+    //   new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000)
+    // ));
+
+    //launchButton.whenHeld(new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000));
 
   }
 

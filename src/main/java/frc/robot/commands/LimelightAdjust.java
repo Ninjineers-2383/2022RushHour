@@ -10,6 +10,7 @@ public class LimelightAdjust extends CommandBase {
   private final LimelightSubsystem limelight;
 
   public double turretPower = 0;
+  public double kickerPower = 0;
   
   // Lie
   public LimelightAdjust(LimelightSubsystem subsystem) {
@@ -20,6 +21,10 @@ public class LimelightAdjust extends CommandBase {
 
   public double getTurretPower() {
     return turretPower;
+  }
+
+  public double getKickerPower() {
+    return kickerPower;
   }
 
   @Override
@@ -47,6 +52,7 @@ public class LimelightAdjust extends CommandBase {
         else {
           turretPower = 0;
           SmartDashboard.putNumber("Turret Power", turretPower);
+          kickerPower = 0.5;
         }
     }
     else if(dir.equals("Left")) {

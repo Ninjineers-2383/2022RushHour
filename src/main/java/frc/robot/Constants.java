@@ -1,6 +1,8 @@
 package frc.robot;
 
 public final class Constants {
+    //Hood angle: 90-16.1 degrees
+
     public final static double LIMELIGHT_AIM_TOLERANCE = 18; // 16 on each side, 32 total
     public final static int TURRET_INBOUNDS = 33000;
     public final static double SEEKING_POWER = 0.7;

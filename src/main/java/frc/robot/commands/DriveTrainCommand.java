@@ -40,7 +40,7 @@ public class DriveTrainCommand extends CommandBase {
   @Override
   public void execute() {
     // See DriveTrainSubsystem.java for more details how the arcade() method works.
-    driveTrainSubsystem.arcade(throttle.getAsDouble(), turn.getAsDouble());
+    driveTrainSubsystem.arcade(throttle.getAsDouble() * 0.5, turn.getAsDouble() * 0.5);
   }
 
   // Called once the command ends or is interrupted.

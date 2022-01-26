@@ -50,4 +50,10 @@ public class LauncherSubsystem extends SubsystemBase {
         launcherMaster.set(ControlMode.Velocity, velocity);
       }
     }
+
+    /* =============== */
+    /* 15 FEET : 14200 */
+    /* 13 FEET : 13900 */
+    /* 10 FEET : 12000 */
+    /* =============== */
 }

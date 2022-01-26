@@ -24,15 +24,15 @@ public class DriveTrainSubsystem extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public DriveTrainSubsystem() {
-    rightMasterMotor  .setInverted(false);
+    rightMasterMotor  .setInverted(true);
     leftMasterMotor   .setInverted(false);
-    rightFollowerMotor.setInverted(false);
+    rightFollowerMotor.setInverted(true);
     leftFollowerMotor .setInverted(false);
 
-    rightMasterMotor  .setNeutralMode(NeutralMode.Coast);
-    rightFollowerMotor.setNeutralMode(NeutralMode.Coast);
-    leftMasterMotor   .setNeutralMode(NeutralMode.Coast);
-    leftFollowerMotor .setNeutralMode(NeutralMode.Coast);
+    rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
+    rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
+    leftMasterMotor   .setNeutralMode(NeutralMode.Brake);
+    leftFollowerMotor .setNeutralMode(NeutralMode.Brake);
 
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
     
