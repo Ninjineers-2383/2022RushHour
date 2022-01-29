@@ -30,7 +30,6 @@ public class KickerCommand extends CommandBase {
         // See KickerSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
         m_subsystem.kick(m_speed.getAsDouble());
-        System.out.println("Cock");
         //m_subsystem.kickV(m_speed.getAsDouble());
     }
 

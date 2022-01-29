@@ -4,19 +4,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ChimneySubsystem extends SubsystemBase {
 
     // create Chimney instance that uses a TalonSRX motor controller.
-    public TalonSRX Chimney;
+    public VictorSPX Chimney;
     public static double ChimneyPower = 0.5;
     
     // Chimney subsystem defined
     public ChimneySubsystem() {
 
-        Chimney = new TalonSRX(RobotMap.CHIMNEY_PORT);
+        Chimney = new VictorSPX(RobotMap.CHIMNEY_PORT);
         Chimney.setInverted(true);
         
     }
@@ -33,7 +33,7 @@ public class ChimneySubsystem extends SubsystemBase {
     }
     
     // method that returns nothing (void) but sets the Chimney at a set velocity.
-    public void elevateV(Double velocity) {
-        Chimney.set(ControlMode.Velocity, velocity);
-    }
+    // public void elevateV(Double velocity) {
+    //     Chimney.set(ControlMode.Velocity, velocity);
+    // }
 }

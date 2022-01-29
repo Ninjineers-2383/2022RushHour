@@ -58,7 +58,8 @@ public class RobotContainer {
 
   private DoubleSupplier turn = () -> m_driverController.getRightX();
 
-  //private DoubleSupplier chimneyPower = () -> m_operatorController.getLeftTriggerAxis() - m_operatorController.getRightTriggerAxis();
+  private Button chimneyPowerUp = new Button(() -> m_driverController.getYButton());
+  private Button chimneyPowerDown = new Button (() -> m_driverController.getAButton());
 
   private DoubleSupplier feederPower = () -> m_driverController.getLeftTriggerAxis()* 0.95 - m_driverController.getRightTriggerAxis() * 0.95;
 
@@ -87,7 +88,7 @@ public class RobotContainer {
     // launcher default command. See LauncherCommand.java for more details on how it works.
     m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
 
-    //m_chimney.setDefaultCommand(new ChimneyCommand(m_chimney, chimneyPower));   
+    m_chimney.setDefaultCommand(new ChimneyCommand(m_chimney, () -> 0));
     
     m_feeder.setDefaultCommand(new FeederCommand(m_feeder, feederPower));
   }
@@ -105,6 +106,13 @@ public class RobotContainer {
 
     // kicker button configured for testing purposes
     kickerButton.whenHeld(new KickerCommand(m_kicker, () -> 0.5));
+
+    // Y button sucks balls up chimney, while A button shoots balls down Chimney
+    // Kicker shoots down to prevent the robot from shooting the ball accidentally
+    chimneyPowerUp.whenHeld(new ParallelCommandGroup(
+      new ChimneyCommand(m_chimney, () -> 0.5),
+      new KickerCommand(m_kicker, () -> -0.35)));
+    chimneyPowerDown.whenHeld(new ChimneyCommand(m_chimney, () -> -0.5));
 
     //launchButton.whenHeld(new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000));
 
