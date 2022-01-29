@@ -58,10 +58,9 @@ public class RobotContainer {
 
   private DoubleSupplier turn = () -> m_driverController.getRightX();
 
-  private Button chimneyPowerUp = new Button(() -> m_driverController.getYButton());
-  private Button chimneyPowerDown = new Button (() -> m_driverController.getAButton());
-
   private DoubleSupplier feederPower = () -> m_driverController.getLeftTriggerAxis()* 0.95 - m_driverController.getRightTriggerAxis() * 0.95;
+
+  private double chimneyPower = feederPower.getAsDouble() * 0.75;
 
   //private Button JoystickX = new Button(() -> m_driverController.)
 
@@ -90,7 +89,11 @@ public class RobotContainer {
 
     m_chimney.setDefaultCommand(new ChimneyCommand(m_chimney, () -> 0));
     
-    m_feeder.setDefaultCommand(new FeederCommand(m_feeder, feederPower));
+    m_feeder.setDefaultCommand(new ParallelCommandGroup(
+      new FeederCommand(m_feeder, feederPower),
+      new ChimneyCommand(m_chimney, () -> chimneyPower),
+      new KickerCommand(m_kicker, () -> 0.45)
+    ));
   }
   
   private void configureButtonBindings() {
@@ -104,15 +107,19 @@ public class RobotContainer {
     //   new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0) /* -108 * limelight.getY() + 11000 */)
     // ));
 
-    // kicker button configured for testing purposes
+    // kicker button 
     kickerButton.whenHeld(new KickerCommand(m_kicker, () -> 0.5));
 
-    // Y button sucks balls up chimney, while A button shoots balls down Chimney
-    // Kicker shoots down to prevent the robot from shooting the ball accidentally
-    chimneyPowerUp.whenHeld(new ParallelCommandGroup(
-      new ChimneyCommand(m_chimney, () -> 0.5),
-      new KickerCommand(m_kicker, () -> -0.35)));
-    chimneyPowerDown.whenHeld(new ChimneyCommand(m_chimney, () -> -0.5));
+    // // Y button sucks balls up chimney, while A button shoots balls down Chimney
+    // // Kicker shoots down to prevent the robot from shooting the ball accidentally
+    // chimneyPowerUp.whenHeld(new ParallelCommandGroup(
+    //   new ChimneyCommand(m_chimney, () -> 0.7),
+    //   new KickerCommand(m_kicker, () -> -0.45)));
+
+    // chimneyPowerDown.whenHeld(new ParallelCommandGroup(
+    //   new ChimneyCommand(m_chimney, () -> -0.7),
+    //   new KickerCommand(m_kicker, () -> -0.45)
+    // ));
 
     //launchButton.whenHeld(new LauncherCommand (m_launcher, () ->  -108 * limelight.getY() + 11000));
 

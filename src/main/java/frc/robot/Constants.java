@@ -11,6 +11,10 @@ public final class Constants {
     public final static double LIMELIGHT_HEIGHT_DIFFERENCE = 103 - (42.25); // height difference between limelight camera and limelight tape
 
     public final class RobotMap {
+
+        //solenoid ports on pcm
+        public final static int SOLENOID1_PORT = 1;
+        public final static int SOLENOID2_PORT = 2;
         
         public final static int LAUNCHER_MASTER_PORT = 1;
         public final static int LAUNCHER_FOLLOWER_PORT = 2;
