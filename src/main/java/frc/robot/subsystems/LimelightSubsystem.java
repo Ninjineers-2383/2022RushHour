@@ -36,7 +36,10 @@ public class LimelightSubsystem extends SubsystemBase {
     //read values periodically
     x = fx.calculate(tx.getDouble(0.0));
     valid = tv.getDouble(1) != 0;
-    y = fy.calculate(ty.getDouble(0.0));
+    y = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
+    
+    //the line right below doesn't work for some reason, so I'm using the y value above without the filter.
+    //y = fy.calculate(ty.getDouble(0.0));
     double area = ta.getDouble(0.0);
 
     //post to smart dashboard periodically
@@ -73,7 +76,6 @@ public class LimelightSubsystem extends SubsystemBase {
   public String direction() {
     if (!valid) {
       return "Not Found";
-
     } else {
       if (x < -tolerance) {
         return "Left";

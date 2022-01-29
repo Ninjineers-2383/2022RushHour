@@ -10,21 +10,20 @@ public class LimelightAdjust extends CommandBase {
   private final LimelightSubsystem limelight;
 
   public double turretPower = 0;
-  public double kickerPower = 0;
   
-  // Lie
+
+  /**
+   * Creates a new ExampleCommand.
+   *
+   * @param subsystem The subsystem used by this command.
+   */
   public LimelightAdjust(LimelightSubsystem subsystem) {
     limelight = subsystem;
-    
     addRequirements(subsystem);
   }
 
   public double getTurretPower() {
     return turretPower;
-  }
-
-  public double getKickerPower() {
-    return kickerPower;
   }
 
   @Override
@@ -42,25 +41,39 @@ public class LimelightAdjust extends CommandBase {
     SmartDashboard.putString("Turret Intended Direction",dir);
     //if limelight is within tolerance, break from adjust
     if(dir.equals("Locked On")) {
-        if((limelight.getX() < -2)) {
+      //System.out.println("Turret not adjusted.");
+      // if (limelight.getX() > Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
+      //   turretPower = -0.02;
+      // } else if (limelight.getX() < Constants.LIMELIGHT_AIM_TOLERANCE / 2) {
+      //   turretPower = 0.02;
+      // }
+      // return;
+        // if((limelight.getX() > 8)&&(limelight.getX() < -8)) {
+        //   turretPower = 
+        //   if((limelight.getX() > 3) || (limelight.getX() < -3)) {
+        //     turretPower = ((limelight.getX()*limelight.getX()) - 6*(limelight.getX()) + 9)/(200);
+        //   } else {
+        //     turretPower = 0;
+        //   }
+        // }
+        if((limelight.getX() < -1)) {
           turretPower = 1/(1 + sig);
           SmartDashboard.putNumber("Turret Power", turretPower);
-        } else if((limelight.getX() > 2)) {
+        } else if((limelight.getX() > 1)) {
           turretPower = -1/(1 + sig);
           SmartDashboard.putNumber("Turret Power", turretPower);
         }
         else {
           turretPower = 0;
           SmartDashboard.putNumber("Turret Power", turretPower);
-          kickerPower = 0.5;
         }
     }
     else if(dir.equals("Left")) {
-      turretPower = 0.35;
+      turretPower = 0.25;
       //System.out.println("Turret adjusted left.");
     } 
     else if(dir.equals("Right")) {
-      turretPower = -0.35;
+      turretPower = -0.25;
      //System.out.println("Turret adjusted right.");
     } 
     else if(dir.equals("Not Found")) {

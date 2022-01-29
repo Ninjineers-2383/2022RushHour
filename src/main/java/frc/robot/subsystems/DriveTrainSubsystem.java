@@ -6,9 +6,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.RobotMap;
 
@@ -35,7 +37,6 @@ public class DriveTrainSubsystem extends SubsystemBase {
     leftFollowerMotor .setNeutralMode(NeutralMode.Brake);
 
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
-    
   }
 
   public void arcade(double power, double turn){
@@ -53,16 +54,38 @@ public class DriveTrainSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 
-  // Timed Auto Method
-  // public void autoDrive(double left, double right, double duration) {
-  //   rightMasterMotor.set(ControlMode.PercentOutput,   -right);
-  //   rightFollowerMotor.set(ControlMode.PercentOutput, -right);
-  //   leftMasterMotor.set(ControlMode.PercentOutput,     left);
-  //   leftFollowerMotor.set(ControlMode.PercentOutput,   left);
-  //   Timer.delay(duration); 
-  //   rightMasterMotor.set(ControlMode.PercentOutput, 0);
-  //   rightFollowerMotor.set(ControlMode.PercentOutput, 0);
-  //   leftMasterMotor.set(ControlMode.PercentOutput, 0);
-  //   leftFollowerMotor.set(ControlMode.PercentOutput, 0);
-  // }
+  public void resetEncoders() {
+		leftMasterMotor.setSelectedSensorPosition(0);
+		rightMasterMotor.setSelectedSensorPosition(0);
+  }
+
+  public double getLeftPosition() {
+		return leftMasterMotor.getSelectedSensorPosition();
+	}
+	
+	public double getRightPosition() {
+		return rightMasterMotor.getSelectedSensorPosition();
+  }
+
+  // Auto Method
+  public void drive(int left, int right, int power, int time) {
+
+    rightMasterMotor.set(ControlMode.Position, right);
+    rightFollowerMotor.set(ControlMode.Position, right);
+    leftMasterMotor.set(ControlMode.Position, left);
+    leftFollowerMotor.set(ControlMode.Position, left);
+
+    rightMasterMotor.set(power);
+    rightFollowerMotor.set(power);
+    leftMasterMotor.set(power);
+    leftFollowerMotor.set(power);
+
+    Timer.delay(time);
+
+    rightMasterMotor.set(0);
+    rightFollowerMotor.set(0);
+    leftMasterMotor.set(0);
+    leftFollowerMotor.set(0);
+    
+  }
 }

@@ -1,24 +1,23 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.KickerSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class KickerCommand extends CommandBase {
+public class FeederCommand extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 
-    private final KickerSubsystem m_subsystem;
+    private final FeederSubsystem m_subsystem;
     private final DoubleSupplier m_speed;
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
-    // In this case, a kicker command that takes in the kicker subsystem and runs kicker subsystem actions.
-    public KickerCommand(KickerSubsystem subsystem, DoubleSupplier speed) {
+    // In this case, a feeder command that takes in the feeder subsystem and runs feeder subsystem actions.
+    public FeederCommand(FeederSubsystem subsystem, DoubleSupplier speed) {
         m_subsystem = subsystem;
         m_speed = speed;
         addRequirements(subsystem);
-        System.out.println("My ass");
     } 
 
     @Override
@@ -27,10 +26,9 @@ public class KickerCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // See KickerSubsystem.java for more details.
+        // See FeederSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        m_subsystem.kick(m_speed.getAsDouble());
-        System.out.println("Cock");
+        m_subsystem.feed(m_speed.getAsDouble());
         //m_subsystem.kickV(m_speed.getAsDouble());
     }
 

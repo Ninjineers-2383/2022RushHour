@@ -6,8 +6,8 @@ public final class Constants {
     public final static double LIMELIGHT_AIM_TOLERANCE = 18; // 16 on each side, 32 total
     public final static int TURRET_INBOUNDS = 33000;
     public final static double SEEKING_POWER = 0.7;
-    public final static double LIMELIGHT_ANGLE = 33; //measured in degrees
-    public final static double LIMELIGHT_FOV = 45.7;
+    public final static double LIMELIGHT_ANGLE = 31; // measured in degrees
+    public final static double LIMELIGHT_FOV = 45.7; // degrees
     public final static double LIMELIGHT_HEIGHT_DIFFERENCE = 103 - (42.25); // height difference between limelight camera and limelight tape
 
     public final class RobotMap {
@@ -25,5 +25,8 @@ public final class Constants {
         public final static int KICKER_PORT = 8;
 
         public final static int CHIMNEY_PORT = 9;
+
+        public final static int FRONT_FEEDER_PORT = 10;
+        public final static int BACK_FEEDER_PORT = 11;
     }
 }

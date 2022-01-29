@@ -20,8 +20,10 @@ public class LauncherSubsystem extends SubsystemBase {
 
     // Launcher Subsystem is created. Set parameters like port value, mode, inversion, and follows are defined here.
     public LauncherSubsystem() {
+
       launcherMaster = new WPI_TalonFX(RobotMap.LAUNCHER_MASTER_PORT);
       launcherFollower = new WPI_TalonFX(RobotMap.LAUNCHER_FOLLOWER_PORT);
+
       launcherMaster.setNeutralMode(NeutralMode.Coast);
       launcherFollower.setNeutralMode(NeutralMode.Coast);
 
@@ -51,9 +53,9 @@ public class LauncherSubsystem extends SubsystemBase {
       }
     }
 
-    /* =============== */
-    /* 15 FEET : 14200 */
-    /* 13 FEET : 13900 */
-    /* 10 FEET : 12000 */
-    /* =============== */
+    /* ========================= */
+    /* -1.10548496 ANGLE : 13000 */
+    /*  1.76843929 ANGLE :  */
+    /*  ANGLE : 12000 */
+    /* ========================= */
 }

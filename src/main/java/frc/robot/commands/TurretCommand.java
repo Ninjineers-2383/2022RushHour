@@ -30,11 +30,11 @@ public class TurretCommand extends CommandBase {
         // 1 degree of rotation = 145.695364 ticks
         if (m_subsystem.getCurrentPosition() > Constants.TURRET_INBOUNDS) {
             SmartDashboard.putString("Hello", "am Turning");
-            m_subsystem.turn(0.1);
+            m_subsystem.turn(0.2);
             range = 1;
         } else if (m_subsystem.getCurrentPosition() < -Constants.TURRET_INBOUNDS) {
             SmartDashboard.putString("Wassup", "Am also turning");
-            m_subsystem.turn(-0.1);
+            m_subsystem.turn(-0.2);
             range = -1;
         } else {
             SmartDashboard.putString("fUcK yOu", "Brian suck a dik");
