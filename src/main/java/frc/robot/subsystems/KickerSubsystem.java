@@ -5,19 +5,18 @@ import frc.robot.Constants.RobotMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class KickerSubsystem extends SubsystemBase {
 
     // create kicker instance that uses a TalonSRX motor controller.
-    public TalonSRX kicker;
+    private TalonSRX kicker = new TalonSRX(RobotMap.KICKER_PORT);
 
     // Kicker subsystem defined
     public KickerSubsystem() {
-
-        kicker = new TalonSRX(RobotMap.KICKER_PORT);
         kicker.setInverted(true);
-        
+        kicker.setNeutralMode(NeutralMode.Brake);
     }
 
     @Override

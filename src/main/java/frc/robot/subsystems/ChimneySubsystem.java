@@ -9,31 +9,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ChimneySubsystem extends SubsystemBase {
 
-    // create Chimney instance that uses a TalonSRX motor controller.
-    public TalonSRX Chimney;
-    public static double ChimneyPower = 0.5;
+    // create motor instance that uses a TalonSRX motor controller.
+    private final TalonSRX Motor;
     
-    // Chimney subsystem defined
+    // Chimney subsystem constructor
     public ChimneySubsystem() {
-
-        Chimney = new TalonSRX(RobotMap.CHIMNEY_PORT);
-        Chimney.setInverted(true);
+        Motor = new TalonSRX(RobotMap.CHIMNEY_PORT);
+        Motor.setInverted(true);
         
     }
 
-    // method that returns a double of Chimney power.
-    public double getChimneyPower() {
-        SmartDashboard.putNumber("Chimney Power", ChimneyPower);
-        return ChimneyPower;
-      }
-
-    // method that returns nothing (void) but sets the kiceer at a set power in the inverval of [-1, 1]
-    public void elevateP(Double power) {
-        Chimney.set(ControlMode.PercentOutput, power);
+    // method that returns nothing (void) but sets the kicker at a set power in the inverval of [-1, 1]
+    public void setPower(Double power) {
+        Motor.set(ControlMode.PercentOutput, power);
+        SmartDashboard.putNumber("Chimney Power", power);
     }
-    
-    // method that returns nothing (void) but sets the Chimney at a set velocity.
-    // public void elevateV(Double velocity) {
-    //     Chimney.set(ControlMode.Velocity, velocity);
-    // }
 }

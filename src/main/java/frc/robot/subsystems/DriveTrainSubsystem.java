@@ -17,19 +17,19 @@ import frc.robot.Constants.RobotMap;
 
 public class DriveTrainSubsystem extends SubsystemBase {
 
-  WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
-  WPI_TalonFX rightFollowerMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
-  WPI_TalonFX leftMasterMotor   = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
-  WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
+  private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
+  private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
+  private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
+  private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
   
   private DifferentialDrive drive;
 
-  /** Creates a new ExampleSubsystem. */
   public DriveTrainSubsystem() {
     rightMasterMotor  .setInverted(true);
-    leftMasterMotor   .setInverted(false);
     rightFollowerMotor.setInverted(true);
+    leftMasterMotor   .setInverted(false);
     leftFollowerMotor .setInverted(false);
+
 
     rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
     rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
