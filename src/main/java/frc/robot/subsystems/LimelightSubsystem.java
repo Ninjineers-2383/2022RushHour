@@ -46,6 +46,11 @@ public class LimelightSubsystem extends SubsystemBase {
         return targetY;
     }
 
+    
+    public boolean getTargetVisible() {
+        return targetValid;
+    }
+
 
     //returns direction to move ring turret; i.e. if right is returned, turret must turn right.
     public String direction() {
