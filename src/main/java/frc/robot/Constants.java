@@ -9,32 +9,40 @@ public final class Constants {
 
     //Hood angle: 90-16.1 degrees
     public final static class Turret {
-        public final static int TURRET_INBOUNDS = 33000;
+        public final static int PORT = 3;
+        public final static int BOUNDS = 33000;
         public final static double SEEKING_POWER = 0.7;
     } 
-    
-    
-    public final static class RobotMap {
 
+
+    public final static class Drivetrain {
+        public final static int RIGHT_MASTER_PORT = 4;
+        public final static int LEFT_MASTER_PORT = 5;
+        public final static int RIGHT_FOLLOWER_PORT = 6;
+        public final static int LEFT_FOLLOWER_PORT = 7;
+    }
+
+
+    public final static class Launcher {
+        public final static int MASTER_PORT = 1;
+        public final static int FOLLOWER_PORT = 2;
+    }
+
+    public final static class Intake {
         //solenoid ports on pcm
-        public final static int SOLENOID1_PORT = 1;
-        public final static int SOLENOID2_PORT = 2;
-        
-        public final static int LAUNCHER_MASTER_PORT = 1;
-        public final static int LAUNCHER_FOLLOWER_PORT = 2;
+        public final static int FRONT_SOLENOID_PORT = 1;
+        public final static int REAR_SOLENOID_PORT = 2;
+        public final static int FRONT_INTAKE_PORT = 10;
+        public final static int REAR_INTAKE_PORT = 11;
+    }
 
-        public final static int TURRET_PORT = 3;
 
-        public final static int RIGHT_MASTER_DRIVE_PORT = 4;
-        public final static int LEFT_MASTER_DRIVE_PORT = 5;
-        public final static int RIGHT_FOLLOWER_DRIVE_PORT = 6;
-        public final static int LEFT_FOLLOWER_DRIVE_PORT = 7;
+    public final static class Kicker {
+        public final static int PORT = 8;
+    }
+    
 
-        public final static int KICKER_PORT = 8;
-
-        public final static int CHIMNEY_PORT = 9;
-
-        public final static int FRONT_FEEDER_PORT = 10;
-        public final static int BACK_FEEDER_PORT = 11;
+    public final static class Chimney {
+        public final static int PORT = 9;
     }
 }

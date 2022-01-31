@@ -1,48 +1,70 @@
 package frc.robot.commands;
 
-import frc.robot.Constants.Limelight;
-import frc.robot.subsystems.LimelightSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class LimelightAdjust extends CommandBase {
+import frc.robot.Constants.Limelight;
+import frc.robot.subsystems.LimelightSubsystem;
+
+
+public class LimelightCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  
   private final LimelightSubsystem limelight;
-  private final TurretSubsystem turret;
+
+  private double turretPower = 0;
+
+  private boolean turretSeek = false;
+
+  private boolean kickerOn = false;
   
 
-  public LimelightAdjust(LimelightSubsystem limelight, TurretSubsystem turret) {
+  public LimelightCommand(LimelightSubsystem limelight) {
     this.limelight = limelight;
-    this.turret = turret;
     addRequirements(limelight);
-    addRequirements(turret);
   }
   
 
   @Override
   public void execute() {
     double sig = (Math.pow(Math.E, -0.15*(((limelight.getX())/2)-10)));
-
+    kickerOn = false;
+    turretSeek = false;
     if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on left
-      turret.setPower(0.25);
+      turretPower = 0.25;
     } else if(limelight.getX() > Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on right
-      turret.setPower(-0.25);
+      turretPower = -0.25;
     } else if(limelight.getTargetVisible()) {
       // target in center
         if((limelight.getX() < -1)) {
-          turret.setPower(1/(1 + sig));
+          turretPower = 1/(1 + sig);
         } else if((limelight.getX() > 1)) {
-          turret.setPower(-1/(1 + sig));
+          turretPower = -1/(1 + sig);
         }
         else {
-          turret.setPower(0.0);
+          turretPower = 0.0;
+          kickerOn = true;
         }
 
     } else  {
       // no target present
-      turret.seek();
+      turretSeek = true;
     }
+  }
+
+
+  public double getTurretPower() {
+    return turretPower;
+  }
+
+
+  public boolean getTurretSeek() {
+    return turretSeek;
+  }
+
+
+  public boolean getKickerOn() {
+    return kickerOn;
   }
 }
