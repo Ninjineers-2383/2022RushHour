@@ -4,7 +4,7 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.DoubleSupplier;
 
@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 
 /** An example command that uses an example subsystem. */
-public class DriveTrainCommand extends CommandBase {
+public class Drivetrain extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final DriveTrainSubsystem driveTrainSubsystem;
+  private final DrivetrainSubsystem drivetrainSubsystem;
   private DoubleSupplier throttle;
   private DoubleSupplier turn;
 
@@ -23,8 +23,8 @@ public class DriveTrainCommand extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public DriveTrainCommand(DriveTrainSubsystem subsystem, DoubleSupplier throttle, DoubleSupplier turn) {
-    driveTrainSubsystem = subsystem;
+  public Drivetrain(DrivetrainSubsystem subsystem, DoubleSupplier throttle, DoubleSupplier turn) {
+    drivetrainSubsystem = subsystem;
     this.throttle = throttle;
     this.turn = turn;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -40,7 +40,7 @@ public class DriveTrainCommand extends CommandBase {
   @Override
   public void execute() {
     // See DriveTrainSubsystem.java for more details how the arcade() method works.
-    driveTrainSubsystem.arcade(throttle.getAsDouble() * 0.5, turn.getAsDouble() * 0.5);
+    drivetrainSubsystem.arcade(throttle.getAsDouble() * 0.5, turn.getAsDouble() * 0.5);
   }
 
   // Called once the command ends or is interrupted.

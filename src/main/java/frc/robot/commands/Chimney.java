@@ -6,7 +6,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ChimneyCommand extends CommandBase {
+public class Chimney extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 
     private final ChimneySubsystem m_subsystem;
@@ -14,7 +14,7 @@ public class ChimneyCommand extends CommandBase {
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs Chimney subsystem actions.
-    public ChimneyCommand(ChimneySubsystem subsystem, DoubleSupplier speed) {
+    public Chimney(ChimneySubsystem subsystem, DoubleSupplier speed) {
         m_subsystem = subsystem;
         m_speed = speed;
         addRequirements(subsystem);

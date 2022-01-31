@@ -15,8 +15,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import frc.robot.Constants.RobotMap;
 
 
-public class DriveTrainSubsystem extends SubsystemBase {
-
+public class DrivetrainSubsystem extends SubsystemBase {
   private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
   private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(RobotMap.RIGHT_MASTER_DRIVE_PORT);
   private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(RobotMap.LEFT_MASTER_DRIVE_PORT);
@@ -24,12 +23,11 @@ public class DriveTrainSubsystem extends SubsystemBase {
   
   private DifferentialDrive drive;
 
-  public DriveTrainSubsystem() {
+  public DrivetrainSubsystem() {
     rightMasterMotor  .setInverted(true);
     rightFollowerMotor.setInverted(true);
     leftMasterMotor   .setInverted(false);
     leftFollowerMotor .setInverted(false);
-
 
     rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
     rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
@@ -39,34 +37,7 @@ public class DriveTrainSubsystem extends SubsystemBase {
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
   }
 
-  public void arcade(double power, double turn){
-    // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
-    drive.arcadeDrive(power, turn * 0.9);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per schedsuler run
-  }
-
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-  }
-
-  public void resetEncoders() {
-		leftMasterMotor.setSelectedSensorPosition(0);
-		rightMasterMotor.setSelectedSensorPosition(0);
-  }
-
-  public double getLeftPosition() {
-		return leftMasterMotor.getSelectedSensorPosition();
-	}
-	
-	public double getRightPosition() {
-		return rightMasterMotor.getSelectedSensorPosition();
-  }
-
+  
   // Auto Method
   public void drive(int left, int right, int power, int time) {
 
@@ -87,5 +58,27 @@ public class DriveTrainSubsystem extends SubsystemBase {
     leftMasterMotor.set(0);
     leftFollowerMotor.set(0);
     
+  }
+
+
+  public void arcade(double power, double turn){
+    // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
+    drive.arcadeDrive(power, turn * 0.9);
+  }
+
+
+  public void zeroEncoders() {
+		leftMasterMotor.setSelectedSensorPosition(0);
+		rightMasterMotor.setSelectedSensorPosition(0);
+  }
+  
+  
+  public double getLeftPosition() {
+		return leftMasterMotor.getSelectedSensorPosition();
+	}
+	
+
+	public double getRightPosition() {
+		return rightMasterMotor.getSelectedSensorPosition();
   }
 }

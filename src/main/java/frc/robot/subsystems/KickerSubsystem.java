@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+
 public class KickerSubsystem extends SubsystemBase {
 
     // create kicker instance that uses a TalonSRX motor controller.

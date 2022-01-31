@@ -1,16 +1,20 @@
 package frc.robot;
 
+
 public final class Constants {
+
+    public final static class Limelight {
+        public final static double LIMELIGHT_AIM_TOLERANCE = 18;
+    }
+
     //Hood angle: 90-16.1 degrees
-
-    public final static double LIMELIGHT_AIM_TOLERANCE = 18; // 16 on each side, 32 total
-    public final static int TURRET_INBOUNDS = 33000;
-    public final static double SEEKING_POWER = 0.7;
-    public final static double LIMELIGHT_ANGLE = 31; // measured in degrees
-    public final static double LIMELIGHT_FOV = 45.7; // degrees
-    public final static double LIMELIGHT_HEIGHT_DIFFERENCE = 103 - (42.25); // height difference between limelight camera and limelight tape
-
-    public final class RobotMap {
+    public final static class Turret {
+        public final static int TURRET_INBOUNDS = 33000;
+        public final static double SEEKING_POWER = 0.7;
+    } 
+    
+    
+    public final static class RobotMap {
 
         //solenoid ports on pcm
         public final static int SOLENOID1_PORT = 1;

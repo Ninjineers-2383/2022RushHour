@@ -12,20 +12,19 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.ChimneyCommand;
+import frc.robot.commands.Chimney;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.commands.LimelightAdjust;
 import frc.robot.subsystems.LauncherSubsystem;
-import frc.robot.commands.DriveTrainCommand;
+import frc.robot.commands.Drivetrain;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.FeederCommand;
-import frc.robot.subsystems.DriveTrainSubsystem;
+import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class RobotContainer {
 
@@ -44,13 +43,11 @@ public class RobotContainer {
 
   private final KickerSubsystem m_kicker = new KickerSubsystem();
 
-  private final DriveTrainSubsystem m_drivetrain = new DriveTrainSubsystem();
+  private final DrivetrainSubsystem m_drivetrain = new DrivetrainSubsystem();
 
   private final ChimneySubsystem m_chimney = new ChimneySubsystem();
 
   private final FeederSubsystem m_feeder = new FeederSubsystem();
-
-  private Button launchButton = new Button(() -> m_driverController.getRightBumper());
 
   private Button kickerButton = new Button(() -> m_driverController.getLeftBumper());
 
@@ -73,7 +70,7 @@ public class RobotContainer {
 
     /* Driving method. Default command will suffice, 
     as setting multiple commands when it is in use or not is unnecessary and overcomplicated. */
-    m_drivetrain.setDefaultCommand(new DriveTrainCommand(m_drivetrain, throttle, turn));
+    m_drivetrain.setDefaultCommand(new Drivetrain(m_drivetrain, throttle, turn));
     
     // Limelight default command. See LimelightAdjust.java -> public void adjust() for more details on how it works.
     limelight.setDefaultCommand(m_adjust);
@@ -87,11 +84,11 @@ public class RobotContainer {
     // launcher default command. See LauncherCommand.java for more details on how it works.
     m_launcher.setDefaultCommand(new LauncherCommand (m_launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
 
-    m_chimney.setDefaultCommand(new ChimneyCommand(m_chimney, () -> 0));
+    m_chimney.setDefaultCommand(new Chimney(m_chimney, () -> 0));
     
     m_feeder.setDefaultCommand(new ParallelCommandGroup(
       new FeederCommand(m_feeder, feederPower),
-      new ChimneyCommand(m_chimney, () -> chimneyPower),
+      new Chimney(m_chimney, () -> chimneyPower),
       new KickerCommand(m_kicker, () -> 0.45)
     ));
   }

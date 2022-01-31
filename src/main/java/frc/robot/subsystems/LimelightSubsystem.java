@@ -6,7 +6,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class LimelightSubsystem extends SubsystemBase {
 
@@ -49,20 +48,5 @@ public class LimelightSubsystem extends SubsystemBase {
     
     public boolean getTargetVisible() {
         return targetValid;
-    }
-
-
-    //returns direction to move ring turret; i.e. if right is returned, turret must turn right.
-    public String direction() {
-        if (!targetValid) {
-            return "Not Found";
-        } else {
-            if (targetX < -Constants.LIMELIGHT_AIM_TOLERANCE) {
-                return "Left";
-            } else if (targetX > Constants.LIMELIGHT_AIM_TOLERANCE) {
-                return "Right";
-            }
-            return "Locked On";
-        }
     }
 }
