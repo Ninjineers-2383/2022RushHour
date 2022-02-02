@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -16,6 +17,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
   private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
   private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+
+  SlewRateLimiter throttleF = new SlewRateLimiter(2);
+  SlewRateLimiter turnF = new SlewRateLimiter(2);
   
   private DifferentialDrive drive;
 
@@ -31,12 +35,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
     leftMasterMotor   .setNeutralMode(NeutralMode.Brake);
     leftFollowerMotor .setNeutralMode(NeutralMode.Brake);
 
+    rightFollowerMotor.follow(rightMasterMotor);
+    leftFollowerMotor .follow(leftMasterMotor);
+
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
   }
 
   // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
   public void drive(double power, double turn){
-    drive.arcadeDrive(power, turn * 0.9);
+    drive.arcadeDrive(throttleF.calculate(power), turnF.calculate(turn * 0.9));
   }
   // autonomous driving
   public void drive(int left, int right, int power, int time) {

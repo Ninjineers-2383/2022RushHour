@@ -18,11 +18,11 @@ public class IntakeCommand extends CommandBase {
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
     // In this case, a feeder command that takes in the feeder subsystem and runs feeder subsystem actions.
-    public IntakeCommand(IntakeSubsystem intake, DoubleSupplier power) {
+    public IntakeCommand(IntakeSubsystem intake, DoubleSupplier power, boolean frontDown, boolean rearDown) {
         this.intake = intake;
         this.power = power;
-        this.frontDown = false;
-        this.rearDown = false;
+        this.frontDown = frontDown;
+        this.rearDown = rearDown;
         addRequirements(intake);
     } 
 

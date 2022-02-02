@@ -35,7 +35,8 @@ public class RobotContainer {
 
   private DoubleSupplier throttle = () -> driverController.getLeftY();
   private DoubleSupplier turn = () -> driverController.getRightX();
-  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
+  private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
+  private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.7;
   
   private Button launchButton = new Button(() -> driverController.getRightBumper());
   private Button frontIntakeButton = new Button(() -> operatorController.getRightBumper());
@@ -49,7 +50,7 @@ public class RobotContainer {
   private final IntakeSubsystem intake = new IntakeSubsystem();
   
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
-  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -63,8 +64,9 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> 0));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
     intake.setDefaultCommand(intakeCommand);
+
   }
   
   private void configureButtonBindings() {
@@ -75,8 +77,8 @@ public class RobotContainer {
 
     launchButton.whileHeld(new ParallelCommandGroup(
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand (launcher, () -> -108 * limelight.getY() + 11000),
-      new IndexerCommand(indexer, () -> aimCommand.getKickerOn() ? 0.5: 0)));
+      new LauncherCommand (launcher, () -> -108 * limelight.getY() + 13000),
+      new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
     
     // toggles that run when the intakes needs to be lowered
     frontIntakeButton.toggleWhenPressed(
