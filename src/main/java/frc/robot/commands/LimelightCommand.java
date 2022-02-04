@@ -27,7 +27,7 @@ public class LimelightCommand extends CommandBase {
   @Override
   public void execute() {
     double Psig = (Math.pow(Math.E, -0.15*((limelight.getX()/2)-12)));
-    double Nsig = (Math.pow(Math.E, -0.15*((-limelight.getX()/2)-12)));
+    double Nsig = (Math.pow(Math.E, -0.15*(((-limelight.getX())/2)-12)));
     kickerOn = false;
     turretSeek = false;
     if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
@@ -38,9 +38,9 @@ public class LimelightCommand extends CommandBase {
       turretPower = -0.25;
     } else if(limelight.getTargetVisible()) {
       // target in center
-        if((limelight.getX() < -1)) {
+        if((limelight.getX() < -2)) {
           turretPower = 1/(1 + Psig);
-        } else if((limelight.getX() > 1)) {
+        } else if((limelight.getX() > 2)) {
           turretPower = -1/(1 + Nsig);
         }
         else {

@@ -3,6 +3,8 @@ package frc.robot;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.*;
@@ -28,20 +30,29 @@ import frc.robot.subsystems.IndexerSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here, as well as controllers
-  private final LimelightSubsystem limelight = new LimelightSubsystem();
-
   final XboxController driverController = new XboxController(0);
   final XboxController operatorController = new XboxController(1);
 
   private DoubleSupplier throttle = () -> driverController.getLeftY();
   private DoubleSupplier turn = () -> driverController.getRightX();
-  private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
-  private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.7;
+  // private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
+  // private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
   
-  private Button launchButton = new Button(() -> driverController.getRightBumper());
-  private Button frontIntakeButton = new Button(() -> operatorController.getRightBumper());
-  private Button rearIntakeButton = new Button(() -> operatorController.getLeftBumper());
+  // private Button launchButton = new Button(() -> driverController.getRightBumper());
+  // private Button frontIntakeButton = new Button(() -> operatorController.getRightBumper());
+  // private Button rearIntakeButton = new Button(() -> operatorController.getLeftBumper());
 
+  final Trigger drive = new JoystickButton(driverController, XboxController.Axis.kLeftY.value)
+  .or(new JoystickButton(driverController, XboxController.Axis.kRightX.value));
+  //final JoystickButton turn = new JoystickButton(driverController, XboxController.Axis.kRightX.value);
+  final Trigger In = new JoystickButton(operatorController, XboxController.Axis.kRightTrigger.value);
+  final Trigger Out = new JoystickButton(operatorController, XboxController.Axis.kLeftTrigger.value);
+  
+  final JoystickButton launchButton = new JoystickButton(driverController, 6);
+  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, 5);
+  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, 6);
+
+  private final LimelightSubsystem limelight = new LimelightSubsystem();
   private final LauncherSubsystem launcher = new LauncherSubsystem();
   private final TurretSubsystem turret = new TurretSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
@@ -50,10 +61,10 @@ public class RobotContainer {
   private final IntakeSubsystem intake = new IntakeSubsystem();
   
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
-  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake, () -> 0, false, false);
   
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /* The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
@@ -64,7 +75,7 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> 0));
     intake.setDefaultCommand(intakeCommand);
 
   }
@@ -75,18 +86,30 @@ public class RobotContainer {
     launcher rev
     launching a ball on target lock */
 
+    drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
+
     launchButton.whileHeld(new ParallelCommandGroup(
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand (launcher, () -> -108 * limelight.getY() + 13000),
+      new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
       new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
-    
+
+    In.whenActive(new ParallelCommandGroup(
+      new IntakeCommand(intake, () -> operatorController.getRightTriggerAxis(), true, true),
+      new ChimneyCommand(chimney, () -> operatorController.getRightTriggerAxis()
+      )));
+
+    Out.whenActive(new ParallelCommandGroup(
+      new IntakeCommand(intake, () -> -operatorController.getLeftTriggerAxis(), true, true),
+      new ChimneyCommand(chimney, () -> -operatorController.getLeftTriggerAxis())
+      ));
+
     // toggles that run when the intakes needs to be lowered
-    frontIntakeButton.toggleWhenPressed(
+    lowerFrontFeeder.toggleWhenPressed(
       new StartEndCommand(
         () -> intakeCommand.setFrontDown(true), 
         () -> intakeCommand.setFrontDown(false)));
 
-    rearIntakeButton.toggleWhenPressed(
+    lowerBackFeeder.toggleWhenPressed(
       new StartEndCommand(
         () -> intakeCommand.setRearDown(true), 
         () -> intakeCommand.setRearDown(false)));
@@ -96,3 +119,9 @@ public class RobotContainer {
     return null;
   }
 }
+
+// tu = 210
+// ku = 0.14
+// P = 0.084
+// I = 0.0008
+// D = 2.205
