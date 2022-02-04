@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.XboxController;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -12,7 +13,7 @@ import frc.robot.Constants.Turret;
 public class TurretSubsystem extends SubsystemBase{
     private TalonSRX motor = new TalonSRX(Turret.PORT);
     private boolean side = false;
-
+    final XboxController driverController = new XboxController(0);
 
     @Override
     public void periodic(){
@@ -27,8 +28,6 @@ public class TurretSubsystem extends SubsystemBase{
 
 
     public void setPower(Double power) {
-        SmartDashboard.putNumber("446pm", power);
-        System.out.println("aaaaa");
         if (getCurrentPosition() > Turret.BOUNDS) {
             power = 0.2;
             this.side = true;

@@ -45,10 +45,10 @@ public class RobotContainer {
   final Trigger drive = new JoystickButton(driverController, XboxController.Axis.kLeftY.value)
   .or(new JoystickButton(driverController, XboxController.Axis.kRightX.value));
   //final JoystickButton turn = new JoystickButton(driverController, XboxController.Axis.kRightX.value);
-  final Trigger In = new JoystickButton(operatorController, XboxController.Axis.kRightTrigger.value);
-  final Trigger Out = new JoystickButton(operatorController, XboxController.Axis.kLeftTrigger.value);
+  final Trigger In = new JoystickButton(driverController, 3);
+  final Trigger Out = new JoystickButton(driverController, 2);
   
-  final JoystickButton launchButton = new JoystickButton(driverController, 6);
+  final JoystickButton launchButton = new JoystickButton(driverController, 1);
   final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, 5);
   final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, 6);
 
@@ -86,23 +86,24 @@ public class RobotContainer {
     launcher rev
     launching a ball on target lock */
 
-    drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
+    // drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
 
     // launchButton.whileHeld(new ParallelCommandGroup(
-    //   new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+    //   //new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
     //   new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
     //   new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
 
-    launchButton.whileHeld(new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()));
+    
+    //  launchButton.whileHeld(new ChimneyCommand(chimney, () -> 0.5));
 
     In.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, () -> operatorController.getRightTriggerAxis(), true, true),
-      new ChimneyCommand(chimney, () -> operatorController.getRightTriggerAxis()
+      new IntakeCommand(intake, () -> driverController.getRightTriggerAxis(), true, true),
+      new ChimneyCommand(chimney, () -> driverController.getRightTriggerAxis()
       )));
 
     Out.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, () -> -operatorController.getLeftTriggerAxis(), true, true),
-      new ChimneyCommand(chimney, () -> -operatorController.getLeftTriggerAxis())
+      new IntakeCommand(intake, () -> -driverController.getLeftTriggerAxis(), true, true),
+      new ChimneyCommand(chimney, () -> -driverController.getLeftTriggerAxis())
       ));
 
     // toggles that run when the intakes needs to be lowered
