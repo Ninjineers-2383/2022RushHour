@@ -27,6 +27,8 @@ public class TurretSubsystem extends SubsystemBase{
 
 
     public void setPower(Double power) {
+        SmartDashboard.putNumber("446pm", power);
+        System.out.println("aaaaa");
         if (getCurrentPosition() > Turret.BOUNDS) {
             power = 0.2;
             this.side = true;

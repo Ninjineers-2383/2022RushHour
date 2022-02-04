@@ -33,8 +33,8 @@ public class RobotContainer {
   final XboxController driverController = new XboxController(0);
   final XboxController operatorController = new XboxController(1);
 
-  private DoubleSupplier throttle = () -> driverController.getLeftY();
-  private DoubleSupplier turn = () -> driverController.getRightX();
+  private DoubleSupplier throttle = () -> driverController.getLeftY() * .5;
+  private DoubleSupplier turn = () -> driverController.getRightX() * .5;
   // private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
   // private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
   
@@ -88,10 +88,12 @@ public class RobotContainer {
 
     drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
 
-    launchButton.whileHeld(new ParallelCommandGroup(
-      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
-      new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
+    // launchButton.whileHeld(new ParallelCommandGroup(
+    //   new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+    //   new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
+    //   new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
+
+    launchButton.whileHeld(new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()));
 
     In.whenActive(new ParallelCommandGroup(
       new IntakeCommand(intake, () -> operatorController.getRightTriggerAxis(), true, true),
@@ -104,15 +106,15 @@ public class RobotContainer {
       ));
 
     // toggles that run when the intakes needs to be lowered
-    lowerFrontFeeder.toggleWhenPressed(
-      new StartEndCommand(
-        () -> intakeCommand.setFrontDown(true), 
-        () -> intakeCommand.setFrontDown(false)));
+    // lowerFrontFeeder.toggleWhenPressed(
+    //   new StartEndCommand(
+    //     () -> intakeCommand.setFrontDown(true), 
+    //     () -> intakeCommand.setFrontDown(false)));
 
-    lowerBackFeeder.toggleWhenPressed(
-      new StartEndCommand(
-        () -> intakeCommand.setRearDown(true), 
-        () -> intakeCommand.setRearDown(false)));
+    // lowerBackFeeder.toggleWhenPressed(
+    //   new StartEndCommand(
+    //     () -> intakeCommand.setRearDown(true), 
+    //     () -> intakeCommand.setRearDown(false)));
     }
 
   public Command getAutonomousCommand() {
