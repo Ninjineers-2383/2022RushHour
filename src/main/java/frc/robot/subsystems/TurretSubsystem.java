@@ -28,11 +28,11 @@ public class TurretSubsystem extends SubsystemBase{
 
 
     public void setPower(Double power) {
-        if (getCurrentPosition() > Turret.BOUNDS) {
-            power = 0.2;
-            this.side = true;
-        } else if (getCurrentPosition() <= 0) {
+        if (getCurrentPosition() < -Turret.BOUNDS) {
             power = -0.2;
+            this.side = true;
+        } else if (getCurrentPosition() >= 0) {
+            power = 0.2;
             this.side = false;
         }
         motor.set(ControlMode.PercentOutput, power);
@@ -42,7 +42,7 @@ public class TurretSubsystem extends SubsystemBase{
 
     // Rotates til side flips, then rotates other direction
     public void seek() {
-        setPower(this.side ? 1:-1 * Turret.SEEKING_POWER);
+        setPower(this.side ? -1:1 * Turret.SEEKING_POWER);
     }
 
     

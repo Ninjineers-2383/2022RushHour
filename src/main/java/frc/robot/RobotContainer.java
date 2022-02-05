@@ -29,29 +29,28 @@ import frc.robot.subsystems.IndexerSubsystem;
 
 public class RobotContainer {
 
-  // The robot's subsystems and commands are defined here, as well as controllers
+  // Controllers and ports
   final XboxController driverController = new XboxController(0);
   final XboxController operatorController = new XboxController(1);
 
-  private DoubleSupplier throttle = () -> driverController.getLeftY() * .5;
-  private DoubleSupplier turn = () -> driverController.getRightX() * .5;
-  // private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
-  // private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
-  
-  // private Button launchButton = new Button(() -> driverController.getRightBumper());
-  // private Button frontIntakeButton = new Button(() -> operatorController.getRightBumper());
-  // private Button rearIntakeButton = new Button(() -> operatorController.getLeftBumper());
+  // Defining doublesuppliers that we will use for axis
+  private DoubleSupplier throttle = () -> driverController.getLeftY();
+  private DoubleSupplier turn = () -> driverController.getRightX();
+  private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
+  private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
 
-  final Trigger drive = new JoystickButton(driverController, XboxController.Axis.kLeftY.value)
-  .or(new JoystickButton(driverController, XboxController.Axis.kRightX.value));
-  //final JoystickButton turn = new JoystickButton(driverController, XboxController.Axis.kRightX.value);
-  final Trigger In = new JoystickButton(driverController, 3);
-  final Trigger Out = new JoystickButton(driverController, 2);
+  // Defining trigger classes for drive and feed (analog inputs)
+  final Trigger drive = new JoystickButton(driverController, Axis.kLeftY.value)
+  .or(new JoystickButton(driverController, Axis.kRightX.value));
+  final Trigger intakeTrigger = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
+  .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
   
-  final JoystickButton launchButton = new JoystickButton(driverController, 1);
-  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, 5);
-  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, 6);
+  // defining joystick buttons for other subsystems (digital input)
+  final JoystickButton launchButton = new JoystickButton(driverController, Button.kRightBumper.value);
+  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
+  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
 
+  // defining subsystems
   private final LimelightSubsystem limelight = new LimelightSubsystem();
   private final LauncherSubsystem launcher = new LauncherSubsystem();
   private final TurretSubsystem turret = new TurretSubsystem();
@@ -60,8 +59,9 @@ public class RobotContainer {
   private final ChimneySubsystem chimney = new ChimneySubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
   
+  // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
-  private final IntakeCommand intakeCommand = new IntakeCommand(intake, () -> 0, false, false);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   
 
   /* The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -70,6 +70,7 @@ public class RobotContainer {
     configureButtonBindings();
     SmartDashboard.putNumber("Launcher Velocity", 0.0);
 
+    // default commands for functions
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
     limelight.setDefaultCommand(aimCommand);
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
@@ -81,41 +82,33 @@ public class RobotContainer {
   }
   
   private void configureButtonBindings() {
+    // drive buttons
+    drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
+
     /* parallel command that runs:
     turret aiming
     launcher rev
     launching a ball on target lock */
+    launchButton.whileHeld(new ParallelCommandGroup(
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+      new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
+      new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
 
-    // drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
-
-    // launchButton.whileHeld(new ParallelCommandGroup(
-    //   //new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-    //   new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
-    //   new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
-
-    
-    //  launchButton.whileHeld(new ChimneyCommand(chimney, () -> 0.5));
-
-    In.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, () -> driverController.getRightTriggerAxis(), true, true),
-      new ChimneyCommand(chimney, () -> driverController.getRightTriggerAxis()
-      )));
-
-    Out.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, () -> -driverController.getLeftTriggerAxis(), true, true),
-      new ChimneyCommand(chimney, () -> -driverController.getLeftTriggerAxis())
-      ));
+    // feeding button
+    intakeTrigger.whenActive(new ParallelCommandGroup(
+      new IntakeCommand(intake, intakePower, true, true),
+      new ChimneyCommand(chimney, chimneyPower)));
 
     // toggles that run when the intakes needs to be lowered
-    // lowerFrontFeeder.toggleWhenPressed(
-    //   new StartEndCommand(
-    //     () -> intakeCommand.setFrontDown(true), 
-    //     () -> intakeCommand.setFrontDown(false)));
+    lowerFrontFeeder.toggleWhenPressed(
+      new StartEndCommand(
+        () -> intakeCommand.setFrontDown(true), 
+        () -> intakeCommand.setFrontDown(false)));
 
-    // lowerBackFeeder.toggleWhenPressed(
-    //   new StartEndCommand(
-    //     () -> intakeCommand.setRearDown(true), 
-    //     () -> intakeCommand.setRearDown(false)));
+    lowerBackFeeder.toggleWhenPressed(
+      new StartEndCommand(
+        () -> intakeCommand.setRearDown(true), 
+        () -> intakeCommand.setRearDown(false)));
     }
 
   public Command getAutonomousCommand() {
@@ -123,6 +116,7 @@ public class RobotContainer {
   }
 }
 
+// PID Drivetrain values
 // tu = 210
 // ku = 0.14
 // P = 0.084
