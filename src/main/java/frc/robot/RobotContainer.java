@@ -36,19 +36,28 @@ public class RobotContainer {
   // Defining doublesuppliers that we will use for axis
   private DoubleSupplier throttle = () -> driverController.getLeftY();
   private DoubleSupplier turn = () -> driverController.getRightX();
-  private DoubleSupplier intakePower = () -> operatorController.getLeftTriggerAxis()* 0.95 - operatorController.getRightTriggerAxis() * 0.95;
+  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
+  private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // Defining trigger classes for drive and feed (analog inputs)
   final Trigger drive = new JoystickButton(driverController, Axis.kLeftY.value)
   .or(new JoystickButton(driverController, Axis.kRightX.value));
-  final Trigger intakeTrigger = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
+  final Trigger intakeTrigger = new JoystickButton(driverController, Axis.kLeftTrigger.value)
+  .or(new JoystickButton(driverController, Axis.kRightTrigger.value));
+
+  // Backup turret trigger if limelight dies
+  final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
   
   // defining joystick buttons for other subsystems (digital input)
-  final JoystickButton launchButton = new JoystickButton(driverController, Button.kRightBumper.value);
-  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
-  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
+  final JoystickButton launchButton = new JoystickButton(driverController, Button.kY.value);
+  final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
+
+  // backup joystick buttons if limelight dies
+  final JoystickButton launchbuttonBackup = new JoystickButton(operatorController, Button.kY.value);
+  final JoystickButton indexerbuttonBackup = new JoystickButton(operatorController, Button.kRightBumper.value);
 
   // defining subsystems
   private final LimelightSubsystem limelight = new LimelightSubsystem();
@@ -73,10 +82,10 @@ public class RobotContainer {
     // default commands for functions
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
     limelight.setDefaultCommand(aimCommand);
-    turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
+    turret.setDefaultCommand(new TurretCommand(turret, turretBackupPower, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> 0));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
     intake.setDefaultCommand(intakeCommand);
 
   }
@@ -93,6 +102,15 @@ public class RobotContainer {
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
       new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
       new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
+
+    // backup turret control if limelight fails
+    turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
+
+    // backup kicker control if limelight fails
+    indexerbuttonBackup.whileHeld(new IndexerCommand(indexer, () -> 1));
+
+    // backup launcher control if limelight fails
+    launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 13800));
 
     // feeding button
     intakeTrigger.whenActive(new ParallelCommandGroup(
