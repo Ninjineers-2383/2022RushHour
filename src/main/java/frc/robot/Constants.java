@@ -27,8 +27,8 @@ public final class Constants {
         // 0.87 volts left side kv
 
         public static final double ksVolts = 0.78;
-        public static final double kvVoltSecondsPerMeter = 0.87;
-        public static final double kaVoltSecondsSquaredPerMeter = 0;
+        public static final double kvVoltSecondsPerMeter = 0.95;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.208;
         public static final double kPDriveVel = 8.5;
 
         public final static double DRIVETRAIN_GEAR_RATIO = 8.33;
@@ -48,8 +48,8 @@ public final class Constants {
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     
         // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7;
+        public static final double kRamseteB = 1.45;
+        public static final double kRamseteZeta = 0.45;
       }
 
     public final static class Launcher {

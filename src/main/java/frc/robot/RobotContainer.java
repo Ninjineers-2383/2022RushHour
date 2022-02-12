@@ -146,7 +146,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 
-    drivetrain.tankDriveVolts(leftVoltsTest.getAsDouble(), rightVoltsTest.getAsDouble());
+    // drivetrain.tankDriveVolts(leftVoltsTest.getAsDouble(), rightVoltsTest.getAsDouble());
     
     // We don't know if we need the following two objects, but I'm leaving it just in case.
     // Create a voltage constraint to ensure we don't accelerate too fast
@@ -167,8 +167,19 @@ public class RobotContainer {
     //         .setKinematics(Constants.Drivetrain.kDriveKinematics)
     //         // Apply the voltage constraint
     //         .addConstraint(autoVoltageConstraint);
+
+    // String trajectoryJSON = "/PathWeaver/output/StraightLinePath.wpilib.json";
+    // Trajectory trajectory = new Trajectory();
+    // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+    // try {
+    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    // } catch (IOException ex) {
+    //   DriverStation.reportError("POOP IN MY MOUTH " + trajectoryJSON, ex.getStackTrace());
+    // } 
     
-    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.5, 0.1); 
+    // System.out.println(trajectory.toString());
+    
+    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.75, 0.5); 
     
     RamseteCommand ramseteCommand = new RamseteCommand(
         straightLine,
