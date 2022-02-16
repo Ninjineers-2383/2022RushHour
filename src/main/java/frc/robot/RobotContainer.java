@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import com.fasterxml.jackson.databind.cfg.ContextAttributes;
 import com.pathplanner.lib.PathPlanner;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,9 +23,11 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.LauncherCommand;
+import frc.robot.Constants.Drivetrain;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.commands.LimelightCommand;
+import frc.robot.commands.PIDTuneCommand;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.commands.DrivetrainCommand;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -50,6 +53,7 @@ public class RobotContainer {
   private DoubleSupplier turn = () -> driverController.getRightX();
   private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
+  private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // Defining trigger classes for drive and feed (analog inputs)
@@ -92,8 +96,17 @@ public class RobotContainer {
     SmartDashboard.putNumber("Launcher Velocity", 0.0);
     SmartDashboard.putNumber("L Volts Test", 0.0);
     SmartDashboard.putNumber("R Volts Test", 0.0);
-
+    SmartDashboard.putNumber("R Velocity", driveVelocity);
+    SmartDashboard.putNumber("R Kp", Constants.Drivetrain.Motor_kP);
+    SmartDashboard.putNumber("R Ki", Constants.Drivetrain.Motor_kI);
+    SmartDashboard.putNumber("R Kd", Constants.Drivetrain.Motor_kD);
     // default commands for functions
+    // drivetrain.setDefaultCommand(new PIDTuneCommand(drivetrain,
+    //   () -> SmartDashboard.getNumber("R Kp", 0.0),
+    //   () -> SmartDashboard.getNumber("R Ki", 0.0),
+    //   () -> SmartDashboard.getNumber("R Kd", 0.0)
+    //   ));
+
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
     // drivetrain.setDefaultCommand(new DrivetrainVoltTest(drivetrain, leftVoltsTest, rightVoltsTest));
     limelight.setDefaultCommand(aimCommand);
@@ -178,8 +191,8 @@ public class RobotContainer {
     // } 
     
     // System.out.println(trajectory.toString());
-    
-    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.75, 0.5); 
+  
+    Trajectory straightLine = PathPlanner.loadPath("Simple Curve", 1.0, 0.5); 
     
     RamseteCommand ramseteCommand = new RamseteCommand(
         straightLine,
@@ -191,8 +204,8 @@ public class RobotContainer {
         Constants.Drivetrain.kDriveKinematics,
         drivetrain::getWheelSpeeds,
         //CHANGE THE PID VALUES
-        new PIDController(0.084, 0.0008, 2.205),
-        new PIDController(0.084, 0.0008, 2.205),
+        new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
+        new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
         // RamseteCommand passes volts to the callback
         drivetrain::tankDriveVolts,
         drivetrain

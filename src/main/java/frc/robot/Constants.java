@@ -17,6 +17,13 @@ public final class Constants {
 
 
     public final static class Drivetrain {
+        // PID thing
+        public static final double Ramset_kP = 0.084;
+        // PID Values
+        public static final double Motor_kP = 0.084;
+        public static final double Motor_kI = 0.0007999;
+        public static final double Motor_kD =  2.205;
+
         public static final double kTrackwidthMeters = 0.62865;
         public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackwidthMeters);

@@ -16,21 +16,24 @@ import frc.robot.Constants.Drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class DrivetrainSubsystem extends SubsystemBase {
-  private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
-  private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
-  private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
-  private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+  public final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
+  public final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
+  public final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
+  public final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
-  SlewRateLimiter throttleF = new SlewRateLimiter(2);
+  SlewRateLimiter throttleF = new SlewRateLimiter(1);
   SlewRateLimiter turnF = new SlewRateLimiter(2);
   
   private DifferentialDrive drive;
@@ -53,10 +56,33 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   
   public DrivetrainSubsystem() {
+    rightMasterMotor  .configFactoryDefault();
+    rightFollowerMotor.configFactoryDefault();
+    leftMasterMotor   .configFactoryDefault();
+    leftFollowerMotor .configFactoryDefault();
+
     rightMasterMotor  .setInverted(true);
     rightFollowerMotor.setInverted(true);
     leftMasterMotor   .setInverted(false);
     leftFollowerMotor .setInverted(false);
+
+    // //Configure P values
+    // rightMasterMotor  .config_kP(0, Drivetrain.Motor_kP);
+    // rightFollowerMotor.config_kP(0, Drivetrain.Motor_kP);
+    // leftMasterMotor   .config_kP(0, Drivetrain.Motor_kP);
+    // leftFollowerMotor .config_kP(0, Drivetrain.Motor_kP);
+
+    // //Configure I values
+    // rightMasterMotor  .config_kI(0, Drivetrain.Motor_kI);
+    // rightFollowerMotor.config_kI(0, Drivetrain.Motor_kI);
+    // leftMasterMotor   .config_kI(0, Drivetrain.Motor_kI);
+    // leftFollowerMotor .config_kI(0, Drivetrain.Motor_kI);
+
+    // //Configure D values
+    // rightMasterMotor  .config_kD(0, Drivetrain.Motor_kD);
+    // rightFollowerMotor.config_kD(0, Drivetrain.Motor_kD);
+    // leftMasterMotor   .config_kD(0, Drivetrain.Motor_kD);
+    // leftFollowerMotor .config_kD(0, Drivetrain.Motor_kD);
 
     rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
     rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
@@ -101,6 +127,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
     m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+  }
+
+  public void VelocityOutput(int leftVelocity, int rightVelocity) {
+    rightMasterMotor.set(ControlMode.Velocity, rightVelocity);
+    rightFollowerMotor.set(ControlMode.Velocity, rightVelocity);
+    leftMasterMotor.set(ControlMode.Velocity, leftVelocity);
+    leftFollowerMotor.set(ControlMode.Velocity, leftVelocity);
   }
 
   public void tankDriveVolts(double leftVolts, double rightVolts) {
