@@ -18,7 +18,7 @@ public final class Constants {
 
     public final static class Drivetrain {
         // PID thing
-        public static final double Ramset_kP = 0.084;
+        public static final double Ramset_kP = 0;
         // PID Values
         public static final double Motor_kP = 0.084;
         public static final double Motor_kI = 0.0007999;
@@ -34,7 +34,7 @@ public final class Constants {
         // 0.87 volts left side kv
 
         public static final double ksVolts = 0.78; //.78
-        public static final double kvVoltSecondsPerMeter = .95; //.95
+        public static final double kvVoltSecondsPerMeter = .83; //.95
         public static final double kaVoltSecondsSquaredPerMeter = 0.208; //0.208
         public static final double kPDriveVel = 8.5;
 

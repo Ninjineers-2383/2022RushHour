@@ -51,8 +51,8 @@ public class RobotContainer {
   private DoubleSupplier leftVoltsTest = () -> SmartDashboard.getNumber("L Volts Test", 0);
   private DoubleSupplier rightVoltsTest = () -> SmartDashboard.getNumber("R Volts Test", 0);
   private DoubleSupplier turn = () -> driverController.getRightX();
-  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
-  private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
+  //private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
+  //private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
   private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
@@ -68,8 +68,8 @@ public class RobotContainer {
   
   // defining joystick buttons for other subsystems (digital input)
   final JoystickButton launchButton = new JoystickButton(driverController, Button.kY.value);
-  final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
-  final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
+  //final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
+  //final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
 
   // backup joystick buttons if limelight dies
   final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
@@ -81,12 +81,12 @@ public class RobotContainer {
   private final TurretSubsystem turret = new TurretSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
   private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-  private final ChimneySubsystem chimney = new ChimneySubsystem();
-  private final IntakeSubsystem intake = new IntakeSubsystem();
+  //private final ChimneySubsystem chimney = new ChimneySubsystem();
+  //private final IntakeSubsystem intake = new IntakeSubsystem();
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
-  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
+  //private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   
 
   /* The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -113,8 +113,8 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
-    intake.setDefaultCommand(intakeCommand);
+    //chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
+    //intake.setDefaultCommand(intakeCommand);
 
   }
   
@@ -141,20 +141,20 @@ public class RobotContainer {
     launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
     // feeding button
-    intakeTrigger.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, intakePower, true, true),
-      new ChimneyCommand(chimney, chimneyPower)));
+    // intakeTrigger.whenActive(new ParallelCommandGroup(
+    //   new IntakeCommand(intake, intakePower, true, true),
+    //   new ChimneyCommand(chimney, chimneyPower)));
 
     // toggles that run when the intakes needs to be lowered
-    lowerFrontFeeder.toggleWhenPressed(
-      new StartEndCommand(
-        () -> intakeCommand.setFrontDown(true), 
-        () -> intakeCommand.setFrontDown(false)));
+    // lowerFrontFeeder.toggleWhenPressed(
+    //   new StartEndCommand(
+    //     () -> intakeCommand.setFrontDown(true), 
+    //     () -> intakeCommand.setFrontDown(false)));
 
-    lowerBackFeeder.toggleWhenPressed(
-      new StartEndCommand(
-        () -> intakeCommand.setRearDown(true), 
-        () -> intakeCommand.setRearDown(false)));
+    // lowerBackFeeder.toggleWhenPressed(
+    //   new StartEndCommand(
+    //     () -> intakeCommand.setRearDown(true), 
+    //     () -> intakeCommand.setRearDown(false)));
     }
 
   public Command getAutonomousCommand() {
@@ -192,7 +192,7 @@ public class RobotContainer {
     
     // System.out.println(trajectory.toString());
   
-    Trajectory straightLine = PathPlanner.loadPath("Simple Curve", 1.0, 0.5); 
+    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 1.0, 0.5); 
     
     RamseteCommand ramseteCommand = new RamseteCommand(
         straightLine,
@@ -206,6 +206,7 @@ public class RobotContainer {
         //CHANGE THE PID VALUES
         new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
         new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
+        
         // RamseteCommand passes volts to the callback
         drivetrain::tankDriveVolts,
         drivetrain

@@ -20,6 +20,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -49,17 +50,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
       Drivetrain.RIGHT_FOLLOWER_PORT);
   
     // The gyro sensor
-    private final Gyro m_gyro = new AHRS();
+    private final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
 
     // Odometry class for tracking robot pose
     private final DifferentialDriveOdometry m_odometry;
 
   
   public DrivetrainSubsystem() {
-    rightMasterMotor  .configFactoryDefault();
-    rightFollowerMotor.configFactoryDefault();
-    leftMasterMotor   .configFactoryDefault();
-    leftFollowerMotor .configFactoryDefault();
+    // rightMasterMotor  .configFactoryDefault();
+    // rightFollowerMotor.configFactoryDefault();
+    // leftMasterMotor   .configFactoryDefault();
+    // leftFollowerMotor .configFactoryDefault();
 
     rightMasterMotor  .setInverted(true);
     rightFollowerMotor.setInverted(true);
@@ -107,6 +108,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
     m_odometry.update(
       m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+
+    SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
 
     SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Left Follower Senser Pos", leftFollowerMotor.getSelectedSensorPosition());
