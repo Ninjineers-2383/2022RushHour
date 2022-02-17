@@ -20,9 +20,9 @@ public final class Constants {
         // PID thing
         public static final double Ramset_kP = 0;
         // PID Values
-        public static final double Motor_kP = 0.084;
-        public static final double Motor_kI = 0.0007999;
-        public static final double Motor_kD =  2.205;
+        public static final double Motor_kP = 0.01;
+        public static final double Motor_kI = 0.001;
+        public static final double Motor_kD =  0;
 
         public static final double kTrackwidthMeters = 0.62865;
         public static final DifferentialDriveKinematics kDriveKinematics =
@@ -33,9 +33,9 @@ public final class Constants {
         // 0.83 volts right side kv
         // 0.87 volts left side kv
 
-        public static final double ksVolts = 0.78; //.78
-        public static final double kvVoltSecondsPerMeter = .83; //.95
-        public static final double kaVoltSecondsSquaredPerMeter = 0.208; //0.208
+        public static final double ksVolts = 0.66; //.78
+        public static final double kvVoltSecondsPerMeter = 0.35; //.95s
+        public static final double kaVoltSecondsSquaredPerMeter = 0.1; //0.208
         public static final double kPDriveVel = 8.5;
 
         public final static double DRIVETRAIN_GEAR_RATIO = 8.33;

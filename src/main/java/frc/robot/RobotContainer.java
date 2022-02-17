@@ -192,7 +192,11 @@ public class RobotContainer {
     
     // System.out.println(trajectory.toString());
   
-    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 1.0, 0.5); 
+    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.5, 1); 
+    SimpleMotorFeedforward a = new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
+    Constants.Drivetrain.kvVoltSecondsPerMeter,
+    Constants.Drivetrain.kaVoltSecondsSquaredPerMeter);
+    SmartDashboard.putNumber("Simple feedforward", a.calculate(0.5, 1));
     
     RamseteCommand ramseteCommand = new RamseteCommand(
         straightLine,
@@ -204,8 +208,8 @@ public class RobotContainer {
         Constants.Drivetrain.kDriveKinematics,
         drivetrain::getWheelSpeeds,
         //CHANGE THE PID VALUES
-        new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
-        new PIDController(Constants.Drivetrain.Ramset_kP, 0, 0),
+        new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
+        new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
         
         // RamseteCommand passes volts to the callback
         drivetrain::tankDriveVolts,
