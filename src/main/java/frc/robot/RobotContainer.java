@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
+import frc.robot.commands.Autonomous.DriveToFirstBall;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.Constants.Drivetrain;
@@ -82,7 +84,7 @@ public class RobotContainer {
   private final IndexerSubsystem indexer = new IndexerSubsystem();
   private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
   //private final ChimneySubsystem chimney = new ChimneySubsystem();
-  //private final IntakeSubsystem intake = new IntakeSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem();
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
@@ -219,7 +221,11 @@ public class RobotContainer {
     // Reset odometry to the starting pose of the trajectory.
     drivetrain.resetOdometry(straightLine.getInitialPose());
 
-    return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
+    //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
+    return new SequentialCommandGroup(
+      new IntakeCommand(intake, () -> 1, true, true),
+      new DriveToFirstBall(drivetrain)
+      );
     //return null;
   }
 }

@@ -180,21 +180,125 @@ public class DrivetrainSubsystem extends SubsystemBase {
     drive.arcadeDrive(throttleF.calculate(power), turnF.calculate(turn * 0.9));
   }
 
-  public void drive(int left, int right, int power, int time) {
-    rightMasterMotor.set(ControlMode.Position, right);
-    rightFollowerMotor.set(ControlMode.Position, right);
-    leftMasterMotor.set(ControlMode.Position, left);
-    leftFollowerMotor.set(ControlMode.Position, left);
+  public void autoForward(int distanceTicks, int accelerationInterval, double maxVoltage, double timeout) {
+    final double kP_HEADING_CORRECTION = 0.1;                                       // Strength of heading correction                                      
+    final double ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
 
-    rightMasterMotor.set(power);
-    leftMasterMotor.set(power);
+    Timer timer = new Timer();
+    zeroEncoders();
 
-    Timer.delay(time);
+    int profileState = 0; //Finite State Machine
+    profile: while (timer.get() < timeout ) {
+      double leftOutput;
+      double rightOutput;
+      
 
-    rightMasterMotor.set(0);
-    rightFollowerMotor.set(0);
-    leftMasterMotor.set(0);
-    leftFollowerMotor.set(0);
+      switch (profileState) {                                                      // Piece-wise motion profile
+        case 0: // Ramp Up
+          final double aL = getLeftPosition() / (double) accelerationInterval;
+          final double aR = getRightPosition() / (double) accelerationInterval;
+
+          leftOutput = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(aL, 2) - 2 * Math.pow(aL, 3));
+          rightOutput = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(aR, 2) - 2 * Math.pow(aR, 3));
+
+          if (getAverageEncoderDistance() > accelerationInterval) {
+            profileState ++;
+          } else {
+            break;
+          }
+        
+        case 1: // Max Voltage
+          leftOutput = 1;
+          rightOutput = 1;
+          if (getAverageEncoderDistance() > distanceTicks - accelerationInterval) {
+            profileState ++;
+          } else {
+            break;
+          }
+
+        case 2: // Ramp Down
+          final double bL = ((double) (getLeftPosition() - distanceTicks + accelerationInterval)) / (double) accelerationInterval;
+          final double bR = ((double) (getRightPosition() - distanceTicks + accelerationInterval)) / (double) accelerationInterval;
+
+          leftOutput = (1 - (3 * Math.pow(bL, 2) - 2 * Math.pow(bL, 3)));
+          rightOutput = (1 - (3 * Math.pow(bR, 2) - 2 * Math.pow(bR, 3)));
+
+          if (getLeftPosition() > distanceTicks && getRightPosition() > distanceTicks) {
+            profileState ++;
+          } else {
+            break;
+          }
+
+        default:
+          break profile;
+      }
+      
+      leftOutput += kP_HEADING_CORRECTION * getTurnRate();                        // Compensation for unwanted turn
+      rightOutput -= kP_HEADING_CORRECTION * getTurnRate();
+
+      leftOutput *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
+      rightOutput *= ADJUSTED_MAX_VOLTAGE;
+
+      leftOutput += Math.signum(maxVoltage) * Drivetrain.ksVolts;
+      rightOutput += Math.signum(maxVoltage) * Drivetrain.ksVolts;
+      tankDriveVolts(leftOutput, -rightOutput);
+    }
+
+    tankDriveVolts(0, 0);
+  }
+
+  public void autoTurn(double targetHeading, int accelerationInterval, double maxVoltage, double timeout) {
+    final double TOLERANCE = 0.5;
+    final double kP_ANGULAR = 0.5;
+    final double ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(targetHeading) * Drivetrain.ksVolts;  
+
+    zeroHeading();
+    Timer timer = new Timer();
+
+    int profileState = 0;
+    profile: while (timer.get() < timeout) {
+        double output;
+
+        switch (profileState) {                                                      // Piece-wise motion profile
+          case 0: // Ramp Up
+            final double a = getLeftPosition() / (double) accelerationInterval;
+  
+            output = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(a, 2) - 2 * Math.pow(a, 3));
+  
+            if (Math.abs(getHeading()) > accelerationInterval) {
+              profileState ++;
+            } else {
+              break;
+            }
+          
+          case 1: // Max Voltage
+            output = 1;
+            if (Math.abs(getHeading()) > targetHeading - accelerationInterval) {
+              profileState ++;
+            } else {
+              break;
+            }
+  
+          case 2: // Ramp Down
+            final double b = ((double) (getHeading() - targetHeading + accelerationInterval)) / (double) accelerationInterval;
+  
+            output = (1 - (3 * Math.pow(b, 2) - 2 * Math.pow(b, 3)));
+  
+            if (Math.abs(getHeading()) > targetHeading) {
+              profileState ++;
+            } else {
+              break;
+            }
+  
+          default:
+            break profile;
+        }
+  
+        output *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
+        tankDriveVolts(output, output);
+      }
+      
+      tankDriveVolts(0, 0);
   }
 
   // reset encoder positions to 0
