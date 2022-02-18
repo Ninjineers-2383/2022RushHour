@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,7 +36,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
   SlewRateLimiter throttleF = new SlewRateLimiter(1);
-  SlewRateLimiter turnF = new SlewRateLimiter(2);
+  SlewRateLimiter turnF = new SlewRateLimiter(3);
   
   private DifferentialDrive drive;
 
@@ -57,10 +58,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   
   public DrivetrainSubsystem() {
-    // rightMasterMotor  .configFactoryDefault();
-    // rightFollowerMotor.configFactoryDefault();
-    // leftMasterMotor   .configFactoryDefault();
-    // leftFollowerMotor .configFactoryDefault();
+    rightMasterMotor  .configFactoryDefault();
+    rightFollowerMotor.configFactoryDefault();
+    leftMasterMotor   .configFactoryDefault();
+    leftFollowerMotor .configFactoryDefault();
+    rightMasterMotor  .setSelectedSensorPosition(0);
+    rightFollowerMotor.setSelectedSensorPosition(0);
+    leftMasterMotor   .setSelectedSensorPosition(0);
+    leftFollowerMotor .setSelectedSensorPosition(0);
+
 
     rightMasterMotor  .setInverted(true);
     rightFollowerMotor.setInverted(true);
@@ -178,73 +184,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
   public void drive(double power, double turn){
     drive.arcadeDrive(throttleF.calculate(power), turnF.calculate(turn * 0.9));
-  }
-
-  public void autoForward(int distanceTicks, int accelerationInterval, double maxVoltage, double timeout) {
-    final double kP_HEADING_CORRECTION = 0.1;                                       // Strength of heading correction                                      
-    final double ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
-
-    Timer timer = new Timer();
-    zeroEncoders();
-
-    int profileState = 0; //Finite State Machine
-    profile: while (timer.get() < timeout ) {
-      double leftOutput;
-      double rightOutput;
-      
-
-      switch (profileState) {                                                      // Piece-wise motion profile
-        case 0: // Ramp Up
-          final double aL = getLeftPosition() / (double) accelerationInterval;
-          final double aR = getRightPosition() / (double) accelerationInterval;
-
-          leftOutput = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(aL, 2) - 2 * Math.pow(aL, 3));
-          rightOutput = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(aR, 2) - 2 * Math.pow(aR, 3));
-
-          if (getAverageEncoderDistance() > accelerationInterval) {
-            profileState ++;
-          } else {
-            break;
-          }
-        
-        case 1: // Max Voltage
-          leftOutput = 1;
-          rightOutput = 1;
-          if (getAverageEncoderDistance() > distanceTicks - accelerationInterval) {
-            profileState ++;
-          } else {
-            break;
-          }
-
-        case 2: // Ramp Down
-          final double bL = ((double) (getLeftPosition() - distanceTicks + accelerationInterval)) / (double) accelerationInterval;
-          final double bR = ((double) (getRightPosition() - distanceTicks + accelerationInterval)) / (double) accelerationInterval;
-
-          leftOutput = (1 - (3 * Math.pow(bL, 2) - 2 * Math.pow(bL, 3)));
-          rightOutput = (1 - (3 * Math.pow(bR, 2) - 2 * Math.pow(bR, 3)));
-
-          if (getLeftPosition() > distanceTicks && getRightPosition() > distanceTicks) {
-            profileState ++;
-          } else {
-            break;
-          }
-
-        default:
-          break profile;
-      }
-      
-      leftOutput += kP_HEADING_CORRECTION * getTurnRate();                        // Compensation for unwanted turn
-      rightOutput -= kP_HEADING_CORRECTION * getTurnRate();
-
-      leftOutput *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
-      rightOutput *= ADJUSTED_MAX_VOLTAGE;
-
-      leftOutput += Math.signum(maxVoltage) * Drivetrain.ksVolts;
-      rightOutput += Math.signum(maxVoltage) * Drivetrain.ksVolts;
-      tankDriveVolts(leftOutput, -rightOutput);
-    }
-
-    tankDriveVolts(0, 0);
+    //drive.arcadeDrive(power, 0.9 * turn);
   }
 
   public void autoTurn(double targetHeading, int accelerationInterval, double maxVoltage, double timeout) {

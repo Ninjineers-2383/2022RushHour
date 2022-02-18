@@ -36,7 +36,7 @@ public class DrivetrainCommand extends CommandBase {
   @Override
   public void execute() {
     // See DriveTrainSubsystem.java for more details how the arcade() method works.
-    drivetrainSubsystem.drive(throttle.getAsDouble(), turn.getAsDouble());
+    drivetrainSubsystem.drive(-throttle.getAsDouble(), turn.getAsDouble());
     //drivetrainSubsystem.VelocityOutput((int)(throttle.getAsDouble()), (int)(turn.getAsDouble()));
   }
 

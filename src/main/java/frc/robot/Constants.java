@@ -17,11 +17,13 @@ public final class Constants {
 
 
     public final static class Drivetrain {
+        //average encoder ticks per foot travelled.
+        public static final double TICKS_PER_FOOT = 16200;
         // PID thing
         public static final double Ramset_kP = 0;
         // PID Values
         // Before Big John touched this P=.01, I=.001, D=0
-        public static final double Motor_kP = 0.011551;
+        public static final double Motor_kP = 0.069715;
         public static final double Motor_kI = 0;
         public static final double Motor_kD = 0;
 
@@ -35,9 +37,9 @@ public final class Constants {
         // 0.87 volts left side kv
 
         // Before Big John touched this kV = .66, kVspm = .35, kvsspm = .1
-        public static final double ksVolts = 0.70474; //.78
-        public static final double kvVoltSecondsPerMeter = 0.500; //.95s
-        public static final double kaVoltSecondsSquaredPerMeter = 0.208; //0.208
+        public static final double ksVolts = 2; //.78
+        public static final double kvVoltSecondsPerMeter = 0.072357; //.95s
+        public static final double kaVoltSecondsSquaredPerMeter = 0.006527; //0.208
 
         public final static double DRIVETRAIN_GEAR_RATIO = 8.33;
         public final static double WHEEL_DIAMETER_METERS = 0.1016;
@@ -68,9 +70,9 @@ public final class Constants {
     public final static class Intake {
         //solenoid ports on pcm
         public final static int FRONT_LEFT_SOLENOID_PORT = 7;
-        public final static int REAR_LEFT_SOLENOID_PORT = 4;
-        public final static int FRONT_RIGHT_SOLENOID_PORT = 6;
-        public final static int REAR_RIGHT_SOLENOID_PORT = 5;
+        public final static int REAR_LEFT_SOLENOID_PORT = 6;
+        public final static int FRONT_RIGHT_SOLENOID_PORT = 0;
+        public final static int REAR_RIGHT_SOLENOID_PORT = 1;
         public final static int FRONT_INTAKE_PORT = 10;
         public final static int REAR_INTAKE_PORT = 11;
     }

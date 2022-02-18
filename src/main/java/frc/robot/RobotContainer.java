@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.*;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -22,7 +23,9 @@ import edu.wpi.first.math.controller.PIDController;
 
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
-import frc.robot.commands.Autonomous.DriveToFirstBall;
+import frc.robot.commands.Autonomous.AutoForward;
+import frc.robot.commands.Autonomous.AutoTurn;
+import frc.robot.commands.DrivetrainCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.Constants.Drivetrain;
@@ -31,7 +34,6 @@ import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.PIDTuneCommand;
 import frc.robot.subsystems.LauncherSubsystem;
-import frc.robot.commands.DrivetrainCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.DrivetrainVoltTest;
@@ -53,8 +55,8 @@ public class RobotContainer {
   private DoubleSupplier leftVoltsTest = () -> SmartDashboard.getNumber("L Volts Test", 0);
   private DoubleSupplier rightVoltsTest = () -> SmartDashboard.getNumber("R Volts Test", 0);
   private DoubleSupplier turn = () -> driverController.getRightX();
-  //private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
-  //private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
+  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
+  private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.9;
   private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
@@ -70,8 +72,8 @@ public class RobotContainer {
   
   // defining joystick buttons for other subsystems (digital input)
   final JoystickButton launchButton = new JoystickButton(driverController, Button.kY.value);
-  //final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
-  //final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
+  final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
 
   // backup joystick buttons if limelight dies
   final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
@@ -83,12 +85,12 @@ public class RobotContainer {
   private final TurretSubsystem turret = new TurretSubsystem();
   private final IndexerSubsystem indexer = new IndexerSubsystem();
   private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-  //private final ChimneySubsystem chimney = new ChimneySubsystem();
+  private final ChimneySubsystem chimney = new ChimneySubsystem();
   private final IntakeSubsystem intake = new IntakeSubsystem();
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight);
-  //private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   
 
   /* The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -102,6 +104,8 @@ public class RobotContainer {
     SmartDashboard.putNumber("R Kp", Constants.Drivetrain.Motor_kP);
     SmartDashboard.putNumber("R Ki", Constants.Drivetrain.Motor_kI);
     SmartDashboard.putNumber("R Kd", Constants.Drivetrain.Motor_kD);
+    SmartDashboard.putNumber("Throttle", throttle.getAsDouble());
+    SmartDashboard.putNumber("Turn", turn.getAsDouble());
     // default commands for functions
     // drivetrain.setDefaultCommand(new PIDTuneCommand(drivetrain,
     //   () -> SmartDashboard.getNumber("R Kp", 0.0),
@@ -220,12 +224,25 @@ public class RobotContainer {
 
     // Reset odometry to the starting pose of the trajectory.
     drivetrain.resetOdometry(straightLine.getInitialPose());
+    
 
     //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
-    return new SequentialCommandGroup(
-      new IntakeCommand(intake, () -> 1, true, true),
-      new DriveToFirstBall(drivetrain)
-      );
+
+    //return turn;
+    return new AutoTurn(drivetrain, 90, 5, 4, 2)
+    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
+    .andThen(new WaitCommand(1))
+    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7));
     //return null;
   }
 }
