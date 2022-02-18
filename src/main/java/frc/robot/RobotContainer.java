@@ -192,7 +192,7 @@ public class RobotContainer {
     
     // System.out.println(trajectory.toString());
   
-    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.5, 1); 
+    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.8, 0.5); 
     SimpleMotorFeedforward a = new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
     Constants.Drivetrain.kvVoltSecondsPerMeter,
     Constants.Drivetrain.kaVoltSecondsSquaredPerMeter);
@@ -220,7 +220,7 @@ public class RobotContainer {
     drivetrain.resetOdometry(straightLine.getInitialPose());
 
     return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
-    // return null;
+    //return null;
   }
 }
 

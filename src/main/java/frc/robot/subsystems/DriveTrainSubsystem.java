@@ -145,7 +145,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     leftFollowerMotor.setVoltage(leftVolts);
     rightFollowerMotor.setVoltage(rightVolts);
     drive.feed();
-
+    SmartDashboard.putNumber("Bruh Its Left", leftVolts);
+    SmartDashboard.putNumber("Bruh Its Right", rightVolts);
     SmartDashboard.putNumber("LM Volts", leftMasterMotor.getMotorOutputVoltage());
     SmartDashboard.putNumber("RM Volts", rightMasterMotor.getMotorOutputVoltage());
     SmartDashboard.putNumber("LF Volts", leftFollowerMotor.getMotorOutputVoltage());
