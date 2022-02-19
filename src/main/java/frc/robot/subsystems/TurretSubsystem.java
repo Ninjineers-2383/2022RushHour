@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.XboxController;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -13,14 +12,13 @@ import frc.robot.Constants.Turret;
 public class TurretSubsystem extends SubsystemBase{
     private TalonSRX motor = new TalonSRX(Turret.PORT);
     private boolean side = false;
-    final XboxController driverController = new XboxController(0);
+
 
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Turret pos", getCurrentPosition());
     }
 
-    
     public TurretSubsystem() {
         motor.setInverted(false);
         motor.setSelectedSensorPosition(0);
@@ -28,11 +26,12 @@ public class TurretSubsystem extends SubsystemBase{
 
 
     public void setPower(Double power) {
-        if (getCurrentPosition() < -Turret.BOUNDS) {
-            power = -0.2;
-            this.side = true;
-        } else if (getCurrentPosition() >= 0) {
+        SmartDashboard.putNumber("446pm", power);
+        if (getCurrentPosition() > Turret.BOUNDS) {
             power = 0.2;
+            this.side = true;
+        } else if (getCurrentPosition() <= 0) {
+            power = -0.2;
             this.side = false;
         }
         motor.set(ControlMode.PercentOutput, power);
@@ -42,7 +41,7 @@ public class TurretSubsystem extends SubsystemBase{
 
     // Rotates til side flips, then rotates other direction
     public void seek() {
-        setPower(this.side ? -1:1 * Turret.SEEKING_POWER);
+        setPower(this.side ? 1:-1 * Turret.SEEKING_POWER);
     }
 
     

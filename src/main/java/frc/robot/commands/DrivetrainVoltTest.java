@@ -7,22 +7,22 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class DrivetrainCommand extends CommandBase {
+public class DrivetrainVoltTest extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   
   private final DrivetrainSubsystem drivetrainSubsystem;
-  private DoubleSupplier throttle;
-  private DoubleSupplier turn;
+  private DoubleSupplier leftVolts;
+  private DoubleSupplier rightVolts;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public DrivetrainCommand(DrivetrainSubsystem subsystem, DoubleSupplier throttle, DoubleSupplier turn) {
+  public DrivetrainVoltTest(DrivetrainSubsystem subsystem, DoubleSupplier leftVolts, DoubleSupplier rightVolts) {
     drivetrainSubsystem = subsystem;
-    this.throttle = throttle;
-    this.turn = turn;
+    this.leftVolts = leftVolts;
+    this.rightVolts = rightVolts;
     // Use addRequirements() here to declare subsystem dependencies.
     
     addRequirements(subsystem);
@@ -36,15 +36,14 @@ public class DrivetrainCommand extends CommandBase {
   @Override
   public void execute() {
     // See DriveTrainSubsystem.java for more details how the arcade() method works.
-    drivetrainSubsystem.drive(throttle.getAsDouble(), turn.getAsDouble());
-    //drivetrainSubsystem.VelocityOutput((int)(throttle.getAsDouble()), (int)(turn.getAsDouble()));
+    drivetrainSubsystem.tankDriveVolts(leftVolts.getAsDouble(), rightVolts.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
 
-  // Returns true when the command should end.
+  // RerightVoltss true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
