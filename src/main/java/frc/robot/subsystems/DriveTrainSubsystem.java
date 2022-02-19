@@ -62,6 +62,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     rightFollowerMotor.configFactoryDefault();
     leftMasterMotor   .configFactoryDefault();
     leftFollowerMotor .configFactoryDefault();
+
     rightMasterMotor  .setSelectedSensorPosition(0);
     rightFollowerMotor.setSelectedSensorPosition(0);
     leftMasterMotor   .setSelectedSensorPosition(0);
@@ -157,6 +158,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("RM Volts", rightMasterMotor.getMotorOutputVoltage());
     SmartDashboard.putNumber("LF Volts", leftFollowerMotor.getMotorOutputVoltage());
     SmartDashboard.putNumber("RF Volts", rightFollowerMotor.getMotorOutputVoltage());
+  }
+
+  public void tankDrive(double left, double right) {
+    drive.tankDrive(left, right);
   }
 
   public double getAverageEncoderDistance() {

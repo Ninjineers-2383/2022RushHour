@@ -19,13 +19,14 @@ public class AutoForward extends CommandBase {
   private final DrivetrainSubsystem drivetrainSubsystem;
 
   private final double kP_HEADING_CORRECTION = 10;                                       // Strength of heading correction 
-  private final double ADJUSTED_MAX_VOLTAGE;
+  private final double ADJUSTED_MAX_POWER;
 
   
-  final private double DISTANCE_TICKS;
-  final private double ACCELERATION_INTERVAL;
+  final private int DISTANCE_TICKS;
+  final private int ACCELERATION_INTERVAL;
   final private double TIMEOUT;
   final private Timer TIMER;
+  final double startHeading;
   
   private boolean done = false;
   private int profileState = 0; //Finite State Machine
@@ -37,10 +38,11 @@ public class AutoForward extends CommandBase {
    */
   public AutoForward(DrivetrainSubsystem subsystem, double distanceFeet, double accelerationIntervalFeet, double maxVoltage, double timeout) {
     drivetrainSubsystem = subsystem;
-    this.ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
+    this.ADJUSTED_MAX_POWER = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
 
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
+    this.startHeading = drivetrainSubsystem.getHeading();
 
     drivetrainSubsystem.zeroEncoders();
     this.TIMEOUT = timeout;
@@ -60,10 +62,8 @@ public class AutoForward extends CommandBase {
   @Override
   public void execute() {
     
-
-    double startHeading = drivetrainSubsystem.getHeading();
-    double leftOutput = 0;
-    double rightOutput = 0;
+    double averageTicks = ((double) (drivetrainSubsystem.getLeftPosition() + drivetrainSubsystem.getRightPosition())) / 2;
+    double output = 0;
 
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;
@@ -72,33 +72,28 @@ public class AutoForward extends CommandBase {
 
     switch (profileState) {                                                      // Piece-wise motion profile
       case 0: // Ramp Up
-        final double aL = drivetrainSubsystem.getLeftPosition() / (double) ACCELERATION_INTERVAL;
-        final double aR = drivetrainSubsystem.getRightPosition() / (double) ACCELERATION_INTERVAL;
+        final double a =  averageTicks / (double) ACCELERATION_INTERVAL;
 
-        leftOutput = aL;
-        rightOutput = aR;
+        output = a;
 
-        if (drivetrainSubsystem.getLeftPosition() > ACCELERATION_INTERVAL) {
+        if (averageTicks > ACCELERATION_INTERVAL) {
           profileState ++;
         } else {
           break;
         }
       
       case 1: // Max Voltage
-        leftOutput = 1;
-        rightOutput = 1;
-        if (drivetrainSubsystem.getLeftPosition() > DISTANCE_TICKS - ACCELERATION_INTERVAL) {
+        output = 1;
+        if (averageTicks > DISTANCE_TICKS - ACCELERATION_INTERVAL) {
           profileState ++;
         } else {
           break;
         }
 
       case 2: // Ramp Down
-        final double bL = 1 - ((double) (drivetrainSubsystem.getLeftPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
-        final double bR = 1 - ((double) (drivetrainSubsystem.getRightPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
+        final double b = 1 - (averageTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL) / (double) ACCELERATION_INTERVAL;
 
-        leftOutput = bL;
-        rightOutput = bR;
+        output = b;
 
         if (drivetrainSubsystem.getLeftPosition() >= DISTANCE_TICKS && drivetrainSubsystem.getRightPosition() >= DISTANCE_TICKS) {
           profileState ++;
@@ -110,15 +105,11 @@ public class AutoForward extends CommandBase {
         done = true;
     }
     
-    leftOutput += kP_HEADING_CORRECTION * (drivetrainSubsystem.m_gyro.getAngle() - startHeading);                // Compensation for unwanted turn
-    rightOutput -= kP_HEADING_CORRECTION * (drivetrainSubsystem.m_gyro.getAngle() - startHeading);
+    double headingCorrection = kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading) ;                // Compensation for unwanted turn
 
-    leftOutput *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
-    rightOutput *= ADJUSTED_MAX_VOLTAGE;
-
-    leftOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    rightOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDriveVolts(leftOutput, rightOutput);
+    drivetrainSubsystem.tankDrive(
+      (output + headingCorrection) * ADJUSTED_MAX_POWER + Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksVolts,
+     (output - headingCorrection) * ADJUSTED_MAX_POWER + Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksVolts);
   }
 
 
@@ -126,7 +117,7 @@ public class AutoForward extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.tankDriveVolts(0, 0);
+    drivetrainSubsystem.tankDrive(0, 0);
     SmartDashboard.putBoolean("Auto Done", true);
   }
 

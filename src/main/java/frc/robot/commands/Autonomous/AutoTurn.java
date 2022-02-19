@@ -12,7 +12,7 @@ public class AutoTurn extends CommandBase {
   
   private final DrivetrainSubsystem drivetrainSubsystem;
 
-  private final double ADJUSTED_MAX_VOLTAGE;
+  private final double ADJUSTED_MAX_POWER;
 
   
   final private double TARGET_HEADING;
@@ -30,9 +30,9 @@ public class AutoTurn extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AutoTurn(DrivetrainSubsystem subsystem, double targetHeading, double accelerationInterval, double maxVoltage, double timeout) {
+  public AutoTurn(DrivetrainSubsystem subsystem, double targetHeading, double accelerationInterval, double maxPower, double timeout) {
     drivetrainSubsystem = subsystem;
-    this.ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
+    this.ADJUSTED_MAX_POWER = maxPower - Math.signum(maxPower) * Drivetrain.ksVolts;                      // Friction
 
     this.TARGET_HEADING = targetHeading;
     this.ACCELERATION_INTERVAL = accelerationInterval;
@@ -40,7 +40,6 @@ public class AutoTurn extends CommandBase {
     this.TIMEOUT = timeout;
     this.TIMER = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
-    
     addRequirements(subsystem);
   }
 
@@ -49,7 +48,6 @@ public class AutoTurn extends CommandBase {
   public void initialize() {
     SmartDashboard.putBoolean("Auto Done", false);
     startHeading = drivetrainSubsystem.getHeading();
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -63,7 +61,7 @@ public class AutoTurn extends CommandBase {
     }
 
 
-    switch (profileState) {                                                      // Piece-wise motion profile
+    switch (profileState) {  // Piece-wise Trapezoidal motion profile
       case 0: // Ramp Up
         final double a =  offsetHeading / (double) ACCELERATION_INTERVAL;
 
@@ -84,7 +82,8 @@ public class AutoTurn extends CommandBase {
         }
 
       case 2: // Ramp Down
-        final double b = 1 - ((double) (offsetHeading - TARGET_HEADING + ACCELERATION_INTERVAL * 1.05)) / (double) ACCELERATION_INTERVAL;
+        final double b = 1 - ((double) ((offsetHeading / 0.98) - TARGET_HEADING + ACCELERATION_INTERVAL * 1.05)) / 
+        (double) (ACCELERATION_INTERVAL / 1.1);
 
         output = b;
 
@@ -94,14 +93,14 @@ public class AutoTurn extends CommandBase {
           break;
         }
 
-      case 3:
+      case 3: // Finish Auto
         done = true;
     }
 
-    output *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
+    output *= ADJUSTED_MAX_POWER;                                                   // Multiply by max voltage
 
-    output += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDriveVolts(-output, output);
+    output += Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksVolts;
+    drivetrainSubsystem.tankDrive(-output, output);
   }
 
 
