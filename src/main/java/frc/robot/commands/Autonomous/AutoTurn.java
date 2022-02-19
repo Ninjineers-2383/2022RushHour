@@ -65,7 +65,7 @@ public class AutoTurn extends CommandBase {
       case 0: // Ramp Up
         final double a =  offsetHeading / (double) ACCELERATION_INTERVAL;
 
-        output = a;
+        output = ADJUSTED_MAX_POWER * (3 * Math.pow(a, 2) - 2 * Math.pow(a, 3));
 
         if (offsetHeading > ACCELERATION_INTERVAL) {
           profileState ++;
@@ -82,10 +82,10 @@ public class AutoTurn extends CommandBase {
         }
 
       case 2: // Ramp Down
-        final double b = 1 - ((double) ((offsetHeading / 0.98) - TARGET_HEADING + ACCELERATION_INTERVAL * 1.05)) / 
-        (double) (ACCELERATION_INTERVAL / 1.1);
+        final double b = 1 - ((double) ((offsetHeading) - TARGET_HEADING + ACCELERATION_INTERVAL * 1.05)) / 
+        (double) (ACCELERATION_INTERVAL / 1.02);
 
-        output = b;
+        output = (1 - (3 * Math.pow(b, 2) - 2 * Math.pow(b, 3)));
 
         if (offsetHeading >= TARGET_HEADING) {
           profileState ++;

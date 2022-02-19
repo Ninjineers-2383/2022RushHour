@@ -38,15 +38,15 @@ public class LimelightCommand extends CommandBase {
     turretSeek = false;
     if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on left
-      turretPower = 0.25;
+      turretPower = -0.18;
     } else if(limelight.getX() > Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on right
-      turretPower = -0.25;
+      turretPower = 0.18;
     } else if(limelight.getTargetVisible()) {
       // target in center
-        if((limelight.getX() < -2)) {
+        if((limelight.getX() < -1.5)) {
           turretPower = 1/(1 + Psig);
-        } else if((limelight.getX() > 2)) {
+        } else if((limelight.getX() > 1.5)) {
           turretPower = -1/(1 + Nsig);
         }
         else {

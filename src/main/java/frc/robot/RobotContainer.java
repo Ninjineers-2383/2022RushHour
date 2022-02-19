@@ -119,8 +119,8 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    //chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
-    //intake.setDefaultCommand(intakeCommand);
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
+    intake.setDefaultCommand(intakeCommand);
 
   }
   
@@ -134,7 +134,7 @@ public class RobotContainer {
     launching a ball on target lock */
     launchButton.whileHeld(new ParallelCommandGroup(
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand(launcher, () -> -108 * limelight.getY() + 12750),
+      new LauncherCommand(launcher, () -> -108 * limelight.getY() + 14000),
       new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
 
     // backup turret control if limelight fails
@@ -147,20 +147,20 @@ public class RobotContainer {
     launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
     // feeding button
-    // intakeTrigger.whenActive(new ParallelCommandGroup(
-    //   new IntakeCommand(intake, intakePower, true, true),
-    //   new ChimneyCommand(chimney, chimneyPower)));
+    intakeTrigger.whenActive(new ParallelCommandGroup(
+      new IntakeCommand(intake, intakePower, true, true),
+      new ChimneyCommand(chimney, chimneyPower)));
 
     // toggles that run when the intakes needs to be lowered
-    // lowerFrontFeeder.toggleWhenPressed(
-    //   new StartEndCommand(
-    //     () -> intakeCommand.setFrontDown(true), 
-    //     () -> intakeCommand.setFrontDown(false)));
+    lowerFrontFeeder.toggleWhenPressed(
+      new StartEndCommand(
+        () -> intakeCommand.setFrontDown(true), 
+        () -> intakeCommand.setFrontDown(false)));
 
-    // lowerBackFeeder.toggleWhenPressed(
-    //   new StartEndCommand(
-    //     () -> intakeCommand.setRearDown(true), 
-    //     () -> intakeCommand.setRearDown(false)));
+    lowerBackFeeder.toggleWhenPressed(
+      new StartEndCommand(
+        () -> intakeCommand.setRearDown(true), 
+        () -> intakeCommand.setRearDown(false)));
     }
 
   public Command getAutonomousCommand() {
@@ -204,23 +204,23 @@ public class RobotContainer {
     Constants.Drivetrain.kaVoltSecondsSquaredPerMeter);
     SmartDashboard.putNumber("Simple feedforward", a.calculate(0.5, 1));
     
-    RamseteCommand ramseteCommand = new RamseteCommand(
-        straightLine,
-        drivetrain::getPose,
-        new RamseteController(Constants.AutoConstants.kRamseteB, Constants.AutoConstants.kRamseteZeta),
-         new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
-                                    Constants.Drivetrain.kvVoltSecondsPerMeter,
-                                    Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
-        Constants.Drivetrain.kDriveKinematics,
-        drivetrain::getWheelSpeeds,
-        //CHANGE THE PID VALUES
-        new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
-        new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
+    // RamseteCommand ramseteCommand = new RamseteCommand(
+    //     straightLine,
+    //     drivetrain::getPose,
+    //     new RamseteController(Constants.AutoConstants.kRamseteB, Constants.AutoConstants.kRamseteZeta),
+    //      new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
+    //                                 Constants.Drivetrain.kvVoltSecondsPerMeter,
+    //                                 Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
+    //     Constants.Drivetrain.kDriveKinematics,
+    //     drivetrain::getWheelSpeeds,
+    //     //CHANGE THE PID VALUES
+    //     new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
+    //     new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
         
-        // RamseteCommand passes volts to the callback
-        drivetrain::tankDriveVolts,
-        drivetrain
-    );
+    //     // RamseteCommand passes volts to the callback
+    //     drivetrain::tankDriveVolts,
+    //     drivetrain
+    // );
 
     // Reset odometry to the starting pose of the trajectory.
     drivetrain.resetOdometry(straightLine.getInitialPose());

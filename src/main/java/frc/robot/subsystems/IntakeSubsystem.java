@@ -8,13 +8,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import frc.robot.Constants.Intake;
 
 
 public class IntakeSubsystem extends SubsystemBase {
-    public  final TalonSRX frontMotor = new TalonSRX(Intake.FRONT_INTAKE_PORT);
-    public  final TalonSRX rearMotor = new TalonSRX(Intake.REAR_INTAKE_PORT);
+    public  final VictorSPX frontMotor = new VictorSPX(Intake.FRONT_INTAKE_PORT);
+    public  final VictorSPX rearMotor = new VictorSPX(Intake.REAR_INTAKE_PORT);
 
     public final Compressor pump = new Compressor(PneumaticsModuleType.CTREPCM);
 
@@ -25,7 +26,7 @@ public class IntakeSubsystem extends SubsystemBase {
     
 
     public IntakeSubsystem() {
-        frontMotor.setInverted(true);
+        frontMotor.setInverted(false);
         rearMotor.setInverted(false);
         pump.enableDigital();
     }

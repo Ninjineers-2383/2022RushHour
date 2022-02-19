@@ -28,10 +28,10 @@ public class TurretSubsystem extends SubsystemBase{
     public void setPower(Double power) {
         SmartDashboard.putNumber("446pm", power);
         if (getCurrentPosition() > Turret.BOUNDS) {
-            power = 0.2;
+            power = 0.15;
             this.side = true;
-        } else if (getCurrentPosition() <= 0) {
-            power = -0.2;
+        } else if (getCurrentPosition() <= -Turret.BOUNDS) {
+            power = -0.15;
             this.side = false;
         }
         motor.set(ControlMode.PercentOutput, power);

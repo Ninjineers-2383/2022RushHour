@@ -74,7 +74,7 @@ public class AutoForward extends CommandBase {
       case 0: // Ramp Up
         final double a =  averageTicks / (double) ACCELERATION_INTERVAL;
 
-        output = a;
+        output = ADJUSTED_MAX_POWER * (3 * Math.pow(a, 2) - 2 * Math.pow(a, 3));
 
         if (averageTicks > ACCELERATION_INTERVAL) {
           profileState ++;
@@ -93,7 +93,7 @@ public class AutoForward extends CommandBase {
       case 2: // Ramp Down
         final double b = 1 - (averageTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL) / (double) ACCELERATION_INTERVAL;
 
-        output = b;
+        output = (1 - (3 * Math.pow(b, 2) - 2 * Math.pow(b, 3)));
 
         if (drivetrainSubsystem.getLeftPosition() >= DISTANCE_TICKS && drivetrainSubsystem.getRightPosition() >= DISTANCE_TICKS) {
           profileState ++;

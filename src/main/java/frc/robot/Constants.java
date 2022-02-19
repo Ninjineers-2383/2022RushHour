@@ -11,8 +11,8 @@ public final class Constants {
     //Hood angle: 90-16.1 degrees
     public final static class Turret {
         public final static int PORT = 3;
-        public final static int BOUNDS = 65100;
-        public final static double SEEKING_POWER = 0.4;
+        public final static int BOUNDS = 33000;
+        public final static double SEEKING_POWER = 0.3;
     } 
 
 
