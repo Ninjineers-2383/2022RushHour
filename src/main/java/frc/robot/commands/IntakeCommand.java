@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.IntakeSubsystem;
@@ -24,7 +25,7 @@ public class IntakeCommand extends CommandBase {
         this.frontDown = frontDown;
         this.rearDown = rearDown;
         addRequirements(intake);
-    } 
+    }
 
 
     @Override
@@ -41,7 +42,6 @@ public class IntakeCommand extends CommandBase {
         intake.setFrontDown(frontDown);
         intake.setRearDown(rearDown);
     }
-
 
     public void setFrontDown(boolean state) {
         frontDown = state;

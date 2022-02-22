@@ -23,6 +23,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_LEFT_SOLENOID_PORT);
     private final Solenoid frontDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_RIGHT_SOLENOID_PORT);
     private final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_RIGHT_SOLENOID_PORT);
+    private boolean frontDown = false;
+    private boolean rearDown = false;
     
 
     public IntakeSubsystem() {
@@ -33,8 +35,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // deployed intakes turn on
     public void setPower(Double power) {
-        frontMotor.set(ControlMode.PercentOutput, power);
-        rearMotor.set(ControlMode.PercentOutput, power);
+        if (frontDown) {
+            frontMotor.set(ControlMode.PercentOutput, power);
+        } else {
+            frontMotor.set(ControlMode.PercentOutput, 0);
+        }
+        if (rearDown) {
+            rearMotor.set(ControlMode.PercentOutput, power);
+        } else {
+            rearMotor.set(ControlMode.PercentOutput, 0);
+        }
     }
 
     // solenoid control
@@ -43,7 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
         frontDownSolenoid.set(!down);
         SmartDashboard.putBoolean("Front Left Feeder State", frontUpSolenoid.get());
         SmartDashboard.putBoolean("Front Right Feeder State", frontDownSolenoid.get());
-        
+        rearDown = down;
     }
 
     
@@ -52,8 +62,16 @@ public class IntakeSubsystem extends SubsystemBase {
         rearDownSolenoid.set(!down);
         SmartDashboard.putBoolean("Rear Left Feeder State", rearUpSolenoid.get());
         SmartDashboard.putBoolean("Rear Right Feeder State", rearDownSolenoid.get());
+        frontDown = down;
     }
 
+    public boolean getFrontDown() {
+        return frontDown;
+    }
+
+    public boolean getRearDown() {
+        return rearDown;
+    }
 
     public boolean getFrontLeftDown() {
         return frontUpSolenoid.get();

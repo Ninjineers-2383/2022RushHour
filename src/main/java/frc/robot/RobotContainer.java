@@ -44,6 +44,8 @@ import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstrai
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
 
+//hooks are front
+
 public class RobotContainer {
 
   // Controllers and ports
@@ -51,7 +53,7 @@ public class RobotContainer {
   final XboxController operatorController = new XboxController(1);
 
   // Defining doublesuppliers that we will use for axis
-  private DoubleSupplier throttle = () -> driverController.getLeftY();
+  private DoubleSupplier throttle = () -> -driverController.getLeftY();
   private DoubleSupplier leftVoltsTest = () -> SmartDashboard.getNumber("L Volts Test", 0);
   private DoubleSupplier rightVoltsTest = () -> SmartDashboard.getNumber("R Volts Test", 0);
   private DoubleSupplier turn = () -> driverController.getRightX();
@@ -119,7 +121,7 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower, intake));
     intake.setDefaultCommand(intakeCommand);
 
   }
@@ -149,86 +151,28 @@ public class RobotContainer {
     // feeding button
     intakeTrigger.whenActive(new ParallelCommandGroup(
       new IntakeCommand(intake, intakePower, true, true),
-      new ChimneyCommand(chimney, chimneyPower)));
+      new ChimneyCommand(chimney, chimneyPower, intake)));
 
     // toggles that run when the intakes needs to be lowered
+    // lowerFrontFeeder.whenPressed()
+
+    //7 rearDown
+    //6 rearUp
+    //1 frontDown
+    //0 frontUp
+
     lowerFrontFeeder.toggleWhenPressed(
       new StartEndCommand(
-        () -> intakeCommand.setFrontDown(true), 
-        () -> intakeCommand.setFrontDown(false)));
+        () -> intakeCommand.setFrontDown(false), 
+        () -> intakeCommand.setFrontDown(true)));
 
     lowerBackFeeder.toggleWhenPressed(
       new StartEndCommand(
-        () -> intakeCommand.setRearDown(true), 
-        () -> intakeCommand.setRearDown(false)));
+        () -> intakeCommand.setRearDown(false), 
+        () -> intakeCommand.setRearDown(true)));
     }
 
   public Command getAutonomousCommand() {
-
-    // drivetrain.tankDriveVolts(leftVoltsTest.getAsDouble(), rightVoltsTest.getAsDouble());
-    
-    // We don't know if we need the following two objects, but I'm leaving it just in case.
-    // Create a voltage constraint to ensure we don't accelerate too fast
-    // var autoVoltageConstraint =
-    // new DifferentialDriveVoltageConstraint(
-    //     new SimpleMotorFeedforward(
-    //         Constants.Drivetrain.ksVolts,
-    //         Constants.Drivetrain.kvVoltSecondsPerMeter,
-    //         Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
-    //         Constants.Drivetrain.kDriveKinematics,
-    //     10);
-    // // Create config for trajectory
-    // TrajectoryConfig config =
-    //     new TrajectoryConfig(
-    //             Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-    //             Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-    //         // Add kinematics to ensure max speed is actually obeyed
-    //         .setKinematics(Constants.Drivetrain.kDriveKinematics)
-    //         // Apply the voltage constraint
-    //         .addConstraint(autoVoltageConstraint);
-
-    // String trajectoryJSON = "/PathWeaver/output/StraightLinePath.wpilib.json";
-    // Trajectory trajectory = new Trajectory();
-    // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-    // try {
-    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    // } catch (IOException ex) {
-    //   DriverStation.reportError("POOP IN MY MOUTH " + trajectoryJSON, ex.getStackTrace());
-    // } 
-    
-    // System.out.println(trajectory.toString());
-  
-    Trajectory straightLine = PathPlanner.loadPath("Straight Line", 0.8, 0.5); 
-    SimpleMotorFeedforward a = new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
-    Constants.Drivetrain.kvVoltSecondsPerMeter,
-    Constants.Drivetrain.kaVoltSecondsSquaredPerMeter);
-    SmartDashboard.putNumber("Simple feedforward", a.calculate(0.5, 1));
-    
-    // RamseteCommand ramseteCommand = new RamseteCommand(
-    //     straightLine,
-    //     drivetrain::getPose,
-    //     new RamseteController(Constants.AutoConstants.kRamseteB, Constants.AutoConstants.kRamseteZeta),
-    //      new SimpleMotorFeedforward(Constants.Drivetrain.ksVolts,
-    //                                 Constants.Drivetrain.kvVoltSecondsPerMeter,
-    //                                 Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
-    //     Constants.Drivetrain.kDriveKinematics,
-    //     drivetrain::getWheelSpeeds,
-    //     //CHANGE THE PID VALUES
-    //     new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
-    //     new PIDController(Constants.Drivetrain.Motor_kP, Constants.Drivetrain.Motor_kI, 0),
-        
-    //     // RamseteCommand passes volts to the callback
-    //     drivetrain::tankDriveVolts,
-    //     drivetrain
-    // );
-
-    // Reset odometry to the starting pose of the trajectory.
-    drivetrain.resetOdometry(straightLine.getInitialPose());
-    
-
-    //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
-
-    //return turn;
     return new AutoTurn(drivetrain, 90, 5, 0.33, 2)
     .andThen(new AutoForward(drivetrain, 10, 2, 0.5, 7))
     .andThen(new WaitCommand(1))

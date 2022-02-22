@@ -69,10 +69,10 @@ public final class Constants {
 
     public final static class Intake {
         //solenoid ports on pcm
-        public final static int FRONT_LEFT_SOLENOID_PORT = 7;
+        public final static int FRONT_LEFT_SOLENOID_PORT = 1;
         public final static int REAR_LEFT_SOLENOID_PORT = 6;
         public final static int FRONT_RIGHT_SOLENOID_PORT = 0;
-        public final static int REAR_RIGHT_SOLENOID_PORT = 1;
+        public final static int REAR_RIGHT_SOLENOID_PORT = 7;
         public final static int FRONT_INTAKE_PORT = 10;
         public final static int REAR_INTAKE_PORT = 11;
     }
