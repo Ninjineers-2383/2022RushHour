@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.commands.TurretCommand;
@@ -79,7 +80,8 @@ public class RobotContainer {
 
   // backup joystick buttons if limelight dies
   final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
-  final JoystickButton indexerbuttonBackup = new JoystickButton(driverController, Button.kX.value);
+  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kX.value);
+  final JoystickButton indexerDown = new JoystickButton(driverController, Button.kB.value);
 
   // defining subsystems
   private final LimelightSubsystem limelight = new LimelightSubsystem();
@@ -143,7 +145,9 @@ public class RobotContainer {
    // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
-    indexerbuttonBackup.whileHeld(new IndexerCommand(indexer, () -> 1));
+    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
+    indexerDown.whileActiveContinuous(new IndexerCommand(indexer, () -> -1));
+
 
     // backup launcher control if limelight fails
     launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
