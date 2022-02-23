@@ -229,20 +229,7 @@ public class RobotContainer {
     //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
 
     //return turn;
-    return new AutoTurn(drivetrain, 90, 5, 4, 2)
-    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoTurn(drivetrain, 90, 5, 4, 2))
-    .andThen(new WaitCommand(1))
-    .andThen(new AutoForward(drivetrain, 10, 2, 6, 7));
+    return new AutoForward(drivetrain, 10, 2, 6, 7);
     //return null;
   }
 }
