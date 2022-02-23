@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -184,58 +185,45 @@ public class RobotContainer {
     }
 
   public Command getAutonomousCommand() {
-    //turret.setPosition(24762);
-    return new AutoForward(drivetrain, 10, 2, 3, 7);
-    // SequentialCommandGroup(
-    //   new LauncherCommand(launcher, () -> 12509).withTimeout(0.5),
-    //   new WaitCommand(1),
-    //   new IndexerCommand(indexer, () -> 0.9).withTimeout(0.5),
-    //   new WaitCommand(2)
-    //   )
-      /* .andThen(new */
-      // ParallelCommandGroup(
-      //   new AutoForward(drivetrain, 3, 2.5, -0.5, 5), 
-      //   new IntakeCommand(intake, () -> 1, false, true).withTimeout(0.5))
-      // .andThen(new WaitCommand(1))
-      // .andThen(new LauncherCommand(launcher, () -> 15000).withTimeout(0.5))
-      // .andThen(new WaitCommand(1))
-      // .andThen(new IndexerCommand(indexer, () -> 1).withTimeout(0.5))
-      // .andThen(new ParallelCommandGroup(
-      //     new DrivetrainCommand(drivetrain, () -> 0, () -> 0),
-      //     new LauncherCommand(launcher, () -> 0),
-      //     new IntakeCommand(intake, () -> 0, false, false),
-      //     new IndexerCommand(indexer, () -> 0)
-      //   ));
-    // return new LauncherCommand(launcher, () -> 12509) 
-    //   .andThen(new IndexerCommand(indexer, () -> 0.9))
-    //   .andThen(new WaitCommand(1))
-    //   .andThen(new ParallelCommandGroup(
-    //     new AutoForward(drivetrain, -3, 1, 0.5, 5), 
-    //     new IntakeCommand(intake, () -> 1, false, true)))
-    //   .andThen(new WaitCommand(1))
-    //   .andThen(new LauncherCommand(launcher, () -> 15000))
-    //   .andThen(new WaitCommand(1))
-    //   .andThen(new IndexerCommand(indexer, () -> 1))
-    //   .andThen(new ParallelCommandGroup(
-    //     new DrivetrainCommand(drivetrain, () -> 0, () -> 0),
-    //     new LauncherCommand(launcher, () -> 0),
-    //     new IntakeCommand(intake, () -> 0, false, false),
-    //     new IndexerCommand(indexer, () -> 0)
-    //   ));
-    // return new AutoTurn(drivetrain, 90, 5, 0.33, 2)
-    // .andThen(new AutoForward(drivetrain, 10, 2, 0.5, 7))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoTurn(drivetrain, 90, 5, 0.33, 2))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoForward(drivetrain, 10, 2, 0.5, 7))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoTurn(drivetrain, 90, 5, 0.33, 2))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoForward(drivetrain, 10, 2, 0.5, 7))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoTurn(drivetrain, 90, 5, 0.33, 2))
-    // .andThen(new WaitCommand(1))
-    // .andThen(new AutoForward(drivetrain, 10, 2, 0.5, 7));
+
+    // drivetrain.tankDriveVolts(leftVoltsTest.getAsDouble(), rightVoltsTest.getAsDouble());
+    
+    // We don't know if we need the following two objects, but I'm leaving it just in case.
+    // Create a voltage constraint to ensure we don't accelerate too fast
+    // var autoVoltageConstraint =
+    // new DifferentialDriveVoltageConstraint(
+    //     new SimpleMotorFeedforward(
+    //         Constants.Drivetrain.ksVolts,
+    //         Constants.Drivetrain.kvVoltSecondsPerMeter,
+    //         Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
+    //         Constants.Drivetrain.kDriveKinematics,
+    //     10);
+    // // Create config for trajectory
+    // TrajectoryConfig config =
+    //     new TrajectoryConfig(
+    //             Constants.AutoConstants.kMaxSpeedMetersPerSecond,
+    //             Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+    //         // Add kinematics to ensure max speed is actually obeyed
+    //         .setKinematics(Constants.Drivetrain.kDriveKinematics)
+    //         // Apply the voltage constraint
+    //         .addConstraint(autoVoltageConstraint);
+
+    // String trajectoryJSON = "/PathWeaver/output/StraightLinePath.wpilib.json";
+    // Trajectory trajectory = new Trajectory();
+    // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+    // try {
+    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    // } catch (IOException ex) {
+    //   DriverStation.reportError("POOP IN MY MOUTH " + trajectoryJSON, ex.getStackTrace());
+    // } 
+    
+    // System.out.println(trajectory.toString());
+    
+
+    //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
+
+    //return turn;
+    return new AutoForward(drivetrain, 10, 2, 6, 7);
     //return null;
   }
 }

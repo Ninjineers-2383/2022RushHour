@@ -110,8 +110,8 @@ public class AutoForward extends CommandBase {
         done = true;
     }
     
-    leftOutput += kP_HEADING_CORRECTION * (drivetrainSubsystem.m_gyro.getAngle() - startHeading);                // Compensation for unwanted turn
-    rightOutput -= kP_HEADING_CORRECTION * (drivetrainSubsystem.m_gyro.getAngle() - startHeading);
+    leftOutput += kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading);                // Compensation for unwanted turn
+    rightOutput -= kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading);
 
     leftOutput *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
     rightOutput *= ADJUSTED_MAX_VOLTAGE;
