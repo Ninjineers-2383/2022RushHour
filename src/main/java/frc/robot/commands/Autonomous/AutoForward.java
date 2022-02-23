@@ -59,7 +59,7 @@ public class AutoForward extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
+    System.out.println(profileState);
 
     double startHeading = drivetrainSubsystem.getHeading();
     double leftOutput = 0;
@@ -73,7 +73,7 @@ public class AutoForward extends CommandBase {
     switch (profileState) {                                                      // Piece-wise motion profile
       case 0: // Ramp Up
         final double aL = drivetrainSubsystem.getLeftPosition() / (double) ACCELERATION_INTERVAL;
-        final double aR = drivetrainSubsystem.getRightPosition() / (double) ACCELERATION_INTERVAL;
+        final double aR = drivetrainSubsystem.getLeftPosition() / (double) ACCELERATION_INTERVAL;
 
         leftOutput = aL;
         rightOutput = aR;
@@ -95,7 +95,7 @@ public class AutoForward extends CommandBase {
 
       case 2: // Ramp Down
         final double bL = 1 - ((double) (drivetrainSubsystem.getLeftPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
-        final double bR = 1 - ((double) (drivetrainSubsystem.getRightPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
+        final double bR = 1 - ((double) (drivetrainSubsystem.getLeftPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
 
         leftOutput = bL;
         rightOutput = bR;
@@ -118,7 +118,7 @@ public class AutoForward extends CommandBase {
 
     leftOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
     rightOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDriveVolts(-leftOutput, rightOutput);
+    drivetrainSubsystem.tankDriveVolts(leftOutput, rightOutput);
   }
 
 

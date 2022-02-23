@@ -37,7 +37,7 @@ public final class Constants {
         // 0.87 volts left side kv
 
         // Before Big John touched this kV = .66, kVspm = .35, kvsspm = .1
-        public static final double ksVolts = 0.78; //.78
+        public static final double ksVolts = 2; //.78
         public static final double kvVoltSecondsPerMeter = 0.072357; //.95s
         public static final double kaVoltSecondsSquaredPerMeter = 0.006527; //0.208
 
