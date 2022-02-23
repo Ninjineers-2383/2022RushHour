@@ -118,7 +118,7 @@ public class AutoForward extends CommandBase {
 
     leftOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
     rightOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDriveVolts(leftOutput, rightOutput);
+    drivetrainSubsystem.tankDriveVolts(-leftOutput, rightOutput);
   }
 
 

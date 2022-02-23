@@ -60,6 +60,8 @@ public class RobotContainer {
   final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
   final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
   final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
+  // final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
+  // final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
   final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
   final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
 
@@ -75,7 +77,7 @@ public class RobotContainer {
   private DoubleSupplier turn = () -> driverController.getRightX();
   private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.75;
-  private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
+  private DoubleSupplier climberPower = () -> climberUp.get() ? 0.5 : climberDown.get() ? -.5 : 0;
   private DoubleSupplier hookPower = () -> hookUp.get() ? 1 : hookDown.get() ? -1 : 0;
   private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
@@ -182,8 +184,8 @@ public class RobotContainer {
     }
 
   public Command getAutonomousCommand() {
-    turret.setPosition(24762);
-    return new AutoForward(drivetrain, 10, 2, 6, 7);
+    //turret.setPosition(24762);
+    return new AutoForward(drivetrain, 10, 2, 3, 7);
     // SequentialCommandGroup(
     //   new LauncherCommand(launcher, () -> 12509).withTimeout(0.5),
     //   new WaitCommand(1),
