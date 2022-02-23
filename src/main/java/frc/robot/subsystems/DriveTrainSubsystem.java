@@ -1,32 +1,23 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
-import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
-import frc.robot.Constants;
-import frc.robot.Constants.Drivetrain;
-
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Drivetrain;
 
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -51,7 +42,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       Drivetrain.RIGHT_FOLLOWER_PORT);
   
     // The gyro sensor
-    private final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
+    public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
 
     // Odometry class for tracking robot pose
     private final DifferentialDriveOdometry m_odometry;
@@ -109,6 +100,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_rightEncoder.reset();
 
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+  }
+
+  public void switchBrakeCoast(boolean isBrake) {
+    NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
+    leftFollowerMotor.setNeutralMode(mode);
+    leftMasterMotor.setNeutralMode(mode);
+    rightMasterMotor.setNeutralMode(mode);
+    rightFollowerMotor.setNeutralMode(mode);
   }
 
   public void periodic() {
@@ -193,8 +192,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public void autoTurn(double targetHeading, int accelerationInterval, double maxVoltage, double timeout) {
-    final double TOLERANCE = 0.5;
-    final double kP_ANGULAR = 0.5;
     final double ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(targetHeading) * Drivetrain.ksVolts;  
 
     zeroHeading();
@@ -254,10 +251,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
   
   
   public double getLeftPosition() {
+    SmartDashboard.putNumber("left pos", leftMasterMotor.getSelectedSensorPosition());
 		return leftMasterMotor.getSelectedSensorPosition();
 	}
 
 	public double getRightPosition() {
+    SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
 		return rightMasterMotor.getSelectedSensorPosition();
   }
 }

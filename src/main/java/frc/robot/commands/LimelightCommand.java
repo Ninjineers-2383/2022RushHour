@@ -30,24 +30,23 @@ public class LimelightCommand extends CommandBase {
   }
   
 
+  //fix bounds issue!
   @Override
   public void execute() {
-    double Psig = (Math.pow(Math.E, -0.15*((limelight.getX()/2)-12)));
-    double Nsig = (Math.pow(Math.E, -0.15*(((-limelight.getX())/2)-12)));
     kickerOn = false;
     turretSeek = false;
     if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on left
-      turretPower = -0.18;
+      turretPower = -0.3;
     } else if(limelight.getX() > Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on right
-      turretPower = 0.18;
+      turretPower = 0.3;
     } else if(limelight.getTargetVisible()) {
       // target in center
         if((limelight.getX() < -1.5)) {
-          turretPower = 1/(1 + Psig);
+          turretPower = 0.1;
         } else if((limelight.getX() > 1.5)) {
-          turretPower = -1/(1 + Nsig);
+          turretPower = -0.1;
         }
         else {
           turretPower = 0.0;

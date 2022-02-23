@@ -24,6 +24,10 @@ public class TurretSubsystem extends SubsystemBase{
         motor.setSelectedSensorPosition(0);
     }
 
+    public void setPosition(int pos) {
+        motor.setSelectedSensorPosition(pos);
+    }
+
 
     public void setPower(Double power) {
         SmartDashboard.putNumber("446pm", power);
@@ -41,7 +45,7 @@ public class TurretSubsystem extends SubsystemBase{
 
     // Rotates til side flips, then rotates other direction
     public void seek() {
-        setPower(this.side ? 1:-1 * Turret.SEEKING_POWER);
+        setPower(this.side ? 1 * Turret.SEEKING_POWER:-1 * Turret.SEEKING_POWER);
     }
 
     

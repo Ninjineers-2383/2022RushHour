@@ -2,9 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -15,8 +13,6 @@ public class ChimneyCommand extends CommandBase {
     private final ChimneySubsystem chimney;
     private final DoubleSupplier power;
     private final IntakeSubsystem intake;
-    private boolean frontDown;
-    private boolean rearDown;
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs Chimney subsystem actions.

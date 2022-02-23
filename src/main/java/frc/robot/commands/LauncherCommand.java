@@ -14,11 +14,21 @@ public class LauncherCommand extends CommandBase {
 
   private final DoubleSupplier m_speed;
 
+  double timeOut;
+
   // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
   // In this case, a launcher command that takes in the launcher subsystem and runs launcher subsystem actions.
   public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
     m_speed = speed;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+  }
+
+  public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, double timeOut) {
+    m_subsystem = subsystem;
+    m_speed = speed;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
