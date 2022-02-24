@@ -2,15 +2,18 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
+import frc.robot.Constants;
 import frc.robot.Constants.Limelight;
 import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 
 public class LimelightCommand extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   
   private final LimelightSubsystem limelight;
+
+  private final TurretSubsystem turret;
 
   private double turretPower = 0;
 
@@ -19,8 +22,9 @@ public class LimelightCommand extends CommandBase {
   private boolean kickerOn = false;
   
 
-  public LimelightCommand(LimelightSubsystem limelight) {
+  public LimelightCommand(LimelightSubsystem limelight, TurretSubsystem turret) {
     this.limelight = limelight;
+    this.turret = turret;
     addRequirements(limelight);
   }
 
@@ -37,10 +41,10 @@ public class LimelightCommand extends CommandBase {
     turretSeek = false;
     if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on left
-      turretPower = -0.3;
+      turretPower = 0.2;
     } else if(limelight.getX() > Limelight.LIMELIGHT_AIM_TOLERANCE) {
       // target on right
-      turretPower = 0.3;
+      turretPower = -0.2;
     } else if(limelight.getTargetVisible()) {
       // target in center
         if((limelight.getX() < -1.5)) {

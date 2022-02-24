@@ -5,10 +5,11 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
@@ -259,4 +260,61 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
 		return rightMasterMotor.getSelectedSensorPosition();
   }
+  public class SlewRateLimiter {
+    private final double m_rateLimit;
+    private double m_prevVal;
+    private double m_prevTime;
+  
+    /**
+     * Creates a new SlewRateLimiter with the given rate limit and initial value.
+     *
+     * @param rateLimit The rate-of-change limit, in units per second.
+     * @param initialValue The initial value of the input.
+     */
+    public SlewRateLimiter(double rateLimit, double initialValue) {
+      m_rateLimit = rateLimit;
+      m_prevVal = initialValue;
+      m_prevTime = WPIUtilJNI.now() * 1e-6;
+    }
+  
+    /**
+     * Creates a new SlewRateLimiter with the given rate limit and an initial value of zero.
+     *
+     * @param rateLimit The rate-of-change limit, in units per second.
+     */
+    public SlewRateLimiter(double rateLimit) {
+      this(rateLimit, 0);
+    }
+  
+    /**
+     * Filters the input to limit its slew rate.
+     *
+     * @param input The input value whose slew rate is to be limited.
+     * @return The filtered value, which will not change faster than the slew rate.
+     */
+    public double calculate(double input) {
+      double currentTime = WPIUtilJNI.now() * 1e-6;
+      double elapsedTime = currentTime - m_prevTime;
+      if (input > m_prevVal && m_prevVal > 0 || input < m_prevVal && m_prevVal < 0) {
+        m_prevVal +=
+          MathUtil.clamp(input - m_prevVal, 1.3 * -m_rateLimit * elapsedTime, 1.3 * m_rateLimit * elapsedTime);
+      }
+      m_prevVal +=
+          MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
+      m_prevTime = currentTime;
+      return m_prevVal;
+    }
+  
+    /**
+     * Resets the slew rate limiter to the specified value; ignores the rate limit when doing so.
+     *
+     * @param value The value to reset to.
+     */
+    public void reset(double value) {
+      m_prevVal = value;
+      m_prevTime = WPIUtilJNI.now() * 1e-6;
+    }
+  }
+  
+  
 }

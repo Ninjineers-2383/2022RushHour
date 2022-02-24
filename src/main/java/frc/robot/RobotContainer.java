@@ -48,28 +48,26 @@ public class RobotContainer {
   .or(new JoystickButton(driverController, Axis.kRightX.value));
   final Trigger intakeTrigger = new JoystickButton(driverController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(driverController, Axis.kRightTrigger.value));
+  
+  // defining joystick buttons for other subsystems (digital input)
+  final JoystickButton launchButton = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton launchLowButton = new JoystickButton(driverController, Button.kA.value);
+  // backup joystick buttons if limelight dies
+  // final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
+  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kRightBumper.value);
+  final JoystickButton indexerDown = new JoystickButton(driverController, Button.kB.value);
 
   // Backup turret trigger if limelight dies
   final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
-  
-  // defining joystick buttons for other subsystems (digital input)
-  final JoystickButton launchButton = new JoystickButton(driverController, Button.kY.value);
-  final JoystickButton launchLowButton = new JoystickButton(driverController, Button.kA.value);
-  final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
-  final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
-  final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
-  final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
-  final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
-  // final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
-  // final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
+  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
+  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
   final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
   final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
+  final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
+  final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
+  //final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
 
-  // backup joystick buttons if limelight dies
-  // final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
-  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kX.value);
-  final JoystickButton indexerDown = new JoystickButton(driverController, Button.kB.value);
 
   // Defining doublesuppliers that we will use for axis
   private DoubleSupplier throttle = () -> -driverController.getLeftY();
@@ -94,7 +92,7 @@ public class RobotContainer {
   private final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight);
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, turret);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
@@ -158,7 +156,7 @@ public class RobotContainer {
     // TODO: Add backup buttons to DPad
     // launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
-    brakeCoastSwitch.whenPressed(brakeCoastSwitchCommand);
+    //brakeCoastSwitch.whenPressed(brakeCoastSwitchCommand);
 
     // feeding button
     intakeTrigger.whenActive(new ParallelCommandGroup(
@@ -186,44 +184,22 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 
-    // drivetrain.tankDriveVolts(leftVoltsTest.getAsDouble(), rightVoltsTest.getAsDouble());
-    
-    // We don't know if we need the following two objects, but I'm leaving it just in case.
-    // Create a voltage constraint to ensure we don't accelerate too fast
-    // var autoVoltageConstraint =
-    // new DifferentialDriveVoltageConstraint(
-    //     new SimpleMotorFeedforward(
-    //         Constants.Drivetrain.ksVolts,
-    //         Constants.Drivetrain.kvVoltSecondsPerMeter,
-    //         Constants.Drivetrain.kaVoltSecondsSquaredPerMeter),
-    //         Constants.Drivetrain.kDriveKinematics,
-    //     10);
-    // // Create config for trajectory
-    // TrajectoryConfig config =
-    //     new TrajectoryConfig(
-    //             Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-    //             Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-    //         // Add kinematics to ensure max speed is actually obeyed
-    //         .setKinematics(Constants.Drivetrain.kDriveKinematics)
-    //         // Apply the voltage constraint
-    //         .addConstraint(autoVoltageConstraint);
-
-    // String trajectoryJSON = "/PathWeaver/output/StraightLinePath.wpilib.json";
-    // Trajectory trajectory = new Trajectory();
-    // Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-    // try {
-    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    // } catch (IOException ex) {
-    //   DriverStation.reportError("POOP IN MY MOUTH " + trajectoryJSON, ex.getStackTrace());
-    // } 
-    
-    // System.out.println(trajectory.toString());
-    
-
-    //return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
-
-    //return turn;
-    return new AutoForward(drivetrain, 10, 2, 6, 7);
+    return new SequentialCommandGroup(
+      new LauncherCommand(launcher, () -> 11500).withTimeout(1),
+      new IndexerCommand(indexer, () -> 1).withTimeout(1), //make sure this power is right
+      new LauncherCommand(launcher, () -> 0).withTimeout(1),
+      new IndexerCommand(indexer, () -> 0).withTimeout(1),
+      new ParallelCommandGroup(new IntakeCommand(intake, () -> -1, false, true).withTimeout(1),
+      new ChimneyCommand(chimney, () ->-0.75, intake).withTimeout(1)),
+      new AutoForward(drivetrain, 3, 1, 5, 7),
+      new WaitCommand(1),
+      new IntakeCommand(intake, () -> 0, false, true).withTimeout(1),
+      new ChimneyCommand(chimney, () ->0, intake).withTimeout(1),
+      new IntakeCommand(intake, () -> 0, false, false).withTimeout(1),
+      new LauncherCommand(launcher, () -> 13500).withTimeout(1),
+      new IndexerCommand(indexer, () -> 0.7).withTimeout(1), //make sure this power is right
+      new LauncherCommand(launcher, () -> 0).withTimeout(1),
+      new IndexerCommand(indexer, () -> 0).withTimeout(1));
     //return null;
   }
 }

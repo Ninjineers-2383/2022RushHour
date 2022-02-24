@@ -18,7 +18,6 @@ public class IndexerCommand extends CommandBase {
         this.indexer = indexer;
         this.power = power;
         addRequirements(indexer);
-        System.out.println("My ass");
     } 
     
 
@@ -30,4 +29,8 @@ public class IndexerCommand extends CommandBase {
         indexer.setPower(power.getAsDouble());
         //m_subsystem.kickV(m_speed.getAsDouble());
     }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {}
 }

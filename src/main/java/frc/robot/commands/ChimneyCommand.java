@@ -29,13 +29,7 @@ public class ChimneyCommand extends CommandBase {
     public void execute() {
         // See ChimneySubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        if (intake.getFrontLeftDown()) {
-            chimney.setPower(-power.getAsDouble());
-        } else if (intake.getRearLeftDown()) {
-            chimney.setPower(-power.getAsDouble());
-        } else {
-            chimney.setPower(0.0);
-        }
+        chimney.setPower(-power.getAsDouble());
         //m_subsystem.kickV(m_speed.getAsDouble());
     }
 }

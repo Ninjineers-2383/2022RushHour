@@ -1,14 +1,9 @@
 package frc.robot.commands.Autonomous;
 
-import java.util.function.DoubleSupplier;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.Drivetrain;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
@@ -26,6 +21,8 @@ public class AutoForward extends CommandBase {
   final private double ACCELERATION_INTERVAL;
   final private double TIMEOUT;
   final private Timer TIMER;
+
+  final private double OFFSET_TICKS;
   
   private boolean done = false;
   private int profileState = 0; //Finite State Machine
@@ -42,7 +39,7 @@ public class AutoForward extends CommandBase {
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
 
-    drivetrainSubsystem.zeroEncoders();
+    OFFSET_TICKS = (drivetrainSubsystem.getLeftPosition() + drivetrainSubsystem.getRightPosition()) / 2.0;
     this.TIMEOUT = timeout;
     this.TIMER = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -65,6 +62,8 @@ public class AutoForward extends CommandBase {
     double leftOutput = 0;
     double rightOutput = 0;
 
+    double workingTicks = ((drivetrainSubsystem.getLeftPosition() + drivetrainSubsystem.getRightPosition()) / 2.0) - OFFSET_TICKS;
+
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;
     }
@@ -72,13 +71,13 @@ public class AutoForward extends CommandBase {
 
     switch (profileState) {                                                      // Piece-wise motion profile
       case 0: // Ramp Up
-        final double aL = drivetrainSubsystem.getLeftPosition() / (double) ACCELERATION_INTERVAL;
-        final double aR = drivetrainSubsystem.getLeftPosition() / (double) ACCELERATION_INTERVAL;
+        final double aL = workingTicks / (double) ACCELERATION_INTERVAL;
+        final double aR = workingTicks / (double) ACCELERATION_INTERVAL;
 
         leftOutput = aL;
         rightOutput = aR;
 
-        if (drivetrainSubsystem.getLeftPosition() > ACCELERATION_INTERVAL) {
+        if (workingTicks > ACCELERATION_INTERVAL) {
           profileState ++;
         } else {
           break;
@@ -87,20 +86,20 @@ public class AutoForward extends CommandBase {
       case 1: // Max Voltage
         leftOutput = 1;
         rightOutput = 1;
-        if (drivetrainSubsystem.getLeftPosition() > DISTANCE_TICKS - ACCELERATION_INTERVAL) {
+        if (workingTicks > DISTANCE_TICKS - ACCELERATION_INTERVAL) {
           profileState ++;
         } else {
           break;
         }
 
       case 2: // Ramp Down
-        final double bL = 1 - ((double) (drivetrainSubsystem.getLeftPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
-        final double bR = 1 - ((double) (drivetrainSubsystem.getLeftPosition() - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
+        final double bL = 1 - ((double) (workingTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
+        final double bR = 1 - ((double) (workingTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
 
         leftOutput = bL;
         rightOutput = bR;
 
-        if (drivetrainSubsystem.getLeftPosition() >= DISTANCE_TICKS && drivetrainSubsystem.getRightPosition() >= DISTANCE_TICKS) {
+        if (workingTicks >= DISTANCE_TICKS) {
           profileState ++;
         } else {
           break;
