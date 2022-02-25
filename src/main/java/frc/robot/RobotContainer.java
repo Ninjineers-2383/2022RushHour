@@ -2,7 +2,6 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -24,7 +23,6 @@ import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
-import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -140,7 +138,7 @@ public class RobotContainer {
     launching a ball on target lock */
     launchButton.whileHeld(new ParallelCommandGroup(
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand(launcher, () -> -162.577 * limelight.getY() + 14286),
+      new LauncherCommand(launcher, () -> -3.09 * limelight.getY() * limelight.getY() -89.3 * limelight.getY() + 14000),
       new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
 
     launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
@@ -149,19 +147,14 @@ public class RobotContainer {
    // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
-    indexerUp.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() ? 1 : 0));
-    indexerDown.whileActiveContinuous(new IndexerCommand(indexer, () -> -1));
+    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
+    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
     // backup launcher control if limelight fails
     // TODO: Add backup buttons to DPad
     // launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
     //brakeCoastSwitch.whenPressed(brakeCoastSwitchCommand);
-
-    // feeding button
-    intakeTrigger.whenActive(new ParallelCommandGroup(
-      new IntakeCommand(intake, intakePower, true, true),
-      new ChimneyCommand(chimney, chimneyPower, intake)));
 
     // toggles that run when the intakes needs to be lowered
     // lowerFrontFeeder.whenPressed()

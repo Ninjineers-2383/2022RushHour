@@ -5,14 +5,14 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 public final class Constants {
 
     public final static class Limelight {
-        public final static double LIMELIGHT_AIM_TOLERANCE = 11;
+        public final static double LIMELIGHT_AIM_TOLERANCE = 9;
     }
 
     //Hood angle: 90-16.1 degrees
     public final static class Turret {
         public final static int PORT = 3;
         public final static int BOUNDS = 29000;
-        public final static double SEEKING_POWER = 0.3;
+        public final static double SEEKING_POWER = 0.5;
     } 
 
 
