@@ -44,6 +44,10 @@ public class LimelightSubsystem extends SubsystemBase {
         return targetY;
     }
 
+    public double getLaunchingVelocity() {
+        return -109 * getY() + 12_590;
+    }
+
     public boolean getTargetVisible() {
         return targetValid;
     }
