@@ -100,7 +100,7 @@ public class AutoTurn extends CommandBase {
     output *= ADJUSTED_MAX_POWER;                                                   // Multiply by max voltage
 
     output += Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDrive(-output, output);
+    drivetrainSubsystem.tankDrive(-output / 12, output / 12);
   }
 
 
@@ -108,7 +108,6 @@ public class AutoTurn extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.tankDriveVolts(0, 0);
     SmartDashboard.putBoolean("Auto Done", true);
   }
 

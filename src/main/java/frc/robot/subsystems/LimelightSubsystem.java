@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class LimelightSubsystem extends SubsystemBase {
-    private final MedianFilter filteredX = new MedianFilter(5);
+    private final MedianFilter filteredX = new MedianFilter(7);
     private final MedianFilter filteredY = new MedianFilter(1000);
 
     private boolean targetValid = false;

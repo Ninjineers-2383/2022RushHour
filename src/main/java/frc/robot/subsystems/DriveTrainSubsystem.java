@@ -1,18 +1,14 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,9 +41,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // The gyro sensor
     public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
 
-    // Odometry class for tracking robot pose
-    private final DifferentialDriveOdometry m_odometry;
-
   
   public DrivetrainSubsystem() {
     rightMasterMotor  .configFactoryDefault();
@@ -66,24 +59,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     leftMasterMotor   .setInverted(false);
     leftFollowerMotor .setInverted(false);
 
-    // //Configure P values
-    // rightMasterMotor  .config_kP(0, Drivetrain.Motor_kP);
-    // rightFollowerMotor.config_kP(0, Drivetrain.Motor_kP);
-    // leftMasterMotor   .config_kP(0, Drivetrain.Motor_kP);
-    // leftFollowerMotor .config_kP(0, Drivetrain.Motor_kP);
-
-    // //Configure I values
-    // rightMasterMotor  .config_kI(0, Drivetrain.Motor_kI);
-    // rightFollowerMotor.config_kI(0, Drivetrain.Motor_kI);
-    // leftMasterMotor   .config_kI(0, Drivetrain.Motor_kI);
-    // leftFollowerMotor .config_kI(0, Drivetrain.Motor_kI);
-
-    // //Configure D values
-    // rightMasterMotor  .config_kD(0, Drivetrain.Motor_kD);
-    // rightFollowerMotor.config_kD(0, Drivetrain.Motor_kD);
-    // leftMasterMotor   .config_kD(0, Drivetrain.Motor_kD);
-    // leftFollowerMotor .config_kD(0, Drivetrain.Motor_kD);
-
     rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
     rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
     leftMasterMotor   .setNeutralMode(NeutralMode.Brake);
@@ -100,7 +75,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
   }
 
   public void switchBrakeCoast(boolean isBrake) {
@@ -112,10 +86,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
-      m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-
     SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
 
     SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
@@ -124,40 +94,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right Follower Sensor Pos", rightFollowerMotor.getSelectedSensorPosition());
   }
 
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
-
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
-  }
-
-  //reset odometry to a pose passed as an argument
-  public void resetOdometry(Pose2d pose) {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
-  }
-
-  public void VelocityOutput(int leftVelocity, int rightVelocity) {
-    rightMasterMotor.set(ControlMode.Velocity, rightVelocity);
-    rightFollowerMotor.set(ControlMode.Velocity, rightVelocity);
-    leftMasterMotor.set(ControlMode.Velocity, leftVelocity);
-    leftFollowerMotor.set(ControlMode.Velocity, leftVelocity);
-  }
-
-  public void tankDriveVolts(double leftVolts, double rightVolts) {
-    leftMasterMotor.setVoltage(leftVolts);
-    rightMasterMotor.setVoltage(rightVolts);
-    leftFollowerMotor.setVoltage(leftVolts);
-    rightFollowerMotor.setVoltage(rightVolts);
-    drive.feed();
-    SmartDashboard.putNumber("Bruh Its Left", leftVolts);
-    SmartDashboard.putNumber("Bruh Its Right", rightVolts);
-    SmartDashboard.putNumber("LM Volts", leftMasterMotor.getMotorOutputVoltage());
-    SmartDashboard.putNumber("RM Volts", rightMasterMotor.getMotorOutputVoltage());
-    SmartDashboard.putNumber("LF Volts", leftFollowerMotor.getMotorOutputVoltage());
-    SmartDashboard.putNumber("RF Volts", rightFollowerMotor.getMotorOutputVoltage());
   }
 
   public void tankDrive(double left, double right) {
@@ -192,58 +130,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     //drive.arcadeDrive(power, 0.9 * turn);
   }
 
-  public void autoTurn(double targetHeading, int accelerationInterval, double maxVoltage, double timeout) {
-    final double ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(targetHeading) * Drivetrain.ksVolts;  
-
-    zeroHeading();
-    Timer timer = new Timer();
-
-    int profileState = 0;
-    profile: while (timer.get() < timeout) {
-        double output;
-
-        switch (profileState) {                                                      // Piece-wise motion profile
-          case 0: // Ramp Up
-            final double a = getLeftPosition() / (double) accelerationInterval;
-  
-            output = ADJUSTED_MAX_VOLTAGE * (3 * Math.pow(a, 2) - 2 * Math.pow(a, 3));
-  
-            if (Math.abs(getHeading()) > accelerationInterval) {
-              profileState ++;
-            } else {
-              break;
-            }
-          
-          case 1: // Max Voltage
-            output = 1;
-            if (Math.abs(getHeading()) > targetHeading - accelerationInterval) {
-              profileState ++;
-            } else {
-              break;
-            }
-  
-          case 2: // Ramp Down
-            final double b = ((double) (getHeading() - targetHeading + accelerationInterval)) / (double) accelerationInterval;
-  
-            output = (1 - (3 * Math.pow(b, 2) - 2 * Math.pow(b, 3)));
-  
-            if (Math.abs(getHeading()) > targetHeading) {
-              profileState ++;
-            } else {
-              break;
-            }
-  
-          default:
-            break profile;
-        }
-  
-        output *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
-        tankDriveVolts(output, output);
-      }
-      
-      tankDriveVolts(0, 0);
-  }
-
   // reset encoder positions to 0
   public void zeroEncoders() {
 		leftMasterMotor.setSelectedSensorPosition(0);
@@ -260,38 +146,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
 		return rightMasterMotor.getSelectedSensorPosition();
   }
+
+  public double getAverageVelocity() {
+    return (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
+  }
+  
   public class SlewRateLimiter {
     private final double m_rateLimit;
     private double m_prevVal;
     private double m_prevTime;
-  
-    /**
-     * Creates a new SlewRateLimiter with the given rate limit and initial value.
-     *
-     * @param rateLimit The rate-of-change limit, in units per second.
-     * @param initialValue The initial value of the input.
-     */
+
     public SlewRateLimiter(double rateLimit, double initialValue) {
       m_rateLimit = rateLimit;
       m_prevVal = initialValue;
       m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
-  
-    /**
-     * Creates a new SlewRateLimiter with the given rate limit and an initial value of zero.
-     *
-     * @param rateLimit The rate-of-change limit, in units per second.
-     */
     public SlewRateLimiter(double rateLimit) {
       this(rateLimit, 0);
     }
-  
-    /**
-     * Filters the input to limit its slew rate.
-     *
-     * @param input The input value whose slew rate is to be limited.
-     * @return The filtered value, which will not change faster than the slew rate.
-     */
+
     public double calculate(double input) {
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - m_prevTime;
@@ -304,12 +177,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       m_prevTime = currentTime;
       return m_prevVal;
     }
-  
-    /**
-     * Resets the slew rate limiter to the specified value; ignores the rate limit when doing so.
-     *
-     * @param value The value to reset to.
-     */
+
     public void reset(double value) {
       m_prevVal = value;
       m_prevTime = WPIUtilJNI.now() * 1e-6;

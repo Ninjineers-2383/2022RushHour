@@ -117,7 +117,7 @@ public class AutoForward extends CommandBase {
 
     leftOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
     rightOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDriveVolts(leftOutput, rightOutput);
+    drivetrainSubsystem.tankDrive(leftOutput / 12, rightOutput / 12);
   }
 
 
@@ -125,7 +125,6 @@ public class AutoForward extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drivetrainSubsystem.tankDriveVolts(0, 0);
     SmartDashboard.putBoolean("Auto Done", true);
   }
 

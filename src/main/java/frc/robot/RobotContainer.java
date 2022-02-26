@@ -90,7 +90,7 @@ public class RobotContainer {
   private final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight, turret);
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, turret, () -> drivetrain.getAverageVelocity());
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
@@ -119,7 +119,7 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
     // drivetrain.setDefaultCommand(new DrivetrainVoltTest(drivetrain, leftVoltsTest, rightVoltsTest));
     limelight.setDefaultCommand(aimCommand);
-    turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false));
+    turret.setDefaultCommand(new TurretCommand(turret, true));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
     chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower, intake));

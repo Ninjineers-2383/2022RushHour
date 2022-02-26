@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.Limelight;
+import frc.robot.Constants.Turret;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
@@ -20,11 +23,15 @@ public class LimelightCommand extends CommandBase {
   private boolean turretSeek = false;
 
   private boolean kickerOn = false;
-  
 
-  public LimelightCommand(LimelightSubsystem limelight, TurretSubsystem turret) {
+  private DoubleSupplier drivetrainVelocity;
+  MedianFilter drivetrainVelocityF = new MedianFilter(10);
+
+  public LimelightCommand(LimelightSubsystem limelight, TurretSubsystem turret, DoubleSupplier drivetrainVelocity) {
     this.limelight = limelight;
     this.turret = turret;
+    this.drivetrainVelocity = drivetrainVelocity;
+    
     addRequirements(limelight);
   }
 
@@ -39,26 +46,15 @@ public class LimelightCommand extends CommandBase {
   public void execute() {
     kickerOn = false;
     turretSeek = false;
-    if(limelight.getX() < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
-      // target on left
-      turretPower = 0.2;
-    } else if(limelight.getX() > Limelight.LIMELIGHT_AIM_TOLERANCE) {
-      // target on right
-      turretPower = -0.2;
-    } else if(limelight.getTargetVisible()) {
-      // target in center
-        if((limelight.getX() < -1.5)) {
-          turretPower = 0.1;
-        } else if((limelight.getX() > 1.5)) {
-          turretPower = -0.1;
-        }
-        else {
-          turretPower = 0.0;
-          kickerOn = true;
-        }
-        //TODO: delete the code below
-        // turretPower = 0.0;
-        // kickerOn = true;
+    
+    double error = limelight.getX() + Turret.DRIVE_VELOCITY_FACTOR * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
+    if(limelight.getTargetVisible()) {
+      if(Math.abs(error) < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
+        // target on left
+        turretPower = Turret.kP * error;
+      } else {
+        turretPower = 0;
+      }
 
     } else  {
       // no target present

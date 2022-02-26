@@ -13,6 +13,8 @@ public final class Constants {
         public final static int PORT = 3;
         public final static int BOUNDS = 29000;
         public final static double SEEKING_POWER = 0.5;
+        public final static double kP = 0.1;
+        public final static double DRIVE_VELOCITY_FACTOR = 0.001;
     } 
 
 
