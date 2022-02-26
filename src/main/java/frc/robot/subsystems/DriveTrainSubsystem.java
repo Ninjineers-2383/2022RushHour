@@ -6,7 +6,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -18,13 +18,13 @@ import frc.robot.Constants.Drivetrain;
 
 
 public class DrivetrainSubsystem extends SubsystemBase {
-  public final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
-  public final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
-  public final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
-  public final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+  private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
+  private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
+  private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
+  private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
-  SlewRateLimiter throttleF = new SlewRateLimiter(1);
-  SlewRateLimiter turnF = new SlewRateLimiter(3);
+  SlewRateLimiter throttleF = new SlewRateLimiter(2);
+  SlewRateLimiter turnF = new SlewRateLimiter(2);
   
   private DifferentialDrive drive;
 
@@ -183,6 +183,4 @@ public class DrivetrainSubsystem extends SubsystemBase {
       m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
   }
-  
-  
 }

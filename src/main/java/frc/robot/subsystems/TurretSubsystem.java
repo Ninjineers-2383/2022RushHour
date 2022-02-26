@@ -19,6 +19,7 @@ public class TurretSubsystem extends SubsystemBase{
         SmartDashboard.putNumber("Turret pos", getCurrentPosition());
     }
 
+    
     public TurretSubsystem() {
         motor.setInverted(false);
         motor.setSelectedSensorPosition(0);

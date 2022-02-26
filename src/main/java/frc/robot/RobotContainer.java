@@ -101,23 +101,9 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     SmartDashboard.putNumber("Launcher Velocity", 0.0);
-    SmartDashboard.putNumber("L Volts Test", 0.0);
-    SmartDashboard.putNumber("R Volts Test", 0.0);
-    SmartDashboard.putNumber("R Velocity", driveVelocity);
-    SmartDashboard.putNumber("R Kp", Constants.Drivetrain.Motor_kP);
-    SmartDashboard.putNumber("R Ki", Constants.Drivetrain.Motor_kI);
-    SmartDashboard.putNumber("R Kd", Constants.Drivetrain.Motor_kD);
-    SmartDashboard.putNumber("Throttle", throttle.getAsDouble());
-    SmartDashboard.putNumber("Turn", turn.getAsDouble());
-    // default commands for functions
-    // drivetrain.setDefaultCommand(new PIDTuneCommand(drivetrain,
-    //   () -> SmartDashboard.getNumber("R Kp", 0.0),
-    //   () -> SmartDashboard.getNumber("R Ki", 0.0),
-    //   () -> SmartDashboard.getNumber("R Kd", 0.0)
-    //   ));
 
+    // default commands for functions
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
-    // drivetrain.setDefaultCommand(new DrivetrainVoltTest(drivetrain, leftVoltsTest, rightVoltsTest));
     limelight.setDefaultCommand(aimCommand);
     turret.setDefaultCommand(new TurretCommand(turret, true));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
