@@ -6,6 +6,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
@@ -18,6 +19,8 @@ import frc.robot.Constants.Drivetrain;
 
 
 public class DrivetrainSubsystem extends SubsystemBase {
+
+  
   private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
   private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
   private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
@@ -43,6 +46,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   
   public DrivetrainSubsystem() {
+    
     rightMasterMotor  .configFactoryDefault();
     rightFollowerMotor.configFactoryDefault();
     leftMasterMotor   .configFactoryDefault();
@@ -126,7 +130,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
   public void drive(double power, double turn){
-    drive.arcadeDrive(throttleF.calculate(power), turnF.calculate(turn * 0.9));
+    
+    double driveOutput = throttleF.calculate(power);
+    double turnOutput = turnF.calculate(turn * 0.9);
+
+    drive.arcadeDrive(driveOutput, turnOutput);
     //drive.arcadeDrive(power, 0.9 * turn);
   }
 

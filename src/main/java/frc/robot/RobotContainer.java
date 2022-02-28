@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.BrakeCoastSwitchCommand;
 import frc.robot.commands.ChimneyCommand;
@@ -59,6 +61,8 @@ public class RobotContainer {
   final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
   final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
+  final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
+  final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
   final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
   final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
   final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
@@ -67,6 +71,7 @@ public class RobotContainer {
   //final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
 
 
+  
   // Defining doublesuppliers that we will use for axis
   private DoubleSupplier throttle = () -> -driverController.getLeftY();
   // private DoubleSupplier leftVoltsTest = () -> SmartDashboard.getNumber("L Volts Test", 0);
@@ -74,8 +79,8 @@ public class RobotContainer {
   private DoubleSupplier turn = () -> driverController.getRightX();
   private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.75;
-  private DoubleSupplier climberPower = () -> climberUp.get() ? 0.5 : climberDown.get() ? -.5 : 0;
-  private DoubleSupplier hookPower = () -> hookUp.get() ? 1 : hookDown.get() ? -1 : 0;
+  private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
+  private DoubleSupplier hookPower = () -> hookUp.get() ? 0.85 : hookDown.get() ? -0.85 : -0.1;
   private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
@@ -111,6 +116,7 @@ public class RobotContainer {
     chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower, intake));
     intake.setDefaultCommand(intakeCommand);
     climber.setDefaultCommand(climberCommand);
+    SmartDashboard.putBoolean("Aim Active", false);
 
   }
   
@@ -122,10 +128,17 @@ public class RobotContainer {
     turret aiming
     launcher rev
     launching a ball on target lock */
-    launchButton.whileHeld(new ParallelCommandGroup(
-      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-      new LauncherCommand(launcher, () -> -3.09 * limelight.getY() * limelight.getY() -89.3 * limelight.getY() + 14000),
-      new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0)));
+    limelightTarget.whileHeld(new ParallelCommandGroup(
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
+    new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+    new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false)))
+    );
+      
+  
+    limelightYeet.whileHeld(new ParallelCommandGroup(
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek())));
+    launchButton.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0) );
 
     launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
 
@@ -133,10 +146,10 @@ public class RobotContainer {
    // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
-    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
-    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
+    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 0.5));
+    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -0.5));
 
-    // backup launcher control if limelight fails
+    // backup launcher control if limelight failss
     // TODO: Add backup buttons to DPad
     // launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
@@ -163,6 +176,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 
+    // return new SequentialCommandGroup(
+    //   new AutoForward(drivetrain, 3, 1, 0.5, 7)
+    // );
     return new SequentialCommandGroup(
       new LauncherCommand(launcher, () -> 11500).withTimeout(1),
       new IndexerCommand(indexer, () -> 1).withTimeout(1), //make sure this power is right
@@ -170,16 +186,21 @@ public class RobotContainer {
       new IndexerCommand(indexer, () -> 0).withTimeout(1),
       new ParallelCommandGroup(new IntakeCommand(intake, () -> -1, false, true).withTimeout(1),
       new ChimneyCommand(chimney, () ->-0.75, intake).withTimeout(1)),
-      new AutoForward(drivetrain, 3, 1, 5, 7),
+      new AutoForward(drivetrain, 5, 1, 0.5, 7),
       new WaitCommand(1),
       new IntakeCommand(intake, () -> 0, false, true).withTimeout(1),
       new ChimneyCommand(chimney, () ->0, intake).withTimeout(1),
       new IntakeCommand(intake, () -> 0, false, false).withTimeout(1),
-      new LauncherCommand(launcher, () -> 13500).withTimeout(1),
+      new ParallelCommandGroup(new ParallelCommandGroup(
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()))).withTimeout(3)
+      ,
+      new TurretCommand(turret, () -> 0, () -> false),
       new IndexerCommand(indexer, () -> 0.7).withTimeout(1), //make sure this power is right
       new LauncherCommand(launcher, () -> 0).withTimeout(1),
       new IndexerCommand(indexer, () -> 0).withTimeout(1));
-    //return null;
+  //   //return null;
+  // }
   }
 }
 

@@ -5,16 +5,17 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 public final class Constants {
 
     public final static class Limelight {
-        public final static double LIMELIGHT_AIM_TOLERANCE = 9;
+        public final static double LIMELIGHT_AIM_TOLERANCE = 10;
     }
 
     //Hood angle: 90-16.1 degrees
     public final static class Turret {
         public final static int PORT = 3;
         public final static int BOUNDS = 29000;
-        public final static double SEEKING_POWER = 0.5;
-        public final static double kP = 0.1;
-        public final static double DRIVE_VELOCITY_FACTOR = 0.001;
+        public final static double SEEKING_POWER = 0.7;
+        public final static double kP = 0.015;
+        public final static double DRIVE_VELOCITY_FACTOR = 0;
+        public final static double OFFSET_TICKS = -1000;
     } 
 
 
@@ -40,6 +41,7 @@ public final class Constants {
 
         // Before Big John touched this kV = .66, kVspm = .35, kvsspm = .1
         public static final double ksVolts = 2; //.78
+        public static final double ksPercent = 0.26;
         public static final double kvVoltSecondsPerMeter = 0.072357; //.95s
         public static final double kaVoltSecondsSquaredPerMeter = 0.006527; //0.208
 

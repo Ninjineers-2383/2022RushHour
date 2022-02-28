@@ -49,7 +49,7 @@ public class TurretSubsystem extends SubsystemBase{
         setPower(this.side ? 1 * Turret.SEEKING_POWER:-1 * Turret.SEEKING_POWER);
     }
     public void center() {
-        setPower(Turret.kP * getCurrentPosition());
+        setPower(0.0);
     }
 
     

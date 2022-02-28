@@ -14,7 +14,7 @@ public class AutoForward extends CommandBase {
   private final DrivetrainSubsystem drivetrainSubsystem;
 
   private final double kP_HEADING_CORRECTION = 10;                                       // Strength of heading correction 
-  private final double ADJUSTED_MAX_VOLTAGE;
+  private final double adjustedMaxOutput;
 
   
   final private double DISTANCE_TICKS;
@@ -32,9 +32,9 @@ public class AutoForward extends CommandBase {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AutoForward(DrivetrainSubsystem subsystem, double distanceFeet, double accelerationIntervalFeet, double maxVoltage, double timeout) {
+  public AutoForward(DrivetrainSubsystem subsystem, double distanceFeet, double accelerationIntervalFeet, double maxOutput, double timeout) {
     drivetrainSubsystem = subsystem;
-    this.ADJUSTED_MAX_VOLTAGE = maxVoltage - Math.signum(maxVoltage) * Drivetrain.ksVolts;                      // Friction
+    this.adjustedMaxOutput = maxOutput - Math.signum(maxOutput) * (Drivetrain.ksPercent);                      // Friction
 
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
@@ -74,6 +74,8 @@ public class AutoForward extends CommandBase {
         final double aL = workingTicks / (double) ACCELERATION_INTERVAL;
         final double aR = workingTicks / (double) ACCELERATION_INTERVAL;
 
+        //SmartDashboard.putNumber("")
+
         leftOutput = aL;
         rightOutput = aR;
 
@@ -112,12 +114,19 @@ public class AutoForward extends CommandBase {
     leftOutput += kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading);                // Compensation for unwanted turn
     rightOutput -= kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading);
 
-    leftOutput *= ADJUSTED_MAX_VOLTAGE;                                                   // Multiply by max voltage
-    rightOutput *= ADJUSTED_MAX_VOLTAGE;
+    leftOutput *= adjustedMaxOutput;                                                   // Multiply by max output
+    rightOutput *= adjustedMaxOutput;
 
-    leftOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    rightOutput += Math.signum(ADJUSTED_MAX_VOLTAGE) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDrive(leftOutput / 12, rightOutput / 12);
+    leftOutput += Math.signum(adjustedMaxOutput) * (Drivetrain.ksPercent);
+    rightOutput += Math.signum(adjustedMaxOutput) * (Drivetrain.ksPercent);
+
+    // leftOutput /= 12;
+    // rightOutput /= 12;
+
+    SmartDashboard.putNumber("left", leftOutput);
+    SmartDashboard.putNumber("right", rightOutput);
+
+    drivetrainSubsystem.tankDrive(leftOutput, rightOutput);
   }
 
 

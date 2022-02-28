@@ -38,6 +38,7 @@ public class LimelightCommand extends CommandBase {
   
   public void periodic() {
     SmartDashboard.putBoolean("Locked On", turretSeek);
+    
   }
   
 
@@ -47,15 +48,9 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
     
-    double error = limelight.getX() + Turret.DRIVE_VELOCITY_FACTOR * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
+    double error = limelight.getX();// - Turret.DRIVE_VELOCITY_FACTOR * Math.cos(Turret.BOUNDS * (turret.getCurcanrentPosition() - Turret.OFFSET_TICKS)  / Math.PI) * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
     if(limelight.getTargetVisible()) {
-      if(Math.abs(error) < -Limelight.LIMELIGHT_AIM_TOLERANCE) {
-        // target on left
-        turretPower = Turret.kP * error;
-      } else {
-        turretPower = 0;
-      }
-
+      turretPower = -Turret.kP * error;
     } else  {
       // no target present
       turretSeek = true;
@@ -76,4 +71,5 @@ public class LimelightCommand extends CommandBase {
   public boolean getKickerOn() {
     return kickerOn;
   }
+
 }
