@@ -61,6 +61,7 @@ public class RobotContainer {
   final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
   final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
+  final POVButton limelightClimb = new POVButton(operatorController, 0, 0);
   final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
   final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
   final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
@@ -73,14 +74,14 @@ public class RobotContainer {
 
   
   // Defining doublesuppliers that we will use for axis
-  private DoubleSupplier throttle = () -> -driverController.getLeftY();
+  private DoubleSupplier throttle = () -> driverController.getLeftY();
   // private DoubleSupplier leftVoltsTest = () -> SmartDashboard.getNumber("L Volts Test", 0);
   // private DoubleSupplier rightVoltsTest = () -> SmartDashboard.getNumber("R Volts Test", 0);
   private DoubleSupplier turn = () -> driverController.getRightX();
   private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.75;
   private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
-  private DoubleSupplier hookPower = () -> hookUp.get() ? 0.85 : hookDown.get() ? -0.85 : -0.1;
+  private DoubleSupplier hookPower = () -> hookUp.get() ? 0.5 : hookDown.get() ? -0.5 : -0.1;
   private Double driveVelocity = 0.0;
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
