@@ -25,6 +25,7 @@ import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
+import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -86,14 +87,14 @@ public class RobotContainer {
   // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // defining subsystems
-  private final LimelightSubsystem limelight = new LimelightSubsystem();
-  private final LauncherSubsystem launcher = new LauncherSubsystem();
-  private final TurretSubsystem turret = new TurretSubsystem();
-  private final IndexerSubsystem indexer = new IndexerSubsystem();
-  private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-  private final ChimneySubsystem chimney = new ChimneySubsystem();
-  private final IntakeSubsystem intake = new IntakeSubsystem();
-  private final ClimberSubsystem climber = new ClimberSubsystem();
+  public final LimelightSubsystem limelight = new LimelightSubsystem();
+  public final LauncherSubsystem launcher = new LauncherSubsystem();
+  public final TurretSubsystem turret = new TurretSubsystem();
+  public final IndexerSubsystem indexer = new IndexerSubsystem();
+  public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
+  public final ChimneySubsystem chimney = new ChimneySubsystem();
+  public final IntakeSubsystem intake = new IntakeSubsystem();
+  public final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight, turret, () -> drivetrain.getAverageVelocity());
@@ -141,6 +142,7 @@ public class RobotContainer {
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek())));
     launchButton.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0) );
 
+    
     launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
 
     // backup turret control if limelight fails
@@ -176,32 +178,28 @@ public class RobotContainer {
     }
 
   public Command getAutonomousCommand() {
-
-    // return new SequentialCommandGroup(
-    //   new AutoForward(drivetrain, 3, 1, 0.5, 7)
-    // );
     return new SequentialCommandGroup(
-      new LauncherCommand(launcher, () -> 11500).withTimeout(1),
-      new IndexerCommand(indexer, () -> 1).withTimeout(1), //make sure this power is right
-      new LauncherCommand(launcher, () -> 0).withTimeout(1),
-      new IndexerCommand(indexer, () -> 0).withTimeout(1),
-      new ParallelCommandGroup(new IntakeCommand(intake, () -> -1, false, true).withTimeout(1),
-      new ChimneyCommand(chimney, () ->-0.75, intake).withTimeout(1)),
-      new AutoForward(drivetrain, 5, 1, 0.5, 7),
-      new WaitCommand(1),
-      new IntakeCommand(intake, () -> 0, false, true).withTimeout(1),
-      new ChimneyCommand(chimney, () ->0, intake).withTimeout(1),
-      new IntakeCommand(intake, () -> 0, false, false).withTimeout(1),
-      new ParallelCommandGroup(new ParallelCommandGroup(
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
-      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()))).withTimeout(3)
-      ,
-      new TurretCommand(turret, () -> 0, () -> false),
-      new IndexerCommand(indexer, () -> 0.7).withTimeout(1), //make sure this power is right
-      new LauncherCommand(launcher, () -> 0).withTimeout(1),
-      new IndexerCommand(indexer, () -> 0).withTimeout(1));
-  //   //return null;
-  // }
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.2),
+      new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
+      //new LauncherCommand(launcher, () -> 11550).withTimeout(1.4),
+      new ChimneyCommand(chimney, () -> -0.75, intake).withTimeout(0.1),
+      //new IndexerCommand(indexer, () -> 0.7).withTimeout(0.5), //make sure this power is right
+      new AutoForward(drivetrain, 5, 0.5, 0.6, 7),
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(0.2),
+      new ParallelCommandGroup(
+        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(0.5),
+        new SequentialCommandGroup(
+          new WaitCommand(0.3), 
+          new IndexerCommand(indexer, () -> 0.7).withTimeout(0.75))
+      ), //make sure this power is right
+      new ParallelCommandGroup(
+        new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
+        new LauncherCommand(launcher, () -> 0).withTimeout(0.1)),
+      new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+      new AutoTurn(drivetrain, 8.5, 5, -0.4, 5),
+      new AutoForward(drivetrain, 15, 0.5, 0.6, 10)
+      );
+    //return null;
   }
 }
 

@@ -22,7 +22,7 @@ public class AutoForward extends CommandBase {
   final private double TIMEOUT;
   final private Timer TIMER;
 
-  final private double OFFSET_TICKS;
+  final private double[] OFFSET_TICKS = new double[2];
   
   private boolean done = false;
   private int profileState = 0; //Finite State Machine
@@ -39,7 +39,8 @@ public class AutoForward extends CommandBase {
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
 
-    OFFSET_TICKS = (drivetrainSubsystem.getLeftPosition() + drivetrainSubsystem.getRightPosition()) / 2.0;
+    OFFSET_TICKS[0] = drivetrainSubsystem.getLeftPosition();
+    OFFSET_TICKS[1] = drivetrainSubsystem.getRightPosition();
     this.TIMEOUT = timeout;
     this.TIMER = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -62,7 +63,7 @@ public class AutoForward extends CommandBase {
     double leftOutput = 0;
     double rightOutput = 0;
 
-    double workingTicks = ((drivetrainSubsystem.getLeftPosition() + drivetrainSubsystem.getRightPosition()) / 2.0) - OFFSET_TICKS;
+    double workingTicks = (((drivetrainSubsystem.getLeftPosition() - OFFSET_TICKS[0]) + (drivetrainSubsystem.getRightPosition() - OFFSET_TICKS[1]))) / 2.0;
 
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;
@@ -71,13 +72,12 @@ public class AutoForward extends CommandBase {
 
     switch (profileState) {                                                      // Piece-wise motion profile
       case 0: // Ramp Up
-        final double aL = workingTicks / (double) ACCELERATION_INTERVAL;
-        final double aR = workingTicks / (double) ACCELERATION_INTERVAL;
+        final double a = workingTicks / (double) ACCELERATION_INTERVAL;
 
         //SmartDashboard.putNumber("")
 
-        leftOutput = aL;
-        rightOutput = aR;
+        leftOutput = a;
+        rightOutput = a;
 
         if (workingTicks > ACCELERATION_INTERVAL) {
           profileState ++;
@@ -95,11 +95,10 @@ public class AutoForward extends CommandBase {
         }
 
       case 2: // Ramp Down
-        final double bL = 1 - ((double) (workingTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
-        final double bR = 1 - ((double) (workingTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
+        final double b = 1 - ((double) (workingTicks - DISTANCE_TICKS + ACCELERATION_INTERVAL)) / (double) ACCELERATION_INTERVAL;
 
-        leftOutput = bL;
-        rightOutput = bR;
+        leftOutput = b;
+        rightOutput = b;
 
         if (workingTicks >= DISTANCE_TICKS) {
           profileState ++;

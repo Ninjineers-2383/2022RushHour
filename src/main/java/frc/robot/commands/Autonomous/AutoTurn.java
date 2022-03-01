@@ -32,7 +32,7 @@ public class AutoTurn extends CommandBase {
    */
   public AutoTurn(DrivetrainSubsystem subsystem, double targetHeading, double accelerationInterval, double maxPower, double timeout) {
     drivetrainSubsystem = subsystem;
-    this.ADJUSTED_MAX_POWER = maxPower - Math.signum(maxPower) * Drivetrain.ksVolts;                      // Friction
+    this.ADJUSTED_MAX_POWER = maxPower - Math.signum(maxPower) * Drivetrain.ksPercentTurn;                      // Friction
 
     this.TARGET_HEADING = targetHeading;
     this.ACCELERATION_INTERVAL = accelerationInterval;
@@ -53,19 +53,18 @@ public class AutoTurn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double offsetHeading = (drivetrainSubsystem.getHeading() - startHeading);
+    double offsetHeading = Math.abs(drivetrainSubsystem.getHeading() - startHeading);
     double output = 0;
 
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;
     }
 
-
     switch (profileState) {  // Piece-wise Trapezoidal motion profile
       case 0: // Ramp Up
-        final double a =  offsetHeading / (double) ACCELERATION_INTERVAL;
+        final double a =  offsetHeading / ACCELERATION_INTERVAL;
 
-        output = ADJUSTED_MAX_POWER * (3 * Math.pow(a, 2) - 2 * Math.pow(a, 3));
+        output = a;
 
         if (offsetHeading > ACCELERATION_INTERVAL) {
           profileState ++;
@@ -82,10 +81,9 @@ public class AutoTurn extends CommandBase {
         }
 
       case 2: // Ramp Down
-        final double b = 1 - ((double) ((offsetHeading) - TARGET_HEADING + ACCELERATION_INTERVAL * 1.05)) / 
-        (double) (ACCELERATION_INTERVAL / 1.02);
+        final double b = ((offsetHeading - TARGET_HEADING + ACCELERATION_INTERVAL)) / (ACCELERATION_INTERVAL);
 
-        output = (1 - (3 * Math.pow(b, 2) - 2 * Math.pow(b, 3)));
+        output = (1 - b);
 
         if (offsetHeading >= TARGET_HEADING) {
           profileState ++;
@@ -99,8 +97,8 @@ public class AutoTurn extends CommandBase {
 
     output *= ADJUSTED_MAX_POWER;                                                   // Multiply by max voltage
 
-    output += Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksVolts;
-    drivetrainSubsystem.tankDrive(-output / 12, output / 12);
+    output += Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksPercentTurn;
+    drivetrainSubsystem.tankDrive(-output, output);
   }
 
 
