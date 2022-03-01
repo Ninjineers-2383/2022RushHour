@@ -38,7 +38,9 @@ public class AutoForward extends CommandBase {
 
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
-
+    while (drivetrainSubsystem.getLeftPosition() != 0) {
+      drivetrainSubsystem.zeroEncoders();
+    }
     OFFSET_TICKS[0] = drivetrainSubsystem.getLeftPosition();
     OFFSET_TICKS[1] = drivetrainSubsystem.getRightPosition();
     this.TIMEOUT = timeout;
@@ -63,7 +65,7 @@ public class AutoForward extends CommandBase {
     double leftOutput = 0;
     double rightOutput = 0;
 
-    double workingTicks = (((drivetrainSubsystem.getLeftPosition() - OFFSET_TICKS[0]) + (drivetrainSubsystem.getRightPosition() - OFFSET_TICKS[1]))) / 2.0;
+    double workingTicks = Math.abs((((drivetrainSubsystem.getLeftPosition() - OFFSET_TICKS[0]) + (drivetrainSubsystem.getRightPosition() - OFFSET_TICKS[1]))) / 2.0);
 
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;

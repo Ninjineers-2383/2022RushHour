@@ -59,4 +59,8 @@ public class LimelightSubsystem extends SubsystemBase {
     public boolean getTargetVisible() {
         return targetValid;
     }
+    public void setLimelight(boolean isOn) {
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        table.getEntry("ledMode").setNumber(isOn ? 0:2);
+    }
 }

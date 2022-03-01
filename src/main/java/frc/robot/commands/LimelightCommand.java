@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Limelight;
@@ -20,9 +21,13 @@ public class LimelightCommand extends CommandBase {
 
   private double turretPower = 0;
 
+  private Timer elapsedTime = new Timer();
+
   private boolean turretSeek = false;
 
   private boolean kickerOn = false;
+
+  private final double TURRET_BOUNDS_THRESHOLD = 100;
 
   private DoubleSupplier drivetrainVelocity;
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
@@ -48,8 +53,15 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
     
-    double error = limelight.getX();// - Turret.DRIVE_VELOCITY_FACTOR * Math.cos(Turret.BOUNDS * (turret.getCurcanrentPosition() - Turret.OFFSET_TICKS)  / Math.PI) * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
-    if(limelight.getTargetVisible()) {
+    double error = limelight.getX(); // - Turret.DRIVE_VELOCITY_FACTOR * Math.cos(Turret.BOUNDS * (turret.getCurcanrentPosition() - Turret.OFFSET_TICKS)  / Math.PI) * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
+    // if (Math.abs(turret.getCurrentPosition())  +  TURRET_BOUNDS_THRESHOLD > Turret.BOUNDS) {
+    //   elapsedTime.reset();
+    //   limelight.setLimelight(false);
+    //   turretSeek = true;
+    // }
+
+    if(limelight.getTargetVisible()){ // && elapsedTime.get() > 1) {
+      limelight.setLimelight(true);
       turretPower = -Turret.kP * error;
     } else  {
       // no target present
