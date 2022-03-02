@@ -27,6 +27,8 @@ public class LimelightCommand extends CommandBase {
   private final double kP = 0.00001;
   private DoubleSupplier drivetrainVelocity;
 
+  private MedianFilter velocityFilter = new MedianFilter(5);
+
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
   public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
@@ -42,7 +44,7 @@ public class LimelightCommand extends CommandBase {
     this.limelight = limelight;
     this.turretTicks = turretTicks;
     this.drivetrainVelocity = drivetrainVelocity;
-    this.velocityCompensation = true;
+    this.velocityCompensation = velocityCompensation;
     addRequirements(limelight);
   }
 

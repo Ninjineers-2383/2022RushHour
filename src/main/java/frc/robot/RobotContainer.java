@@ -96,7 +96,7 @@ public class RobotContainer {
   public final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), true);
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
