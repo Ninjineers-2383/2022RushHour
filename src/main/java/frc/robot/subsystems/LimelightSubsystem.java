@@ -11,7 +11,6 @@ import frc.robot.Constants.Limelight;
 
 public class LimelightSubsystem extends SubsystemBase {
     private final MedianFilter filteredX = new MedianFilter(5);
-    private final MedianFilter filteredY = new MedianFilter(1000);
 
     private boolean targetValid = false;
     private double targetX;
@@ -29,7 +28,6 @@ public class LimelightSubsystem extends SubsystemBase {
         // reads values
         targetValid = tableValidTarget.getDouble(1) != 0;
         targetX = filteredX.calculate(tableTargetX.getDouble(0));
-//        targetY = filteredY.calculate(tableTargetY.getDouble(0));
         targetY = tableTargetY.getDouble(0);
 
         // post to smart dashboard

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.BrakeCoastSwitchCommand;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DrivetrainCommand;
@@ -84,7 +83,6 @@ public class RobotContainer {
   private DoubleSupplier chimneyPower = () -> intakePower.getAsDouble() * 0.75;
   private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
   private DoubleSupplier hookPower = () -> hookUp.get() ? 0.5 : hookDown.get() ? -0.5 : -0.1;
-  private Double driveVelocity = 0.0;
   //private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // defining subsystems
@@ -101,7 +99,7 @@ public class RobotContainer {
   private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), true);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
-  private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
+  // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
   
   // Auto Chooser
   SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -289,13 +287,8 @@ public class RobotContainer {
       new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4)
     );
 
-    Command testAuto = new SequentialCommandGroup(
-      new TurretCommand(turret, true, 0).withTimeout(5)
-    );
-
     autoChooser.setDefaultOption("Two Ball", twoBallAuto);
     autoChooser.addOption("Four Ball", fourBallAuto);
-    //autoChooser.addOption("Test Auto", testAuto);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }

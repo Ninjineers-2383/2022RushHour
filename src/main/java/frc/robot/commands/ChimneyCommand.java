@@ -12,14 +12,12 @@ public class ChimneyCommand extends CommandBase {
 
     private final ChimneySubsystem chimney;
     private final DoubleSupplier power;
-    private final IntakeSubsystem intake;
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs Chimney subsystem actions.
     public ChimneyCommand(ChimneySubsystem chimney, DoubleSupplier power, IntakeSubsystem intake) {
         this.chimney = chimney;
         this.power = power;
-        this.intake = intake;
         addRequirements(chimney);
     } 
 
