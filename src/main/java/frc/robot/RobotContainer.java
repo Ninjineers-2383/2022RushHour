@@ -118,7 +118,7 @@ public class RobotContainer {
     // default commands for functions
     drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
     limelight.setDefaultCommand(aimCommand);
-    turret.setDefaultCommand(new TurretCommand(turret, true));
+    turret.setDefaultCommand(new TurretCommand(turret, true, 6300));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
     chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower, intake));
@@ -278,11 +278,23 @@ public class RobotContainer {
         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
         new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1)
-      )
+      ),
+      new AutoTurn(drivetrain, 55, 10, 0.6, 6),
+      new IntakeCommand(intake, () -> -1, true, false).withTimeout(0.1),
+      new AutoForward(drivetrain, 5, 2, -0.6, 5),
+      new TurretCommand(turret, true, 0).withTimeout(0.6),
+      
+      new LauncherCommand(launcher, () -> 5000).withTimeout(1),
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4)
+    );
+
+    Command testAuto = new SequentialCommandGroup(
+      new TurretCommand(turret, true, 0).withTimeout(5)
     );
 
     autoChooser.setDefaultOption("Two Ball", twoBallAuto);
     autoChooser.addOption("Four Ball", fourBallAuto);
+    //autoChooser.addOption("Test Auto", testAuto);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
