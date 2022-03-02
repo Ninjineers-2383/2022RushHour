@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,24 +18,22 @@ public class LimelightCommand extends CommandBase {
   
   private final LimelightSubsystem limelight;
 
-  private final TurretSubsystem turret;
+  private final DoubleSupplier turretTicks;
 
   private double turretPower = 0;
-
-  private Timer elapsedTime = new Timer();
 
   private boolean turretSeek = false;
 
   private boolean kickerOn = false;
 
-  private final double TURRET_BOUNDS_THRESHOLD = 100;
-
+  private final double kP = 0.01;
   private DoubleSupplier drivetrainVelocity;
+
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
-  public LimelightCommand(LimelightSubsystem limelight, TurretSubsystem turret, DoubleSupplier drivetrainVelocity) {
+  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
     this.limelight = limelight;
-    this.turret = turret;
+    this.turretTicks = turretTicks;
     this.drivetrainVelocity = drivetrainVelocity;
     
     addRequirements(limelight);
@@ -53,14 +52,9 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
     
-    double error = limelight.getX(); // - Turret.DRIVE_VELOCITY_FACTOR * Math.cos(Turret.BOUNDS * (turret.getCurcanrentPosition() - Turret.OFFSET_TICKS)  / Math.PI) * drivetrainVelocityF.calculate(drivetrainVelocity.getAsDouble());
-    // if (Math.abs(turret.getCurrentPosition())  +  TURRET_BOUNDS_THRESHOLD > Turret.BOUNDS) {
-    //   elapsedTime.reset();
-    //   limelight.setLimelight(false);
-    //   turretSeek = true;
-    // }
+    double error = limelight.getX() + kP * drivetrainVelocity.getAsDouble() * Math.cos((turretTicks.getAsDouble() - 25000) * Math.PI / Turret.FULL_ROTATION);
 
-    if(limelight.getTargetVisible()){ // && elapsedTime.get() > 1) {
+    if(limelight.getTargetVisible()){
       limelight.setLimelight(true);
       turretPower = -Turret.kP * error;
     } else  {

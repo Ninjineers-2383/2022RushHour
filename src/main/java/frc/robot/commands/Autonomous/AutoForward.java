@@ -13,7 +13,7 @@ public class AutoForward extends CommandBase {
   
   private final DrivetrainSubsystem drivetrainSubsystem;
 
-  private final double kP_HEADING_CORRECTION = 10;                                       // Strength of heading correction 
+  private final double kP_HEADING_CORRECTION = 9.8;                                       // Strength of heading correction 
   private final double adjustedMaxOutput;
 
   
@@ -38,11 +38,7 @@ public class AutoForward extends CommandBase {
 
     this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
     this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
-    while (drivetrainSubsystem.getLeftPosition() != 0) {
-      drivetrainSubsystem.zeroEncoders();
-    }
-    OFFSET_TICKS[0] = drivetrainSubsystem.getLeftPosition();
-    OFFSET_TICKS[1] = drivetrainSubsystem.getRightPosition();
+  
     this.TIMEOUT = timeout;
     this.TIMER = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -54,6 +50,9 @@ public class AutoForward extends CommandBase {
   @Override
   public void initialize() {
     SmartDashboard.putBoolean("Auto Done", false);
+    TIMER.reset();
+    OFFSET_TICKS[0] = drivetrainSubsystem.getLeftPosition();
+    OFFSET_TICKS[1] = drivetrainSubsystem.getRightPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

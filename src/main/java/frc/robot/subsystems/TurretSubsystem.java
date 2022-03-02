@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -49,7 +50,7 @@ public class TurretSubsystem extends SubsystemBase{
         setPower(this.side ? 1 * Turret.SEEKING_POWER:-1 * Turret.SEEKING_POWER);
     }
     public void center() {
-        setPower(0.0);
+        setPower(MathUtil.clamp(Turret.kPCenter * (this.getCurrentPosition() - 6_300) / Turret.FULL_ROTATION, -0.5, 0.5));
     }
 
     

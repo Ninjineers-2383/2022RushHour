@@ -14,7 +14,8 @@ public final class Constants {
         public final static int FULL_ROTATION = 32000;
         public final static int BOUNDS = FULL_ROTATION + 10000;
         public final static double SEEKING_POWER = 0.7;
-        public final static double kP = 0.02;
+        public final static double kP = 0.015;
+        public final static double kPCenter = 0.5;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static double OFFSET_TICKS = -1000;
     } 
@@ -41,8 +42,8 @@ public final class Constants {
         // 0.87 volts left side kv
 
         // Before Big John touched this kV = .66, kVspm = .35, kvsspm = .1
-        public static final double ksVolts = 2; //.78
-        public static final double ksPercent = 0.26;
+        public static final double ksVolts = 0.24; //.78
+        public static final double ksPercent = 0.29;
         public static final double ksPercentTurn = 0.35;
         public static final double kvVoltSecondsPerMeter = 0.072357; //.95s
         public static final double kaVoltSecondsSquaredPerMeter = 0.006527; //0.208

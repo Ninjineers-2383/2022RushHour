@@ -83,7 +83,7 @@ public class RobotContainer {
   private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
   private DoubleSupplier hookPower = () -> hookUp.get() ? 0.5 : hookDown.get() ? -0.5 : -0.1;
   private Double driveVelocity = 0.0;
-  // private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
+  //private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // defining subsystems
   public final LimelightSubsystem limelight = new LimelightSubsystem();
@@ -96,7 +96,7 @@ public class RobotContainer {
   public final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight, turret, () -> drivetrain.getAverageVelocity());
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity());
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
@@ -146,7 +146,7 @@ public class RobotContainer {
     launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
 
     // backup turret control if limelight fails
-   // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
+    // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
     indexerUp.whileHeld(new IndexerCommand(indexer, () -> 0.5));
@@ -180,44 +180,54 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
-        new LauncherCommand(launcher, () -> 10000).withTimeout(0.1),
+        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
         new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
-        new ChimneyCommand(chimney, () -> -0.75, intake).withTimeout(0.1),
-        new AutoForward(drivetrain, 5, 1.9, 0.8, 5)
+        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+        new AutoForward(drivetrain, 5.3, 2, 0.88, 5)
       ),
-      new ParallelCommandGroup(   // Shoot two ballsez
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1500).withTimeout(1),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1),
+      new ParallelCommandGroup(   // Shoot two ballsez after feeeding one
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
         new SequentialCommandGroup(
-          new WaitCommand(0.3), 
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.75))
-      ), //make sure this power is right
+          new WaitCommand(0.4), 
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+          new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
+      ),
       new ParallelCommandGroup(   // Stop launch system
         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-        new AutoTurn(drivetrain, 12, 1.9, -0.4, 5)
-      ),    // intake human player ball
-      new AutoForward(drivetrain, 15.7, 2, 0.8, 5),
-      new AutoTurn(drivetrain, 32, 10, 0.4, 5),
-      new AutoForward(drivetrain, 16.8, 0.5, 0.5, 2),
-      new WaitCommand(1),
+        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+        new AutoTurn(drivetrain, 19, 8, -0.4, 5)
+      ),    // drives back and intakes human player ball
+      new AutoForward(drivetrain, 9.3, 2.5, 0.9, 5),
+      new AutoTurn(drivetrain, 40, 10, 0.6, 5),
+      new AutoForward(drivetrain, 2.3, 0.5, 0.6, 2),
+      new WaitCommand(0.2),
       new ParallelCommandGroup(
-        new IntakeCommand(intake, () -> 0, false, false).withTimeout(0.1),
-        new LauncherCommand(launcher, () -> 10000).withTimeout(0.1),
-        new AutoTurn(drivetrain, 32, 10, -0.4, 5)
+        new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
+        new AutoTurn(drivetrain, 35, 10, -0.6, 2)
       ),
-      new AutoForward(drivetrain, 30, 1, -0.8, 3),
+      new ParallelCommandGroup(
+        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 0.7, () -> aimCommand.getTurretSeek()).withTimeout(2),
+        new AutoForward(drivetrain, 13.5, 2, -0.88, 2)
+      ),
       new ParallelCommandGroup(   // Shoot two ballsez
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1500).withTimeout(1),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1),
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(0.6),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(1.5),
         new SequentialCommandGroup(
-          new WaitCommand(0.3), 
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.75))
-      ), //make sure this power is right
-      new IntakeCommand(intake, () -> -1, true, false),
-      new WaitCommand(1)
-      );
+          new WaitCommand(0.4), 
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+          new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
+      ));
     //return null;
   }
 }
