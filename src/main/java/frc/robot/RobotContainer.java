@@ -198,6 +198,7 @@ public class RobotContainer {
   }
 
   public void SetAutoCommands() {
+    
     Command fourBallAuto = new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
