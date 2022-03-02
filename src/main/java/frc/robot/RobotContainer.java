@@ -189,12 +189,12 @@ public class RobotContainer {
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
         new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
         new SequentialCommandGroup(
-          new WaitCommand(0.4), 
+          new WaitCommand(0.3), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
-          new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
-          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.15),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
       ),
       new ParallelCommandGroup(   // Stop launch system
@@ -224,8 +224,8 @@ public class RobotContainer {
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
           new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
-          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.2),
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
       ));
     //return null;

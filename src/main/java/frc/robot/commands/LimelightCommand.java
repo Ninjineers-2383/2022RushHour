@@ -26,7 +26,7 @@ public class LimelightCommand extends CommandBase {
 
   private boolean kickerOn = false;
 
-  private final double kP = 0.01;
+  private final double kP = 0.00001;
   private DoubleSupplier drivetrainVelocity;
 
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
@@ -52,7 +52,7 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
     
-    double error = limelight.getX() + kP * drivetrainVelocity.getAsDouble() * Math.cos((turretTicks.getAsDouble() - 25000) * Math.PI / Turret.FULL_ROTATION);
+    double error = limelight.getX();  // + kP * drivetrainVelocity.getAsDouble() * Math.cos((turretTicks.getAsDouble() - 25000) * Math.PI / Turret.FULL_ROTATION);
 
     if(limelight.getTargetVisible()){
       limelight.setLimelight(true);
