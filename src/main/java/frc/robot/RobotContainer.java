@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -50,11 +51,12 @@ public class RobotContainer {
   .or(new JoystickButton(driverController, Axis.kRightTrigger.value));
   
   // defining joystick buttons for other subsystems (digital input)
-  final JoystickButton launchButton = new JoystickButton(driverController, Button.kLeftBumper.value);
+  //final JoystickButton launchButton = new JoystickButton(driverController, Button.kLeftBumper.value);
   final JoystickButton launchLowButton = new JoystickButton(driverController, Button.kA.value);
   // backup joystick buttons if limelight dies
   // final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
-  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kRightBumper.value);
+  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton indexerUpTwoBall = new JoystickButton(driverController, Button.kRightBumper.value);
   final JoystickButton indexerDown = new JoystickButton(driverController, Button.kB.value);
 
   // Backup turret trigger if limelight dies
@@ -96,11 +98,15 @@ public class RobotContainer {
   public final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity());
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), true);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
   
+  // Auto Chooser
+  SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+
 
   /* The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -119,6 +125,8 @@ public class RobotContainer {
     intake.setDefaultCommand(intakeCommand);
     climber.setDefaultCommand(climberCommand);
     SmartDashboard.putBoolean("Aim Active", false);
+
+    SetAutoCommands();
 
   }
   
@@ -140,17 +148,26 @@ public class RobotContainer {
     limelightYeet.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek())));
-    launchButton.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0) );
+    //launchButton.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0) );
 
     
-    launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
+    //launchButton.whenPressed(new LauncherCommand(launcher, () -> 5500));
 
     // backup turret control if limelight fails
     // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
-    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 0.5));
-    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -0.5));
+    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 0.75));
+    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -0.75));
+
+    indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
+      new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.1),
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.12),
+      new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+      new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+      new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.05),
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.15)
+    ));
 
     // backup launcher control if limelight failss
     // TODO: Add backup buttons to DPad
@@ -177,8 +194,13 @@ public class RobotContainer {
         () -> intakeCommand.setRearDown(true)));
     }
 
+
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(
+    return autoChooser.getSelected();
+  }
+
+  public void SetAutoCommands() {
+    Command fourBallAuto = new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
         new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
@@ -195,7 +217,8 @@ public class RobotContainer {
           new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
           new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.15),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
+        )
       ),
       new ParallelCommandGroup(   // Stop launch system
         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
@@ -227,8 +250,41 @@ public class RobotContainer {
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.2),
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
-      ));
-    //return null;
+      )
+    );
+
+    Command twoBallAuto = new SequentialCommandGroup(
+      new ParallelCommandGroup(   // Intake system activate and intake first ball
+        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
+        new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
+        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+        new AutoForward(drivetrain, 5.3, 2, 0.75, 5)
+      ),
+      new ParallelCommandGroup(   // Shoot two balls after feeeding one
+      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.9),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
+        new SequentialCommandGroup(
+          new WaitCommand(0.3), 
+          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.5),
+          new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
+          new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.15),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.5)
+        )
+      ),
+      new ParallelCommandGroup(   // Stop launch system
+        new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
+        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
+        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1)
+      )
+    );
+
+    autoChooser.setDefaultOption("Two Ball", twoBallAuto);
+    autoChooser.addOption("Four Ball", fourBallAuto);
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 }
 

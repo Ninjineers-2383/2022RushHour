@@ -3,6 +3,8 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
+import javax.swing.plaf.basic.BasicTreeUI.TreeCancelEditingAction;
+
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +28,8 @@ public class LimelightCommand extends CommandBase {
 
   private boolean kickerOn = false;
 
+  private final boolean velocityCompensation;
+
   private final double kP = 0.00001;
   private DoubleSupplier drivetrainVelocity;
 
@@ -35,7 +39,16 @@ public class LimelightCommand extends CommandBase {
     this.limelight = limelight;
     this.turretTicks = turretTicks;
     this.drivetrainVelocity = drivetrainVelocity;
+    this.velocityCompensation = false;
     
+    addRequirements(limelight);
+  }
+
+  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation) {
+    this.limelight = limelight;
+    this.turretTicks = turretTicks;
+    this.drivetrainVelocity = drivetrainVelocity;
+    this.velocityCompensation = true;
     addRequirements(limelight);
   }
 
@@ -52,7 +65,7 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
     
-    double error = limelight.getX();  // + kP * drivetrainVelocity.getAsDouble() * Math.cos((turretTicks.getAsDouble() - 25000) * Math.PI / Turret.FULL_ROTATION);
+    double error = limelight.getX() + (velocityCompensation ? 1:0) * kP * drivetrainVelocity.getAsDouble() * Math.cos((turretTicks.getAsDouble() - 25000) * Math.PI / Turret.FULL_ROTATION);
 
     if(limelight.getTargetVisible()){
       limelight.setLimelight(true);
