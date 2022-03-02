@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.Constants.Turret;
 
 public class TurretCommand extends CommandBase {
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -15,10 +16,16 @@ public class TurretCommand extends CommandBase {
     private final BooleanSupplier seek;
     private final Boolean center;
     private final int position;
+    private final Boolean inBounds;
 
 
     public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek) {
         this.turret = turret;
+        if (!(turret.getCurrentPosition() > Turret.BOUNDS) && !(turret.getCurrentPosition() <= -Turret.BOUNDS)) {
+          this.inBounds = true;  
+        } else {
+            this.inBounds = false;
+        }
         this.speed = power;
         this.seek = seek;
         this.center = false;
@@ -32,6 +39,7 @@ public class TurretCommand extends CommandBase {
         this.seek = () -> false;
         this.center = center;
         this.position = position;
+        this.inBounds = true;
         addRequirements(turret);
     } 
     
@@ -41,13 +49,15 @@ public class TurretCommand extends CommandBase {
     @Override
     public void execute() {
         // 1 degree of rotation = 145.695364 ticks
-        if (center) {
-            turret.runToPosition(position);
-        } else {
-            if (seek.getAsBoolean()) {
-                turret.seek();
+        if (inBounds){
+            if (center) {
+                turret.runToPosition(position);
             } else {
-                turret.setPower(speed.getAsDouble());
+                if (seek.getAsBoolean()) {
+                    turret.seek();
+                } else {
+                    turret.setPower(speed.getAsDouble());
+                }
             }
         }
     }
