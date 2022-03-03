@@ -212,7 +212,7 @@ public class RobotContainer {
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4),
           new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
           new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.15),
@@ -227,12 +227,12 @@ public class RobotContainer {
         new AutoTurn(drivetrain, 19, 8, -0.4, 5)
       ),    // drives back and intakes human player ball
       new AutoForward(drivetrain, 9.3, 2.5, 0.9, 5),
-      new AutoTurn(drivetrain, 40, 10, 0.6, 5),
+      new AutoTurn(drivetrain, 35, 10, 0.6, 5),
       new AutoForward(drivetrain, 2.3, 0.5, 0.6, 2),
       new WaitCommand(0.2),
       new ParallelCommandGroup(
         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-        new AutoTurn(drivetrain, 35, 10, -0.6, 2)
+        new AutoTurn(drivetrain, 29, 10, -0.6, 2)
       ),
       new ParallelCommandGroup(
         new TurretCommand(turret, () -> aimCommand.getTurretPower() * 0.7, () -> aimCommand.getTurretSeek()).withTimeout(2),
@@ -288,8 +288,11 @@ public class RobotContainer {
       new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4)
     );
 
+    Command nullAuto = null;
+
     autoChooser.setDefaultOption("Two Ball", twoBallAuto);
     autoChooser.addOption("Four Ball", fourBallAuto);
+    autoChooser.addOption("No Auto", nullAuto);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
