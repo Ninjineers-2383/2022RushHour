@@ -11,7 +11,7 @@ public final class Constants {
     //Hood angle: 90-16.1 degrees
     public final static class Turret {
         public final static int PORT = 3;
-        public final static int FULL_ROTATION = 32000;
+        public final static int FULL_ROTATION = 34000;
         public final static int BOUNDS = FULL_ROTATION;
         public final static double SEEKING_POWER = 0.4;
         public final static double kP = 0.015;

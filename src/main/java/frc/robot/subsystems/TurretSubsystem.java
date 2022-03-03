@@ -13,6 +13,7 @@ import frc.robot.Constants.Turret;
 public class TurretSubsystem extends SubsystemBase{
     private TalonSRX motor = new TalonSRX(Turret.PORT);
     private boolean side = false;
+    private boolean inBounds;
 
 
     @Override
@@ -30,13 +31,20 @@ public class TurretSubsystem extends SubsystemBase{
         motor.setSelectedSensorPosition(pos);
     }
 
+    public void setInBounds(Boolean inBounds) {
+        this.inBounds = inBounds;
+    }
+
+    public Boolean getInBounds() {
+        return inBounds;
+    }
 
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
-            power = 0.15;
+            //power = 0.15;
             this.side = true;
         } else if (getCurrentPosition() <= -Turret.BOUNDS) {
-            power = -0.15;
+            // power = -0.15;
             this.side = false;
         }
         motor.set(ControlMode.PercentOutput, power);

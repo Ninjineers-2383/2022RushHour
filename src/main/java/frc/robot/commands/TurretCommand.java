@@ -31,7 +31,7 @@ public class TurretCommand extends CommandBase {
         this.center = false;
         this.position = 6300;
         addRequirements(turret);
-    } 
+    }
 
     public TurretCommand(TurretSubsystem turret, boolean center, int position) {
         this.turret = turret;

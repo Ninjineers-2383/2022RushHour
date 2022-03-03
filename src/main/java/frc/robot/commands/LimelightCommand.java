@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Turret;
 import frc.robot.subsystems.LimelightSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 
 public class LimelightCommand extends CommandBase {
@@ -20,23 +21,19 @@ public class LimelightCommand extends CommandBase {
 
   private boolean kickerOn = false;
 
+  private TurretSubsystem turret;
+
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
+  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation, TurretSubsystem turret) {
     this.limelight = limelight;
-    
-    addRequirements(limelight);
-  }
-
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation) {
-    this.limelight = limelight;
+    this.turret = turret;
     addRequirements(limelight);
   }
 
   
   public void periodic() {
-    SmartDashboard.putBoolean("Locked On", turretSeek);
-    
+    SmartDashboard.putBoolean("Locked On", turretSeek); 
   }
   
 
@@ -48,7 +45,7 @@ public class LimelightCommand extends CommandBase {
     
     double error = limelight.getX();
 
-    if(limelight.getTargetVisible()){
+    if(limelight.getTargetVisible() && turret.getInBounds()){
       limelight.setLimelight(true);
       turretPower = -Turret.kP * error;
     } else  {

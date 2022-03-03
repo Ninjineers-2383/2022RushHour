@@ -96,7 +96,7 @@ public class RobotContainer {
   public final ClimberSubsystem climber = new ClimberSubsystem();
   
   // defining premeditatied commands
-  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
+  private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false, turret);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
@@ -138,9 +138,9 @@ public class RobotContainer {
     launching a ball on target lock */
     limelightTarget.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
-    new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-    new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false)))
-    );
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+      new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false))
+    ));
       
   
     limelightYeet.whileHeld(new ParallelCommandGroup(
@@ -198,7 +198,7 @@ public class RobotContainer {
   }
 
   public void SetAutoCommands() {
-    
+
     Command fourBallAuto = new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
