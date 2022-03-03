@@ -216,7 +216,7 @@ public class RobotContainer {
           new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.3),
           new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.15),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4)
         )
       ),
       new ParallelCommandGroup(   // Stop launch system
@@ -239,7 +239,7 @@ public class RobotContainer {
         new AutoForward(drivetrain, 13.5, 2, -0.88, 2)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(0.6),
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
         new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(1.5),
         new SequentialCommandGroup(
           new WaitCommand(0.4), 
