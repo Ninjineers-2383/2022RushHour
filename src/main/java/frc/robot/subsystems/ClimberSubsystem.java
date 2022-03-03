@@ -41,14 +41,14 @@ public class ClimberSubsystem extends SubsystemBase {
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
 
-        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 254);
-        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 257);
+        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 243);
+        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 262);
 
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0);
-        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, 0);
+        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -20);
+        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -20);
     }
 
     @Override
