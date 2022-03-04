@@ -41,7 +41,7 @@ public class ClimberSubsystem extends SubsystemBase {
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
 
-        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 243);
+        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 251);
         right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, 262);
 
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
@@ -58,13 +58,14 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void setPower(double left, double right, double hookPower) {
-        left_climber.set(left);
-        right_climber.set(right);
-        if(left < 3) {
-            hook.set(ControlMode.PercentOutput, hookPower * 0.5);
+        hook.set(ControlMode.PercentOutput, hookPower);
+        if(left_encoder.getPosition() < 3) {
+            left_climber.set(left * 0.5);
+            right_climber.set(right * 0.5);
         }
         else {
-            hook.set(ControlMode.PercentOutput, hookPower);
+            left_climber.set(left);
+            right_climber.set(right);
         }
     }
 
