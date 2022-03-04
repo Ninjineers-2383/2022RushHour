@@ -47,8 +47,8 @@ public class ClimberSubsystem extends SubsystemBase {
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -20);
-        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -20);
+        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -5);
+        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -5);
     }
 
     @Override
@@ -60,7 +60,12 @@ public class ClimberSubsystem extends SubsystemBase {
     public void setPower(double left, double right, double hookPower) {
         left_climber.set(left);
         right_climber.set(right);
-        hook.set(ControlMode.PercentOutput, hookPower);
+        if(left < 3) {
+            hook.set(ControlMode.PercentOutput, hookPower * 0.5);
+        }
+        else {
+            hook.set(ControlMode.PercentOutput, hookPower);
+        }
     }
 
     public void switchBrakeCoast(boolean isBrake) {
