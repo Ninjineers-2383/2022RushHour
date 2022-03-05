@@ -138,11 +138,10 @@ public class RobotContainer {
     launching a ball on target lock */
     limelightTarget.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
-    new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-    new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false)))
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+      new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false)))
     );
       
-  
     limelightYeet.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek())));
@@ -159,12 +158,12 @@ public class RobotContainer {
     indexerDown.whileHeld(new IndexerCommand(indexer, () -> -0.75));
 
     indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
-      new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.1),
-      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.12),
-      new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+      new ChimneyCommand(chimney, () -> -0.4, intake).withTimeout(0.1),
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+      new IndexerCommand(indexer, () -> 0).withTimeout(0.3),
       new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
       new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.05),
-      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.15)
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2)
     ));
 
     // backup launcher control if limelight failss
@@ -208,7 +207,7 @@ public class RobotContainer {
       ),
       new ParallelCommandGroup(   // Shoot two ballsez after feeeding one
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(1.2),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
@@ -235,7 +234,7 @@ public class RobotContainer {
         new AutoTurn(drivetrain, 29, 10, -0.6, 2)
       ),
       new ParallelCommandGroup(
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 0.7, () -> aimCommand.getTurretSeek()).withTimeout(2),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 0.5, () -> aimCommand.getTurretSeek()).withTimeout(2),
         new AutoForward(drivetrain, 13.5, 2, -0.88, 2)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez
@@ -301,13 +300,23 @@ public class RobotContainer {
         new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(2)
-      )));
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(2)))
+          );
+
+      Command testAuto = new SequentialCommandGroup(
+        new ParallelCommandGroup(   // Shoot two balls after feeeding one
+          new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.9),
+            new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
+            new SequentialCommandGroup(
+              new WaitCommand(0.3), 
+              new IndexerCommand(indexer, () -> 0.75).withTimeout(2)))
+      );
 
     autoChooser.setDefaultOption("Two Ball", twoBallAuto);
     autoChooser.addOption("Four Ball", fourBallAuto);
     autoChooser.addOption("No Auto", nullAuto);
     autoChooser.addOption("One Ball", oneBallAuto);
+    autoChooser.addOption("Test Auto", testAuto);
 
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
