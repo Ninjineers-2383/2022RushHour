@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -25,6 +26,7 @@ import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.commands.Autonomous.AutoTurn;
+import frc.robot.commands.Autonomous.LimelightCommandAuto;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -197,6 +199,10 @@ public class RobotContainer {
   }
 
   public void SetAutoCommands() {
+
+    LimelightCommandAuto autoLimelight = new LimelightCommandAuto(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
+    LimelightCommandAuto autoLimelight2 = new LimelightCommandAuto(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
+    LimelightCommandAuto autoLimelight3 = new LimelightCommandAuto(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
     
     Command fourBallAuto = new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
@@ -206,8 +212,11 @@ public class RobotContainer {
         new AutoForward(drivetrain, 5.3, 2, 0.88, 5)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez after feeeding one
-      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(1.2),
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
+        new ParallelRaceGroup(
+          autoLimelight,
+          new TurretCommand(turret, () -> autoLimelight.getTurretPower(), () -> autoLimelight.getTurretSeek()).withTimeout(1.2)
+        ),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
@@ -233,13 +242,13 @@ public class RobotContainer {
         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
         new AutoTurn(drivetrain, 29, 10, -0.6, 2)
       ),
-      new ParallelCommandGroup(
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 0.5, () -> aimCommand.getTurretSeek()).withTimeout(2),
+      new ParallelRaceGroup(
+        autoLimelight2,
+        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.5, () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
         new AutoForward(drivetrain, 13.5, 2, -0.88, 2)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez
         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(1.5),
         new SequentialCommandGroup(
           new WaitCommand(0.4), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
@@ -247,7 +256,8 @@ public class RobotContainer {
           new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
           new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.2),
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3))
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
+        )
       )
     );
 
@@ -260,8 +270,11 @@ public class RobotContainer {
         new WaitCommand(0.5)
       ),
       new ParallelCommandGroup(   // Shoot two balls after feeeding one
-      new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.9),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.9),
+        new ParallelRaceGroup(
+          autoLimelight3,
+          new TurretCommand(turret, () -> autoLimelight3.getTurretPower(), () -> autoLimelight3.getTurretSeek()).withTimeout(1.2)
+        ),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),

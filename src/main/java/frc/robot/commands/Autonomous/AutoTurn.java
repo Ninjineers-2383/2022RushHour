@@ -56,6 +56,9 @@ public class AutoTurn extends CommandBase {
     double offsetHeading = Math.abs(drivetrainSubsystem.getHeading() - startHeading);
     double output = 0;
 
+    System.out.print("Turn: ");
+    System.out.println(profileState);
+
     if (TIMER.get() > TIMEOUT) {
       profileState = 3;
     }
@@ -107,6 +110,7 @@ public class AutoTurn extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     SmartDashboard.putBoolean("Auto Done", true);
+    drivetrainSubsystem.tankDrive(0.0, 0.0);
   }
 
   // Returns true when the command should end.

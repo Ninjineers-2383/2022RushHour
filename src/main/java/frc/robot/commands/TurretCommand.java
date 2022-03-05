@@ -51,4 +51,9 @@ public class TurretCommand extends CommandBase {
             }
         }
     }
+
+    @Override
+    public void end(boolean force) {
+        turret.setPower(0.0);
+    }
 }

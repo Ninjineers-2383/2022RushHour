@@ -135,6 +135,7 @@ public class AutoForward extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     SmartDashboard.putBoolean("Auto Done", true);
+    drivetrainSubsystem.tankDrive(0, 0);
   }
 
   // Returns true when the command should end.
