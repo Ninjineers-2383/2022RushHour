@@ -98,7 +98,7 @@ public class RobotContainer {
   public final ChimneySubsystem chimney = new ChimneySubsystem();
   public final IntakeSubsystem intake = new IntakeSubsystem();
   public final ClimberSubsystem climber = new ClimberSubsystem();
-  public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney);
+  //public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney);
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
@@ -107,8 +107,8 @@ public class RobotContainer {
   // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
 
   // Custom Triggers 
-  public final FeedIn pooperIn = new FeedIn(colorSensor);
-  public final FeedOut pooperOut = new FeedOut(colorSensor);
+  // public final FeedIn pooperIn = new FeedIn(colorSensor);
+  // public final FeedOut pooperOut = new FeedOut(colorSensor);
   
   // Auto Chooser
   SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -137,7 +137,7 @@ public class RobotContainer {
     teamColorChooser.setDefaultOption("Blue", "blue");
     teamColorChooser.addOption("Red", "red");
     SmartDashboard.putData("teamColorChooser", teamColorChooser);
-    colorSensor.setColor(teamColor);
+//colorSensor.setColor(teamColor);
     
 
     SetAutoCommands();
@@ -148,19 +148,19 @@ public class RobotContainer {
     // drive buttons
     drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
 
-    pooperIn.whenActive(new SequentialCommandGroup(
-      new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
-      new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
-      new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
-      new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
-    ));
+    // pooperIn.whenActive(new SequentialCommandGroup(
+    //   new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
+    //   new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
+    //   new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
+    //   new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
+    // ));
 
-    pooperOut.whenActive(new SequentialCommandGroup(
-      new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
-      new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
-      new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
-      new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
-    ));
+    // pooperOut.whenActive(new SequentialCommandGroup(
+    //   new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
+    //   new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
+    //   new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
+    //   new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
+    // ));
 
     /* parallel command that runs:
     turret aiming
