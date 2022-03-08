@@ -1,16 +1,24 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.List;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Limelight;
 
 
 public class LimelightSubsystem extends SubsystemBase {
-    private final MedianFilter filteredX = new MedianFilter(5);
+    // private final MedianFilter filteredX = new MedianFilter(5);
+
+    private final PhotonCamera camera = new PhotonCamera(NetworkTableInstance.getDefault(), "limelight");
 
     private boolean targetValid = false;
     private double targetX;
@@ -19,16 +27,17 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // get limelight values from ethernet
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tableValidTarget = table.getEntry("tv");
-        NetworkTableEntry tableTargetX = table.getEntry("tx");
-        NetworkTableEntry tableTargetY = table.getEntry("ty");
-
-        // reads values
-        targetValid = tableValidTarget.getDouble(1) != 0;
-        targetX = filteredX.calculate(tableTargetX.getDouble(0));
-        targetY = tableTargetY.getDouble(0);
+        PhotonPipelineResult res = camera.getLatestResult();
+        List<PhotonTrackedTarget> targets = res.targets;
+        if (!targets.isEmpty()) {
+            targetValid = true;
+            PhotonTrackedTarget bestTarget = res.getBestTarget();
+            targetX = bestTarget.getYaw();
+            targetY = bestTarget.getPitch();
+        }
+        else {
+            targetValid = false;
+        }
 
         // post to smart dashboard
         SmartDashboard.putNumber("Target X", targetX);

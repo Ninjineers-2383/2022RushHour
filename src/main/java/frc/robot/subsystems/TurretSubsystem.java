@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import frc.robot.Constants.Turret;
@@ -24,6 +25,7 @@ public class TurretSubsystem extends SubsystemBase{
     public TurretSubsystem() {
         motor.setInverted(false);
         motor.setSelectedSensorPosition(0);
+        motor.setNeutralMode(NeutralMode.Coast);
     }
 
     public void setPosition(int pos) {

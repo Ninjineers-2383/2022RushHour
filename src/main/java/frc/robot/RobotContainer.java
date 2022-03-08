@@ -156,8 +156,8 @@ public class RobotContainer {
     // turretBackup.whenActive(new TurretCommand(turret, turretBackupPower, () -> false));
 
     // backup kicker control if limelight fails
-    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 0.75));
-    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -0.75));
+    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
+    indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
     indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
       new ChimneyCommand(chimney, () -> -0.4, intake).withTimeout(0.1),
