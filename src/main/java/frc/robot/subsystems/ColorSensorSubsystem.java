@@ -5,9 +5,12 @@ import com.revrobotics.ColorSensorV3;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.ChimneyCommand;
+import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.IntakeCommand;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -19,7 +22,6 @@ public class ColorSensorSubsystem extends SubsystemBase {
     private String teamColor;
     private final IntakeSubsystem intake;
     private final ChimneySubsystem chimney;
-    private final I2C sensorPort = new I2C(I2C.Port.kOnboard, 0x52);
     
     
     // Chimney subsystem constructor
@@ -33,43 +35,53 @@ public class ColorSensorSubsystem extends SubsystemBase {
         teamColor = color;
     }
 
-    public Command colorCheck() {
-        Color colorSensorOutput = colorSensor.getColor();
-        String detectedColor;
-        if(colorSensorOutput.red > colorSensorOutput.blue) {
+    public String getTeamColor() {
+        return teamColor;
+    }
+
+    //int 0 
+    public String colorCheck() {
+        int red = colorSensor.getRed();
+        int blue = colorSensor.getBlue();
+        // System.out.println(teamColor);
+        String detectedColor = "";
+        
+        if(red > 250) {
             detectedColor = "red";
-        } else {
+            //System.out.println("red");
+        } else if (blue > 200) {
             detectedColor = "blue";
-        }
-        if (detectedColor.equals(teamColor)) {
-            return loadIn();
+            //System.out.println("blue");
         } else {
-            return loadOut(intake.getFrontDown());
+            detectedColor = "nothing";
         }
+
+        SmartDashboard.putString("detectedColor", detectedColor);
+        return detectedColor;
     }
 
     public Command loadIn() {
         double p = 1;
         return new SequentialCommandGroup(
-            new IntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1 * p),
+            new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1 * p),
             new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5 * p),
-            new IntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p),
+            new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p),
             new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05 * p)
         );
     }
 
     //true means front down, false means back.
     public Command loadOut(boolean front) {
-        double p = 1;
+        double p = 200;
         if(front) {
             return new SequentialCommandGroup(
-                new IntakeCommand(intake, ()-> -1,() -> 1, true, false).withTimeout(0.1 * p),
-                new IntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
+                new DoubleIntakeCommand(intake, ()-> -1,() -> 1, true, false).withTimeout(0.1 * p),
+                new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
             );
         } else {
             return new SequentialCommandGroup(
-                new IntakeCommand(intake, ()-> 1,() -> -1, true, false).withTimeout(0.1 * p),
-                new IntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
+                new DoubleIntakeCommand(intake, ()-> 1,() -> -1, true, false).withTimeout(0.1 * p),
+                new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
             );
         }
     }
@@ -81,6 +93,9 @@ public class ColorSensorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("blue", colorSensor.getBlue());
         SmartDashboard.putNumber("green", colorSensor.getGreen());
         SmartDashboard.putBoolean("is connected", colorSensor.isConnected());
+        // if (colorCheck() != null) {
+        //     CommandScheduler.getInstance().schedule(colorCheck());
+        // }
     }
 
 }

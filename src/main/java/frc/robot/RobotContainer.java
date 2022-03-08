@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
+import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.DrivetrainCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
@@ -29,12 +30,15 @@ import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.ColorSensorSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.commands.FeedOut;
+import frc.robot.commands.FeedIn;
 
 
 //hooks are front
@@ -73,8 +77,6 @@ public class RobotContainer {
   final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
   final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
   //final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
-
-
   
   // Defining doublesuppliers that we will use for axis
   private DoubleSupplier throttle = () -> driverController.getLeftY();
@@ -96,16 +98,21 @@ public class RobotContainer {
   public final ChimneySubsystem chimney = new ChimneySubsystem();
   public final IntakeSubsystem intake = new IntakeSubsystem();
   public final ClimberSubsystem climber = new ClimberSubsystem();
+  public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney);
   
   // defining premeditatied commands
   private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
   // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
+
+  // Custom Triggers 
+  public final FeedIn pooperIn = new FeedIn(colorSensor);
+  public final FeedOut pooperOut = new FeedOut(colorSensor);
   
   // Auto Chooser
   SendableChooser<Command> autoChooser = new SendableChooser<>();
-
+  String teamColor = "blue";
 
 
   /* The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -126,6 +133,13 @@ public class RobotContainer {
     climber.setDefaultCommand(climberCommand);
     SmartDashboard.putBoolean("Aim Active", false);
 
+    SendableChooser<String> teamColorChooser = new SendableChooser<>();
+    teamColorChooser.setDefaultOption("Blue", "blue");
+    teamColorChooser.addOption("Red", "red");
+    SmartDashboard.putData("teamColorChooser", teamColorChooser);
+    colorSensor.setColor(teamColor);
+    
+
     SetAutoCommands();
 
   }
@@ -133,6 +147,20 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // drive buttons
     drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
+
+    pooperIn.whenActive(new SequentialCommandGroup(
+      new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
+      new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
+      new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
+      new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
+    ));
+
+    pooperOut.whenActive(new SequentialCommandGroup(
+      new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1),
+      new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5),
+      new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05),
+      new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05)
+    ));
 
     /* parallel command that runs:
     turret aiming
@@ -191,6 +219,7 @@ public class RobotContainer {
       new StartEndCommand(
         () -> intakeCommand.setRearDown(false), 
         () -> intakeCommand.setRearDown(true)));
+
     }
 
 

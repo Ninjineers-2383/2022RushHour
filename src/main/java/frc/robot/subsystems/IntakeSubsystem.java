@@ -45,6 +45,11 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public void setPower2(Double frontPower, Double rearPower) {
+        frontMotor.set(ControlMode.PercentOutput, frontPower);
+        rearMotor.set(ControlMode.PercentOutput, rearPower);
+    }
+
     // solenoid control
     public void setFrontDown(Boolean down) {
         frontUpSolenoid.set(down);
