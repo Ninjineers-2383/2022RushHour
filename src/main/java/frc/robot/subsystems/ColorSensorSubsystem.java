@@ -17,6 +17,7 @@ import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.IntakeCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -83,9 +84,10 @@ public class ColorSensorSubsystem extends SubsystemBase {
     //true means front down, false means back.
     public Command loadOut(BooleanSupplier frontDown) {
         double p = 10;
-        return new SequentialCommandGroup(
+        
+        return new ParallelCommandGroup(
                 new DoubleIntakeCommand(intake, ()-> (frontDown.getAsBoolean() ? 1:-1) ,() -> (frontDown.getAsBoolean() ? -1:1)).withTimeout(0.1 * p),
-                new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)
+                new ChimneyCommand(chimney, ()-> 0.2, intake).withTimeout(0.05 * p)
             );
     }
 

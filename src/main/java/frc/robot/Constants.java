@@ -4,6 +4,8 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 
 public final class Constants {
 
+    public final static String teamColor = "red";
+
     public final static class Limelight {
         public final static double LIMELIGHT_AIM_TOLERANCE = 10;
     }
@@ -13,9 +15,9 @@ public final class Constants {
         public final static int PORT = 3;
         public final static int FULL_ROTATION = 32000;
         public final static int BOUNDS = FULL_ROTATION;
-        public final static double SEEKING_POWER = 0.95;
-        public final static double kP = 0.015;
-        public final static double kPCenter = 0.8;
+        public final static double SEEKING_POWER = 1;
+        public final static double kP = 0.02;
+        public final static double kPCenter = 1;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static double OFFSET_TICKS = -1000;
     } 

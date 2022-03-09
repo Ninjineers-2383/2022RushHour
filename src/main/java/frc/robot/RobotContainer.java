@@ -84,7 +84,7 @@ public class RobotContainer {
   private DoubleSupplier turn = () -> driverController.getRightX();
   private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()* 0.95 - driverController.getRightTriggerAxis() * 0.95;
   private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
-  private DoubleSupplier hookPower = () -> hookUp.get() ? 0.5 : hookDown.get() ? -0.5 : -0.1;
+  private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : hookDown.get() ? -0.5 : -0.1;
   //private DoubleSupplier turretBackupPower = () -> operatorController.getLeftTriggerAxis()* 0.4 - operatorController.getRightTriggerAxis() * 0.4;
 
   // defining subsystems
@@ -126,16 +126,10 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, true, 6300));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> 0, intake));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> -0.24, intake));
     intake.setDefaultCommand(intakeCommand);
     climber.setDefaultCommand(climberCommand);
     SmartDashboard.putBoolean("Aim Active", false);
-
-    SendableChooser<String> teamColorChooser = new SendableChooser<>();
-    teamColorChooser.setDefaultOption("Blue", "blue");
-    teamColorChooser.addOption("Red", "red");
-    SmartDashboard.putData("teamColorChooser", teamColorChooser);
-    colorSensor.setColor(teamColorChooser.getSelected());
     
 
     SetAutoCommands();
@@ -152,7 +146,7 @@ public class RobotContainer {
 
     /* parallel command that runs:
     turret aiming
-    launcher rev
+    launcher revf
     launching a ball on target lock */
     limelightTarget.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
