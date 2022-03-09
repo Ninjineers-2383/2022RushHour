@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -26,7 +28,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
     
     // Chimney subsystem constructor
     public ColorSensorSubsystem(IntakeSubsystem intake, ChimneySubsystem chimney) {
-        colorSensor = new ColorSensorV3(I2C.Port.kOnboard);
+        colorSensor = new ColorSensorV3(I2C.Port.kMXP);
         this.intake = intake;
         this.chimney = chimney;
     }
@@ -41,53 +43,59 @@ public class ColorSensorSubsystem extends SubsystemBase {
 
     //int 0 
     public String colorCheck() {
+        int distance = colorSensor.getProximity();
         int red = colorSensor.getRed();
         int blue = colorSensor.getBlue();
         // System.out.println(teamColor);
         String detectedColor = "";
         
-        if(red > 250) {
-            detectedColor = "red";
-            //System.out.println("red");
-        } else if (blue > 200) {
-            detectedColor = "blue";
-            //System.out.println("blue");
-        } else {
-            detectedColor = "nothing";
+        if (distance > 100) {
+            if(red > blue) {
+                detectedColor = "red";
+                //System.out.println("red");
+            } else {
+                detectedColor = "blue";
+                //System.out.println("blue");
+            }
+        }
+        else {
+            detectedColor = "none";
         }
 
         SmartDashboard.putString("detectedColor", detectedColor);
         return detectedColor;
     }
 
-    public Command loadIn() {
+    public Command loadIn(boolean frontDown, boolean rearDown) {
         double p = 1;
         return new SequentialCommandGroup(
-            new DoubleIntakeCommand(intake, ()-> -1,() -> -1, true, false).withTimeout(0.1 * p),
+            new DoubleIntakeCommand(intake, ()-> -1,() -> -1).withTimeout(0.1 * p),
             new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5 * p),
-            new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p),
+            new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p),
             new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05 * p)
         );
     }
 
     //true means front down, false means back.
-    public Command loadOut(boolean front) {
-        double p = 200;
-        if(front) {
+    public Command loadOut(boolean frontDown, boolean rearDown) {
+        SmartDashboard.putBoolean("frontDown", frontDown);
+        double p = 20;
+        if(frontDown) {
             return new SequentialCommandGroup(
-                new DoubleIntakeCommand(intake, ()-> -1,() -> 1, true, false).withTimeout(0.1 * p),
-                new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
+                new DoubleIntakeCommand(intake, ()-> -1,() -> 1).withTimeout(0.1 * p),
+                new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)
             );
         } else {
             return new SequentialCommandGroup(
-                new DoubleIntakeCommand(intake, ()-> 1,() -> -1, true, false).withTimeout(0.1 * p),
-                new DoubleIntakeCommand(intake, ()-> 0,() -> 0, true, false).withTimeout(0.05 * p)
+                new DoubleIntakeCommand(intake, ()-> 1,() -> -1).withTimeout(0.1 * p),
+                new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)
             );
         }
     }
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("ir", colorSensor.getIR());
         SmartDashboard.putNumber("proximity", colorSensor.getProximity());
         SmartDashboard.putNumber("red", colorSensor.getRed());
         SmartDashboard.putNumber("blue", colorSensor.getBlue());

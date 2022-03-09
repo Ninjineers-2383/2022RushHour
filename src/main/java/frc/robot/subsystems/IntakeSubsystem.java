@@ -76,7 +76,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return rearDown;
     }
 
-    public boolean getFrontLeftDown() {
+    public boolean getFrontUp() {
         return frontUpSolenoid.get();
 
     }
@@ -89,7 +89,7 @@ public class IntakeSubsystem extends SubsystemBase {
         return rearDownSolenoid.get();
     }
 
-    public boolean getRearLeftDown() {
+    public boolean getRearUp() {
         return rearUpSolenoid.get();
     }
 }

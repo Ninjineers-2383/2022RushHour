@@ -14,6 +14,7 @@ public class DoubleIntakeCommand extends CommandBase {
     private DoubleSupplier rearPower;
     private boolean frontDown;
     private boolean rearDown;
+    private boolean movePistons = true;
 
 
     // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
@@ -24,6 +25,13 @@ public class DoubleIntakeCommand extends CommandBase {
         this.rearPower = rearPower;
         this.frontDown = frontDown;
         this.rearDown = rearDown;
+        addRequirements(intake);
+    }
+    public DoubleIntakeCommand(IntakeSubsystem intake, DoubleSupplier frontPower, DoubleSupplier rearPower) {
+        this.intake = intake;
+        this.frontPower = frontPower;
+        this.rearPower = rearPower;
+        this.movePistons = false;
         addRequirements(intake);
     }
 
@@ -39,8 +47,10 @@ public class DoubleIntakeCommand extends CommandBase {
         // 1 degree of rotation = 145.695364 ticks
         intake.setPower2(frontPower.getAsDouble(), rearPower.getAsDouble());
         //m_subsystem.kickV(m_speed.getAsDouble());
-        intake.setFrontDown(frontDown);
-        intake.setRearDown(rearDown);
+        if (movePistons) {
+            intake.setFrontDown(frontDown);
+            intake.setRearDown(rearDown);
+        }
     }
 
     public void setFrontDown(boolean state) {

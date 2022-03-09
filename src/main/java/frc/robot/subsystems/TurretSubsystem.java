@@ -32,6 +32,14 @@ public class TurretSubsystem extends SubsystemBase{
         motor.setSelectedSensorPosition(pos);
     }
 
+    public void coast() {
+        motor.setNeutralMode(NeutralMode.Coast);
+    }
+
+    public void brake() {
+        motor.setNeutralMode(NeutralMode.Brake);
+    }
+
 
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
