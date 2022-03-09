@@ -1,13 +1,17 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.IntakeCommand;
@@ -49,7 +53,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         // System.out.println(teamColor);
         String detectedColor = "";
         
-        if (distance > 100) {
+        if (distance > 50) {
             if(red > blue) {
                 detectedColor = "red";
                 //System.out.println("red");
@@ -77,10 +81,9 @@ public class ColorSensorSubsystem extends SubsystemBase {
     }
 
     //true means front down, false means back.
-    public Command loadOut(boolean frontDown, boolean rearDown) {
-        SmartDashboard.putBoolean("frontDown", frontDown);
-        double p = 20;
-        if(frontDown) {
+    public Command loadOut(BooleanSupplier frontDown) {
+        double p = 10;
+        if(frontDown.getAsBoolean()) {
             return new SequentialCommandGroup(
                 new DoubleIntakeCommand(intake, ()-> -1,() -> 1).withTimeout(0.1 * p),
                 new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)

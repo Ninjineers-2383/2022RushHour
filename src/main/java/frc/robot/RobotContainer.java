@@ -146,9 +146,9 @@ public class RobotContainer {
     // drive buttons
     drive.whenActive(new DrivetrainCommand(drivetrain, throttle, turn));
 
-    pooperIn.whenActive(colorSensor.loadIn(intake.getFrontDown(), intake.getRearDown()));
+    pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(), intake.getRearUp()));
 
-    pooperOut.whenActive(colorSensor.loadOut(intake.getFrontDown(), intake.getRearDown()));
+    pooperOut.whenActive(colorSensor.loadOut(() -> intake.getFrontUp()));
 
     /* parallel command that runs:
     turret aiming

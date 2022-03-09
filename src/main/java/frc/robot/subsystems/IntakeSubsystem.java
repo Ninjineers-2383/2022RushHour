@@ -17,10 +17,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public final Compressor pump = new Compressor(PneumaticsModuleType.CTREPCM);
 
-    private final Solenoid frontUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_LEFT_SOLENOID_PORT);
-    private final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_LEFT_SOLENOID_PORT);
-    private final Solenoid frontDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_RIGHT_SOLENOID_PORT);
-    private final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_RIGHT_SOLENOID_PORT);
+    public static final Solenoid frontUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_LEFT_SOLENOID_PORT);
+    public static final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_LEFT_SOLENOID_PORT);
+    private static final Solenoid frontDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_RIGHT_SOLENOID_PORT);
+    private static final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_RIGHT_SOLENOID_PORT);
     private boolean frontDown = false;
     private boolean rearDown = false;
     
@@ -57,6 +57,7 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Front Left Feeder State", frontUpSolenoid.get());
         SmartDashboard.putBoolean("Front Right Feeder State", frontDownSolenoid.get());
         rearDown = down;
+        SmartDashboard.putBoolean("rearDown", rearDown);
     }
 
     
@@ -66,6 +67,7 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Rear Left Feeder State", rearUpSolenoid.get());
         SmartDashboard.putBoolean("Rear Right Feeder State", rearDownSolenoid.get());
         frontDown = down;
+        SmartDashboard.putBoolean("frontDown", frontDown);
     }
 
     public boolean getFrontDown() {
