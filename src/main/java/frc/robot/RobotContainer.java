@@ -218,8 +218,9 @@ public class RobotContainer {
     
     Command fourBallAuto = new SequentialCommandGroup(
       new ParallelCommandGroup(   // Intake system activate and intake first ball
+        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
-        new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
+        new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
         new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
         new AutoForward(drivetrain, 5.3, 2, 0.88, 5)
       ),
@@ -243,21 +244,22 @@ public class RobotContainer {
         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+        new ChimneyCommand(chimney, () -> -0.8, intake).withTimeout(0.1),
         new AutoTurn(drivetrain, 19, 8, -0.4, 5)
       ),    // drives back and intakes human player ball
       new AutoForward(drivetrain, 10.2, 2.5, 0.9, 5),
-      new AutoTurn(drivetrain, 35, 10, 0.6, 5),
-      new AutoForward(drivetrain, 2.3, 0.5, 0.6, 2),
+      new AutoTurn(drivetrain, 26, 10, 0.6, 5),
+      new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
       new WaitCommand(0.2),
       new ParallelCommandGroup(
         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-        new AutoTurn(drivetrain, 29, 10, -0.6, 2)
+        new AutoTurn(drivetrain, 21, 10, -0.6, 2)
       ),
+      new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
       new ParallelRaceGroup(
         autoLimelight2,
-        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.5, () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
-        new AutoForward(drivetrain, 13.5, 2, -0.88, 2)
+        new TurretCommand(turret, () -> autoLimelight2.getTurretPower(), () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
+        new AutoForward(drivetrain, 4, 2, -0.88, 2)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez
         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
