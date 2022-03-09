@@ -83,17 +83,10 @@ public class ColorSensorSubsystem extends SubsystemBase {
     //true means front down, false means back.
     public Command loadOut(BooleanSupplier frontDown) {
         double p = 10;
-        if(frontDown.getAsBoolean()) {
-            return new SequentialCommandGroup(
-                new DoubleIntakeCommand(intake, ()-> -1,() -> 1).withTimeout(0.1 * p),
+        return new SequentialCommandGroup(
+                new DoubleIntakeCommand(intake, ()-> (frontDown.getAsBoolean() ? 1:-1) ,() -> (frontDown.getAsBoolean() ? -1:1)).withTimeout(0.1 * p),
                 new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)
             );
-        } else {
-            return new SequentialCommandGroup(
-                new DoubleIntakeCommand(intake, ()-> 1,() -> -1).withTimeout(0.1 * p),
-                new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p)
-            );
-        }
     }
 
     @Override
