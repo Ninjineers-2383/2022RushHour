@@ -29,6 +29,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
     private String teamColor;
     private final IntakeSubsystem intake;
     private final ChimneySubsystem chimney;
+    private boolean active; //pretty much if auto is finished or not. no pooping during auto
     
     
     // Chimney subsystem constructor
@@ -36,6 +37,11 @@ public class ColorSensorSubsystem extends SubsystemBase {
         colorSensor = new ColorSensorV3(I2C.Port.kMXP);
         this.intake = intake;
         this.chimney = chimney;
+        active = false;
+    }
+
+    public void setActiveTrue() {
+        active = true;
     }
 
     public void setColor(String color) {
@@ -54,7 +60,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         // System.out.println(teamColor);
         String detectedColor = "";
         
-        if (distance > 50) {
+        if (distance > 50 && active) {
             if(red > blue) {
                 detectedColor = "red";
                 //System.out.println("red");
@@ -83,8 +89,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
 
     //true means front down, false means back.
     public Command loadOut(BooleanSupplier frontDown) {
-        double p = 10;
-        
+        double p = 10;        
         return new ParallelCommandGroup(
                 new DoubleIntakeCommand(intake, ()-> (frontDown.getAsBoolean() ? 1:-1) ,() -> (frontDown.getAsBoolean() ? -1:1)).withTimeout(0.1 * p),
                 new ChimneyCommand(chimney, ()-> 0.2, intake).withTimeout(0.05 * p)
@@ -99,9 +104,6 @@ public class ColorSensorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("blue", colorSensor.getBlue());
         SmartDashboard.putNumber("green", colorSensor.getGreen());
         SmartDashboard.putBoolean("is connected", colorSensor.isConnected());
-        // if (colorCheck() != null) {
-        //     CommandScheduler.getInstance().schedule(colorCheck());
-        // }
     }
 
 }

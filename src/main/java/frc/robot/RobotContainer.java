@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -269,7 +270,8 @@ public class RobotContainer {
           new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
           new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
         )
-      )
+      ),
+      new InstantCommand(colorSensor::setActiveTrue, colorSensor)
     );
 
     Command twoBallAuto = new SequentialCommandGroup(
@@ -308,7 +310,8 @@ public class RobotContainer {
       new TurretCommand(turret, true, -1000).withTimeout(0.6),
 
       new LauncherCommand(launcher, () -> 8000).withTimeout(1),
-      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4)
+      new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4),
+      new InstantCommand(colorSensor::setActiveTrue, colorSensor)
     );
 
     Command nullAuto = null;
@@ -324,7 +327,8 @@ public class RobotContainer {
         new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(2)))
+          new IndexerCommand(indexer, () -> 0.75).withTimeout(2))),
+      new InstantCommand(colorSensor::setActiveTrue, colorSensor)
           );
 
       Command testAuto = new SequentialCommandGroup(
@@ -333,7 +337,9 @@ public class RobotContainer {
             new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5, () -> aimCommand.getTurretSeek()).withTimeout(1.2),
             new SequentialCommandGroup(
               new WaitCommand(0.3), 
-              new IndexerCommand(indexer, () -> 0.75).withTimeout(2)))
+              new IndexerCommand(indexer, () -> 0.75).withTimeout(2)),
+        new InstantCommand(colorSensor::setActiveTrue, colorSensor)
+        )
       );
 
     autoChooser.setDefaultOption("Two Ball", twoBallAuto);
