@@ -16,7 +16,7 @@ public final class Constants {
         public final static int FULL_ROTATION = 46640;
         public final static int BOUNDS = FULL_ROTATION;
         public final static double SEEKING_POWER = 1;
-        public final static double kP = 0.05;
+        public final static double kP = 0.02;
         public final static double kPCenter = 1;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static double OFFSET_TICKS = -1000;

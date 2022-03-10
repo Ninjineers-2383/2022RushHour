@@ -257,9 +257,9 @@ public class RobotContainer {
         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
         new ChimneyCommand(chimney, () -> -0.8, intake).withTimeout(0.1),
-        new AutoTurn(drivetrain, 19, 8, -0.4, 5)
+        new AutoTurn(drivetrain, 13, 8, -0.4, 5)
       ),    // drives back and intakes human player ball
-      new AutoForward(drivetrain, 11, 2.5, 0.9, 5),
+      new AutoForward(drivetrain, 10, 2.5, 0.9, 5),
       new AutoTurn(drivetrain, 26, 10, 0.6, 5),
       new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
       new WaitCommand(0.2),
