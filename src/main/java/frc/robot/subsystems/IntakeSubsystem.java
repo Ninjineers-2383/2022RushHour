@@ -33,16 +33,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // deployed intakes turn on
     public void setPower(Double power) {
-        if (frontDown) {
-            frontMotor.set(ControlMode.PercentOutput, power);
-        } else {
-            frontMotor.set(ControlMode.PercentOutput, 0);
-        }
-        if (rearDown) {
-            rearMotor.set(ControlMode.PercentOutput, power);
-        } else {
-            rearMotor.set(ControlMode.PercentOutput, 0);
-        }
+        rearMotor.set(ControlMode.PercentOutput, power);
+        frontMotor.set(ControlMode.PercentOutput, power);
+        // if (frontDown) {
+        // } else {
+        //     frontMotor.set(ControlMode.PercentOutput, 0);
+        // }
+        // if (rearDown) {
+        // } else {
+        //     rearMotor.set(ControlMode.PercentOutput, 0);
+        // }
     }
 
     public void setPower2(Double frontPower, Double rearPower) {

@@ -40,7 +40,6 @@ import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
-
 //hooks are front
 
 public class RobotContainer {
@@ -67,6 +66,7 @@ public class RobotContainer {
   // Backup turret trigger if limelight dies
   final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
+  final JoystickButton pooperPanicButton = new JoystickButton(driverController, Button.kBack.value); // left special button two rectangles
   final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
   final POVButton limelightClimb = new POVButton(operatorController, 0, 0);
   final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
@@ -127,7 +127,7 @@ public class RobotContainer {
     turret.setDefaultCommand(new TurretCommand(turret, true, 6300));
     indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
     launcher.setDefaultCommand(new LauncherCommand (launcher, () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
-    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> -0.24, intake));
+    chimney.setDefaultCommand(new ChimneyCommand(chimney, () -> colorSensor.getActive() ? -0.16 : intakePower.getAsDouble(), intake));
     intake.setDefaultCommand(intakeCommand);
     climber.setDefaultCommand(climberCommand);
     SmartDashboard.putBoolean("Aim Active", false);
@@ -180,7 +180,6 @@ public class RobotContainer {
     ));
 
     // backup launcher control if limelight failss
-    // TODO: Add backup buttons to DPad
     // launchbuttonBackup.whileHeld(new LauncherCommand(launcher, () -> 4000));
 
     //brakeCoastSwitch.whenPressed(brakeCoastSwitchCommand);
@@ -202,8 +201,14 @@ public class RobotContainer {
       new StartEndCommand(
         () -> intakeCommand.setRearDown(false), 
         () -> intakeCommand.setRearDown(true)));
-
-    }
+      
+    pooperPanicButton.toggleWhenPressed(
+      new StartEndCommand(
+        () -> colorSensor.setActiveFalse(),
+        () -> colorSensor.setActiveTrue()
+      )
+    );
+  }
 
 
   public Command getAutonomousCommand() {
@@ -221,14 +226,13 @@ public class RobotContainer {
         new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
         new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
-        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
         new AutoForward(drivetrain, 5.3, 2, 0.88, 5)
       ),
       new ParallelCommandGroup(   // Shoot two ballsez after feeeding one
         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()).withTimeout(0.6),
         new ParallelRaceGroup(
           autoLimelight,
-          new TurretCommand(turret, () -> autoLimelight.getTurretPower(), () -> autoLimelight.getTurretSeek()).withTimeout(1.2)
+          new TurretCommand(turret, () -> autoLimelight.getTurretPower() * 0.65, () -> autoLimelight.getTurretSeek()).withTimeout(1.2)
         ),
         new SequentialCommandGroup(
           new WaitCommand(0.3), 
@@ -258,9 +262,10 @@ public class RobotContainer {
       new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
       new ParallelRaceGroup(
         autoLimelight2,
-        new TurretCommand(turret, () -> autoLimelight2.getTurretPower(), () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
+        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65, () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
         new AutoForward(drivetrain, 4, 2, -0.88, 2)
       ),
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(0.3),
       new ParallelCommandGroup(   // Shoot two ballsez
         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
         new SequentialCommandGroup(

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants;
 import frc.robot.subsystems.ColorSensorSubsystem;
 
 public class FeedOut extends Trigger {
@@ -14,8 +13,7 @@ public class FeedOut extends Trigger {
 
     @Override
     public boolean get() {
-        if (colorSensor.colorCheck().equals("red")) {
-            System.out.println("feedOut");
+        if (colorSensor.colorCheck().equals(colorSensor.getOppositeTeamColor())) {
             return true;
         }
         return false;

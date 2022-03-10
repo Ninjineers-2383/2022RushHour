@@ -14,8 +14,18 @@ public class TurretCommand extends CommandBase {
     private final DoubleSupplier speed;
     private final BooleanSupplier seek;
     private final Boolean center;
+    private final Boolean flipSeek;
     private final int position;
 
+    public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek, boolean flipSeek) {
+        this.turret = turret;
+        this.speed = power;
+        this.seek = seek;
+        this.center = false;
+        this.position = 6300;
+        this.flipSeek = flipSeek;
+        addRequirements(turret);
+    } 
 
     public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek) {
         this.turret = turret;
@@ -23,8 +33,9 @@ public class TurretCommand extends CommandBase {
         this.seek = seek;
         this.center = false;
         this.position = 6300;
+        this.flipSeek = false;
         addRequirements(turret);
-    } 
+    }
 
     public TurretCommand(TurretSubsystem turret, boolean center, int position) {
         this.turret = turret;
@@ -32,6 +43,7 @@ public class TurretCommand extends CommandBase {
         this.seek = () -> false;
         this.center = center;
         this.position = position;
+        this.flipSeek = false;
         addRequirements(turret);
     } 
     
@@ -45,7 +57,7 @@ public class TurretCommand extends CommandBase {
             turret.runToPosition(position);
         } else {
             if (seek.getAsBoolean()) {
-                turret.seek();
+                turret.seek(flipSeek);
             } else {
                 turret.setPower(speed.getAsDouble());
             }

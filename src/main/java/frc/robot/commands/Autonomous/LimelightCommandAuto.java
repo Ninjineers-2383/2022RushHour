@@ -3,6 +3,7 @@ package frc.robot.commands.Autonomous;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Turret;
@@ -19,6 +20,7 @@ public class LimelightCommandAuto extends CommandBase {
   private boolean turretSeek = false;
 
   private boolean kickerOn = false;
+  private int seenCycles = 0;
 
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
@@ -44,22 +46,26 @@ public class LimelightCommandAuto extends CommandBase {
   @Override
   public void execute() {
     kickerOn = false;
-    turretSeek = false;
     
     double error = limelight.getX();
-
+    
     if(limelight.getTargetVisible()){
-      limelight.setLimelight(true);
+      turretSeek = false;
+      // limelight.setLimelight(true);
+      SmartDashboard.putBoolean("isfine", true);
       turretPower = -Turret.kP * error;
+      seenCycles++;
     } else  {
       // no target present
+      SmartDashboard.putBoolean("isfine", false);
       turretSeek = true;
+      seenCycles = 0;
     }
   }
 
   @Override
   public boolean isFinished() {
-    return !turretSeek;
+    return seenCycles > 10;
   }
 
   @Override

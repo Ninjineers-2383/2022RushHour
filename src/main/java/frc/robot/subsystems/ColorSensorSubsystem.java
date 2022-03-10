@@ -4,22 +4,14 @@ import java.util.function.BooleanSupplier;
 
 import com.revrobotics.ColorSensorV3;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants;
-import frc.robot.commands.ChimneyCommand;
-import frc.robot.commands.DoubleIntakeCommand;
-import frc.robot.commands.IntakeCommand;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.ChimneyCommand;
+import frc.robot.commands.DoubleIntakeCommand;
 
 
 public class ColorSensorSubsystem extends SubsystemBase {
@@ -44,13 +36,28 @@ public class ColorSensorSubsystem extends SubsystemBase {
         active = true;
     }
 
+    public void setActiveFalse() {
+        active = false;
+    }
+
+    public boolean getActive() {
+        return active;
+    }
+
     public void setColor(String color) {
         teamColor = color;
     }
 
     public String getTeamColor() {
-        return teamColor;
+        // return teamColor;
+        return "blue";
     }
+
+    public String getOppositeTeamColor() {
+        // return teamColor.equals("red") ? "blue" : "red";
+        return "red";
+    }
+
 
     //int 0 
     public String colorCheck() {
@@ -104,6 +111,8 @@ public class ColorSensorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("blue", colorSensor.getBlue());
         SmartDashboard.putNumber("green", colorSensor.getGreen());
         SmartDashboard.putBoolean("is connected", colorSensor.isConnected());
+        colorCheck();
+        SmartDashboard.putBoolean("Pooper Active", active);
     }
 
 }

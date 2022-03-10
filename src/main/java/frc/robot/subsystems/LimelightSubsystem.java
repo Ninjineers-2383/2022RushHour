@@ -1,16 +1,14 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.List;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Limelight;
 
@@ -57,9 +55,9 @@ public class LimelightSubsystem extends SubsystemBase {
     public double getLaunchingVelocity() {
         //furthest for OG curve: -1.437
         if (getY() > -1.437 && getY() < 16.5) {
-            return 13500 - 165 * getY();
+            return 14000 - 165 * getY();
         } else {
-            return 14500 - 165 * getY();
+            return 15000 - 165 * getY();
         }
     }
 
