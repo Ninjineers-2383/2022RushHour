@@ -50,12 +50,12 @@ public class ColorSensorSubsystem extends SubsystemBase {
 
     public String getTeamColor() {
         // return teamColor;
-        return "blue";
+        return "red";
     }
 
     public String getOppositeTeamColor() {
         // return teamColor.equals("red") ? "blue" : "red";
-        return "red";
+        return "blue";
     }
 
 

@@ -262,10 +262,10 @@ public class RobotContainer {
       new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
       new ParallelRaceGroup(
         autoLimelight2,
-        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65, () -> autoLimelight2.getTurretSeek()).withTimeout(1.2),
+        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65, () -> autoLimelight2.getTurretSeek(), true).withTimeout(1.2),
         new AutoForward(drivetrain, 4, 2, -0.88, 2)
       ),
-      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()).withTimeout(0.3),
+      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek(), true).withTimeout(0.5),
       new ParallelCommandGroup(   // Shoot two ballsez
         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
         new SequentialCommandGroup(

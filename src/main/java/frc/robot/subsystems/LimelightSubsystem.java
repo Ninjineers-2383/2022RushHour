@@ -53,12 +53,19 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double getLaunchingVelocity() {
+        double x = getY();
         //furthest for OG curve: -1.437
-        if (getY() > -1.437 && getY() < 16.5) {
-            return 14000 - 165 * getY();
-        } else {
-            return 15000 - 165 * getY();
+        if (getY() < 5.96) {
+            return 14152 -236 * x + 19.8 * x * x;
         }
+        else {
+            return -200 * x + 14900;
+        }
+        // if (getY() > -1.437 && getY() < 16.5) {
+        //     return 14000 - 165 * getY();
+        // } else {
+        //     return 15000 - 165 * getY();
+        // }
     }
 
     public boolean getTargetVisible() {
