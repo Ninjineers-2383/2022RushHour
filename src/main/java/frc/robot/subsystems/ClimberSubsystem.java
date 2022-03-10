@@ -54,6 +54,16 @@ public class ClimberSubsystem extends SubsystemBase {
         right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, -5);
     }
 
+    public void invertMotorPowers() {
+        right_climber.setInverted(false);
+        left_climber.setInverted(false);
+    }
+
+    public void unInvertMotorPower() {
+        right_climber.setInverted(true);
+        left_climber.setInverted(true);
+    }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Left Climber pos", left_encoder.getPosition());

@@ -6,12 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -96,8 +94,8 @@ public class Robot extends TimedRobot {
     teamColorChooser.addOption("Red", "red");
     SmartDashboard.putData("teamColorChooser", teamColorChooser);
     // m_robotContainer.colorSensor.setColor(teamColorChooser.getSelected());
-    Alliance alliance = DriverStation.getAlliance();
-    m_robotContainer.colorSensor.setColor(alliance == Alliance.Blue ? "blue" : alliance == Alliance.Red ? "red" : "invalid");
+    // Alliance alliance = DriverStation.getAlliance();
+    // m_robotContainer.colorSensor.setColor(alliance == Alliance.Blue ? "blue" : alliance == Alliance.Red ? "red" : "invalid");
   }
 
   public void brakeMotors() {

@@ -76,6 +76,7 @@ public class RobotContainer {
   final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
   final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
   final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
+  final JoystickButton climberInvert = new JoystickButton(operatorController, Button.kStart.value); // Right extra button
   //final JoystickButton brakeCoastSwitch = new JoystickButton(operatorController, Button.kStart.value);
   
   // Defining doublesuppliers that we will use for axis
@@ -208,6 +209,13 @@ public class RobotContainer {
         () -> colorSensor.setActiveTrue()
       )
     );
+
+    climberInvert.toggleWhenPressed(
+      new StartEndCommand(
+        () -> climber.invertMotorPowers(),
+        () -> climber.unInvertMotorPower()
+      )
+    );
   }
 
 
@@ -251,7 +259,7 @@ public class RobotContainer {
         new ChimneyCommand(chimney, () -> -0.8, intake).withTimeout(0.1),
         new AutoTurn(drivetrain, 19, 8, -0.4, 5)
       ),    // drives back and intakes human player ball
-      new AutoForward(drivetrain, 10.2, 2.5, 0.9, 5),
+      new AutoForward(drivetrain, 11, 2.5, 0.9, 5),
       new AutoTurn(drivetrain, 26, 10, 0.6, 5),
       new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
       new WaitCommand(0.2),

@@ -4,6 +4,8 @@ import java.util.function.BooleanSupplier;
 
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,12 +15,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.DoubleIntakeCommand;
 
-
 public class ColorSensorSubsystem extends SubsystemBase {
 
     // create motor instance that uses a TalonSRX motor controller.
     private final ColorSensorV3 colorSensor;
-    private String teamColor;
     private final IntakeSubsystem intake;
     private final ChimneySubsystem chimney;
     private boolean active; //pretty much if auto is finished or not. no pooping during auto
@@ -44,43 +44,36 @@ public class ColorSensorSubsystem extends SubsystemBase {
         return active;
     }
 
-    public void setColor(String color) {
-        teamColor = color;
-    }
-
-    public String getTeamColor() {
+    public Alliance getTeamColor() {
         // return teamColor;
-        return "red";
+        return DriverStation.getAlliance();
     }
 
-    public String getOppositeTeamColor() {
+    public Alliance getOppositeTeamColor() {
         // return teamColor.equals("red") ? "blue" : "red";
-        return "blue";
+        return DriverStation.getAlliance() == Alliance.Red ? Alliance.Blue : Alliance.Red;
     }
 
 
     //int 0 
-    public String colorCheck() {
+    public Alliance colorCheck() {
         int distance = colorSensor.getProximity();
         int red = colorSensor.getRed();
         int blue = colorSensor.getBlue();
         // System.out.println(teamColor);
-        String detectedColor = "";
+        Alliance detectedColor = Alliance.Invalid;
         
         if (distance > 50 && active) {
             if(red > blue) {
-                detectedColor = "red";
+                detectedColor = Alliance.Red;
                 //System.out.println("red");
             } else {
-                detectedColor = "blue";
+                detectedColor = Alliance.Blue;
                 //System.out.println("blue");
             }
         }
-        else {
-            detectedColor = "none";
-        }
 
-        SmartDashboard.putString("detectedColor", detectedColor);
+        SmartDashboard.putString("detectedColor", detectedColor.toString());
         return detectedColor;
     }
 
