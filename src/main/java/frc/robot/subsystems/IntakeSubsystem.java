@@ -10,20 +10,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Intake;
 
-
 public class IntakeSubsystem extends SubsystemBase {
-    public  final VictorSPX frontMotor = new VictorSPX(Intake.FRONT_INTAKE_PORT);
-    public  final VictorSPX rearMotor = new VictorSPX(Intake.REAR_INTAKE_PORT);
+    public final VictorSPX frontMotor = new VictorSPX(Intake.FRONT_INTAKE_PORT);
+    public final VictorSPX rearMotor = new VictorSPX(Intake.REAR_INTAKE_PORT);
 
     public final Compressor pump = new Compressor(PneumaticsModuleType.CTREPCM);
 
-    public static final Solenoid frontUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_LEFT_SOLENOID_PORT);
-    public static final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_LEFT_SOLENOID_PORT);
-    private static final Solenoid frontDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_RIGHT_SOLENOID_PORT);
-    private static final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, Intake.REAR_RIGHT_SOLENOID_PORT);
+    public static final Solenoid frontUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
+            Intake.FRONT_LEFT_SOLENOID_PORT);
+    public static final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
+            Intake.REAR_LEFT_SOLENOID_PORT);
+    private static final Solenoid frontDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
+            Intake.FRONT_RIGHT_SOLENOID_PORT);
+    private static final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
+            Intake.REAR_RIGHT_SOLENOID_PORT);
     private boolean frontDown = false;
     private boolean rearDown = false;
-    
 
     public IntakeSubsystem() {
         frontMotor.setInverted(false);
@@ -33,16 +35,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // deployed intakes turn on
     public void setPower(Double power) {
+        // No need to wast battery power if the intake is not in use
+        if (!frontDown && !rearDown) {
+            frontMotor.set(ControlMode.PercentOutput, 0);
+            rearMotor.set(ControlMode.PercentOutput, 0);
+        }
+
         rearMotor.set(ControlMode.PercentOutput, power);
         frontMotor.set(ControlMode.PercentOutput, power);
-        // if (frontDown) {
-        // } else {
-        //     frontMotor.set(ControlMode.PercentOutput, 0);
-        // }
-        // if (rearDown) {
-        // } else {
-        //     rearMotor.set(ControlMode.PercentOutput, 0);
-        // }
     }
 
     public void setPower2(Double frontPower, Double rearPower) {
@@ -60,7 +60,6 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("rearDown", rearDown);
     }
 
-    
     public void setRearDown(Boolean down) {
         rearUpSolenoid.set(down);
         rearDownSolenoid.set(!down);
