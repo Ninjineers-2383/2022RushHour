@@ -1,30 +1,25 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
-import com.kauailabs.navx.frc.AHRS;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 
 public class DrivetrainSubsystem extends SubsystemBase {
+
+  
   private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
   private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
   private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
@@ -46,13 +41,22 @@ public class DrivetrainSubsystem extends SubsystemBase {
       Drivetrain.RIGHT_FOLLOWER_PORT);
   
     // The gyro sensor
-    private final Gyro m_gyro = new AHRS();
-
-    // Odometry class for tracking robot pose
-    private final DifferentialDriveOdometry m_odometry;
+    public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
 
   
   public DrivetrainSubsystem() {
+    
+    rightMasterMotor  .configFactoryDefault();
+    rightFollowerMotor.configFactoryDefault();
+    leftMasterMotor   .configFactoryDefault();
+    leftFollowerMotor .configFactoryDefault();
+
+    rightMasterMotor  .setSelectedSensorPosition(0);
+    rightFollowerMotor.setSelectedSensorPosition(0);
+    leftMasterMotor   .setSelectedSensorPosition(0);
+    leftFollowerMotor .setSelectedSensorPosition(0);
+
+
     rightMasterMotor  .setInverted(true);
     rightFollowerMotor.setInverted(true);
     leftMasterMotor   .setInverted(false);
@@ -74,13 +78,18 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_leftEncoder.reset();
     m_rightEncoder.reset();
 
-    m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+  }
+
+  public void switchBrakeCoast(boolean isBrake) {
+    NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
+    leftFollowerMotor.setNeutralMode(mode);
+    leftMasterMotor.setNeutralMode(mode);
+    rightMasterMotor.setNeutralMode(mode);
+    rightFollowerMotor.setNeutralMode(mode);
   }
 
   public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
-      m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
 
     SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Left Follower Senser Pos", leftFollowerMotor.getSelectedSensorPosition());
@@ -88,27 +97,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Right Follower Sensor Pos", rightFollowerMotor.getSelectedSensorPosition());
   }
 
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
-
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
   }
 
-  //reset odometry to a pose passed as an argument
-  public void resetOdometry(Pose2d pose) {
-    m_leftEncoder.reset();
-    m_rightEncoder.reset();
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
-  }
-
-  public void tankDriveVolts(double leftVolts, double rightVolts) {
-    leftMasterMotor.setVoltage(leftVolts);
-    rightMasterMotor.setVoltage(rightVolts);
-    leftFollowerMotor.setVoltage(leftVolts);
-    rightFollowerMotor.setVoltage(rightVolts);
-    drive.feed();
+  public void tankDrive(double left, double right) {
+    drive.tankDrive(left, right);
   }
 
   public double getAverageEncoderDistance() {
@@ -135,24 +129,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
   public void drive(double power, double turn){
-    drive.arcadeDrive(throttleF.calculate(power), turnF.calculate(turn * 0.9));
-  }
-  // autonomous driving
-  public void drive(int left, int right, int power, int time) {
-    rightMasterMotor.set(ControlMode.Position, right);
-    rightFollowerMotor.set(ControlMode.Position, right);
-    leftMasterMotor.set(ControlMode.Position, left);
-    leftFollowerMotor.set(ControlMode.Position, left);
+    
+    double driveOutput = throttleF.calculate(power);
+    double turnOutput = turnF.calculate(turn * 0.9);
 
-    rightMasterMotor.set(power);
-    leftMasterMotor.set(power);
-
-    Timer.delay(time);
-
-    rightMasterMotor.set(0);
-    rightFollowerMotor.set(0);
-    leftMasterMotor.set(0);
-    leftFollowerMotor.set(0);
+    drive.arcadeDrive(driveOutput, turnOutput);
+    //drive.arcadeDrive(power, 0.9 * turn);
   }
 
   // reset encoder positions to 0
@@ -163,10 +145,49 @@ public class DrivetrainSubsystem extends SubsystemBase {
   
   
   public double getLeftPosition() {
+    SmartDashboard.putNumber("left pos", leftMasterMotor.getSelectedSensorPosition());
 		return leftMasterMotor.getSelectedSensorPosition();
 	}
 
 	public double getRightPosition() {
+    SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
 		return rightMasterMotor.getSelectedSensorPosition();
+  }
+
+  public double getAverageVelocity() {
+    return (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
+  }
+  
+  public class SlewRateLimiter {
+    private final double m_rateLimit;
+    private double m_prevVal;
+    private double m_prevTime;
+
+    public SlewRateLimiter(double rateLimit, double initialValue) {
+      m_rateLimit = rateLimit;
+      m_prevVal = initialValue;
+      m_prevTime = WPIUtilJNI.now() * 1e-6;
+    }
+    public SlewRateLimiter(double rateLimit) {
+      this(rateLimit, 0);
+    }
+
+    public double calculate(double input) {
+      double currentTime = WPIUtilJNI.now() * 1e-6;
+      double elapsedTime = currentTime - m_prevTime;
+      if (input > m_prevVal && m_prevVal > 0 || input < m_prevVal && m_prevVal < 0) {
+        m_prevVal +=
+          MathUtil.clamp(input - m_prevVal, 1.3 * -m_rateLimit * elapsedTime, 1.3 * m_rateLimit * elapsedTime);
+      }
+      m_prevVal +=
+          MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
+      m_prevTime = currentTime;
+      return m_prevVal;
+    }
+
+    public void reset(double value) {
+      m_prevVal = value;
+      m_prevTime = WPIUtilJNI.now() * 1e-6;
+    }
   }
 }

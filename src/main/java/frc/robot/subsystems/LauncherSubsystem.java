@@ -17,8 +17,8 @@ public class LauncherSubsystem extends SubsystemBase {
       masterMotor.setNeutralMode(NeutralMode.Coast);
       followerMotor.setNeutralMode(NeutralMode.Coast);
 
-      masterMotor.setInverted(true);
-      followerMotor.setInverted(true);
+      masterMotor.setInverted(false);
+      followerMotor.setInverted(false);
       
       followerMotor.follow(masterMotor);
     }

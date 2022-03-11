@@ -1,22 +1,21 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Chimney;
 
 
 public class ChimneySubsystem extends SubsystemBase {
 
     // create motor instance that uses a TalonSRX motor controller.
-    private final TalonSRX motor;
+    private final VictorSPX motor;
     
     // Chimney subsystem constructor
     public ChimneySubsystem() {
-        motor = new TalonSRX(Chimney.PORT);
+        motor = new VictorSPX(Chimney.PORT);
         motor.setInverted(true);
         
     }

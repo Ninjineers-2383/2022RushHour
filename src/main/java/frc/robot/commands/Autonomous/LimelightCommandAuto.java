@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Autonomous;
 
 import java.util.function.DoubleSupplier;
 
@@ -9,7 +9,7 @@ import frc.robot.Constants.Turret;
 import frc.robot.subsystems.LimelightSubsystem;
 
 
-public class LimelightCommand extends CommandBase {
+public class LimelightCommandAuto extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   
   private final LimelightSubsystem limelight;
@@ -19,16 +19,17 @@ public class LimelightCommand extends CommandBase {
   private boolean turretSeek = false;
 
   private boolean kickerOn = false;
+  private int seenCycles = 0;
 
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
+  public LimelightCommandAuto(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
     this.limelight = limelight;
     
     addRequirements(limelight);
   }
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation) {
+  public LimelightCommandAuto(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation) {
     this.limelight = limelight;
     addRequirements(limelight);
   }
@@ -44,17 +45,32 @@ public class LimelightCommand extends CommandBase {
   @Override
   public void execute() {
     kickerOn = false;
-    turretSeek = false;
     
     double error = limelight.getX();
-
+    
     if(limelight.getTargetVisible()){
-      limelight.setLimelight(true);
+      turretSeek = false;
+      // limelight.setLimelight(true);
+      SmartDashboard.putBoolean("isfine", true);
       turretPower = -Turret.kP * error;
+      seenCycles++;
     } else  {
       // no target present
+      SmartDashboard.putBoolean("isfine", false);
       turretSeek = true;
+      seenCycles = 0;
     }
+  }
+
+  @Override
+  public boolean isFinished() {
+    return seenCycles > 10;
+  }
+
+  @Override
+  public void end(boolean end) {
+    System.out.print("End");
+    System.out.println(end);
   }
 
 

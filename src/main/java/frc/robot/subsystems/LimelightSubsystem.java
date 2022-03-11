@@ -1,16 +1,22 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.filter.MedianFilter;
+import java.util.List;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Limelight;
 
 
 public class LimelightSubsystem extends SubsystemBase {
-    private final MedianFilter filteredX = new MedianFilter(5);
-    private final MedianFilter filteredY = new MedianFilter(1000);
+    // private final MedianFilter filteredX = new MedianFilter(5);
+
+    private final PhotonCamera camera = new PhotonCamera(NetworkTableInstance.getDefault(), "limelight");
 
     private boolean targetValid = false;
     private double targetX;
@@ -19,20 +25,22 @@ public class LimelightSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // get limelight from ethernet
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry tableValidTarget = table.getEntry("tv");
-        NetworkTableEntry tableTargetX = table.getEntry("tx");
-        NetworkTableEntry tableTargetY = table.getEntry("ty");
-
-        // reads values
-        targetValid = tableValidTarget.getDouble(1) != 0;
-        targetX = filteredX.calculate(tableTargetX.getDouble(0));
-        targetY = filteredY.calculate(tableTargetY.getDouble(0));
+        PhotonPipelineResult res = camera.getLatestResult();
+        List<PhotonTrackedTarget> targets = res.targets;
+        if (!targets.isEmpty()) {
+            targetValid = true;
+            PhotonTrackedTarget bestTarget = res.getBestTarget();
+            targetX = bestTarget.getYaw();
+            targetY = bestTarget.getPitch();
+        }
+        else {
+            targetValid = false;
+        }
 
         // post to smart dashboard
         SmartDashboard.putNumber("Target X", targetX);
         SmartDashboard.putNumber("Target Y", targetY);
+        SmartDashboard.putBoolean("Ready To Fire", Math.abs(getX()) < Limelight.LIMELIGHT_AIM_TOLERANCE && targetValid);
     }
 
 
@@ -44,7 +52,27 @@ public class LimelightSubsystem extends SubsystemBase {
         return targetY;
     }
 
+    public double getLaunchingVelocity() {
+        double x = getY();
+        //furthest for OG curve: -1.437
+        if (getY() < 5.96) {
+            return 14152 -236 * x + 22 * x * x;
+        }
+        else {
+            return -200 * x + 14900;
+        }
+        // if (getY() > -1.437 && getY() < 16.5) {
+        //     return 14000 - 165 * getY();
+        // } else {
+        //     return 15000 - 165 * getY();
+        // }
+    }
+
     public boolean getTargetVisible() {
         return targetValid;
+    }
+    public void setLimelight(boolean isOn) {
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        table.getEntry("ledMode").setNumber(isOn ? 0:2);
     }
 }

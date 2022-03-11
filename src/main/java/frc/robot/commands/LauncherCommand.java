@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.subsystems.LauncherSubsystem;
@@ -14,11 +15,24 @@ public class LauncherCommand extends CommandBase {
 
   private final DoubleSupplier m_speed;
 
+  double timeOut;
+
+  Timer timer = new Timer();
+
   // Creates a command that takes in a subsystem and speed and runs specific actions created in the subsystem.
   // In this case, a launcher command that takes in the launcher subsystem and runs launcher subsystem actions.
   public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
     m_speed = speed;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+  }
+
+  public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, double timeOut) {
+    m_subsystem = subsystem;
+    m_speed = speed;
+    timer.reset();
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
