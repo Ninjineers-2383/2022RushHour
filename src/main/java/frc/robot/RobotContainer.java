@@ -59,21 +59,27 @@ public class RobotContainer {
   final JoystickButton launchLowButton = new JoystickButton(driverController, Button.kA.value);
   // backup joystick buttons if limelight dies
   // final JoystickButton launchbuttonBackup = new JoystickButton(driverController, Button.kA.value);
-  final JoystickButton indexerUp = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kLeftBumper.value);
   final JoystickButton indexerUpTwoBall = new JoystickButton(driverController, Button.kRightBumper.value);
-  final JoystickButton indexerDown = new JoystickButton(driverController, Button.kB.value);
+  final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kB.value);
 
   // Backup turret trigger if limelight dies
   final Trigger turretBackup = new JoystickButton(operatorController, Axis.kLeftTrigger.value)
   .or(new JoystickButton(operatorController, Axis.kRightTrigger.value));
-  final JoystickButton pooperPanicButton = new JoystickButton(driverController, Button.kBack.value); // left special button two rectangles
-  final JoystickButton lowerFrontFeeder = new JoystickButton(operatorController, Button.kLeftBumper.value);
+  
+  // left special button two rectangles
+  final JoystickButton pooperPanicButton = new JoystickButton(driverController, Button.kBack.value); 
+
+  final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
+  final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
+
   final POVButton limelightClimb = new POVButton(operatorController, 0, 0);
   final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
   final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
-  final JoystickButton lowerBackFeeder = new JoystickButton(operatorController, Button.kRightBumper.value);
+
   final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
   final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
+
   final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
   final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
   final JoystickButton climberInvert = new JoystickButton(operatorController, Button.kStart.value); // Right extra button
@@ -104,6 +110,7 @@ public class RobotContainer {
   private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(), () -> drivetrain.getAverageVelocity(), false);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
+  private final IndexerCommand autoKickCommand = new IndexerCommand(indexer, () -> launcher.autoFire());
   // private final BrakeCoastSwitchCommand brakeCoastSwitchCommand = new BrakeCoastSwitchCommand(drivetrain, climber);
 
   // Custom Triggers 
@@ -153,11 +160,13 @@ public class RobotContainer {
     limelightTarget.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
+      autoKickCommand,
       new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true), () -> SmartDashboard.putBoolean("Aim Active", false)))
     );
       
     limelightYeet.whileHeld(new ParallelCommandGroup(
       new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
+      autoKickCommand,
       new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek())));
     //launchButton.whileHeld(new IndexerCommand(indexer, () -> aimCommand.getKickerOn() && launcher.isReady() ? 1 : 0) );
 
@@ -259,13 +268,13 @@ public class RobotContainer {
         new ChimneyCommand(chimney, () -> -0.8, intake).withTimeout(0.1),
         new AutoTurn(drivetrain, 13, 8, -0.4, 5)
       ),    // drives back and intakes human player ball
-      new AutoForward(drivetrain, 10, 2.5, 0.9, 5),
-      new AutoTurn(drivetrain, 26, 10, 0.6, 5),
+      new AutoForward(drivetrain, 11, 2.5, 0.9, 5),
+      new AutoTurn(drivetrain, 29, 10, 0.6, 5),
       new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
       new WaitCommand(0.2),
       new ParallelCommandGroup(
         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-        new AutoTurn(drivetrain, 21, 10, -0.6, 2)
+        new AutoTurn(drivetrain, 24, 10, -0.6, 2)
       ),
       new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
       new ParallelRaceGroup(

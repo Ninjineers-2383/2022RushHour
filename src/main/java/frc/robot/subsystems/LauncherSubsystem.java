@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Launcher;
+import frc.robot.commands.LimelightCommand;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -12,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class LauncherSubsystem extends SubsystemBase {
     private final WPI_TalonFX masterMotor = new WPI_TalonFX(Launcher.MASTER_PORT);
     private final WPI_TalonFX followerMotor  = new WPI_TalonFX(Launcher.FOLLOWER_PORT);
+    private LimelightCommand limelightCommand;
 
     public LauncherSubsystem() {
       masterMotor.setNeutralMode(NeutralMode.Coast);
@@ -44,5 +46,14 @@ public class LauncherSubsystem extends SubsystemBase {
       && masterMotor.getSelectedSensorVelocity() <= masterMotor.getClosedLoopTarget() + 100
       && followerMotor.getSelectedSensorVelocity() >= followerMotor.getClosedLoopTarget() - 100
       && followerMotor.getSelectedSensorVelocity() <= followerMotor.getClosedLoopTarget() + 100;
+    }
+
+    public double autoFire() {
+      if(masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - 100 
+      && masterMotor.getSelectedSensorVelocity() <= masterMotor.getClosedLoopTarget() + 100 
+      && limelightCommand.getTurretSeek()) {
+        return 1.0;
+      }
+      return 0.0;
     }
 }

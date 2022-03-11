@@ -43,11 +43,21 @@ public class IntakeCommand extends CommandBase {
 
     public void setFrontDown(boolean state) {
         frontDown = state;
+        if(frontDown) {
+            intake.setPower(-0.95);
+        } else {
+            intake.setPower(power.getAsDouble());
+        }
     }
 
 
     public void setRearDown(boolean state) {
         rearDown = state;
+        if (rearDown) {
+            intake.setPower(-0.95);
+        } else {
+            intake.setPower(power.getAsDouble());
+        }
     }
 
 
