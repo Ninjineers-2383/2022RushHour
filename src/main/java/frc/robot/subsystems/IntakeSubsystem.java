@@ -16,6 +16,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public final Compressor pump = new Compressor(PneumaticsModuleType.CTREPCM);
 
+    // public final DoubleSolenoid = new
+    // DoubleSolenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_LEFT_SOLENOID_POR)
     public static final Solenoid frontUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
             Intake.FRONT_LEFT_SOLENOID_PORT);
     public static final Solenoid rearUpSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
@@ -34,11 +36,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // deployed intakes turn on
     public void setPower(Double power) {
         // No need to wast battery power if the intake is not in use
-        if (getFrontUp() && getRearUp()) {
-            frontMotor.set(ControlMode.PercentOutput, 0);
-            rearMotor.set(ControlMode.PercentOutput, 0);
-        }
-
         rearMotor.set(ControlMode.PercentOutput, power);
         frontMotor.set(ControlMode.PercentOutput, power);
     }
@@ -66,8 +63,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean getFrontUp() {
-        return frontUpSolenoid.get();
-
+        boolean front = !frontUpSolenoid.get();
+        SmartDashboard.putBoolean("get front up", front);
+        return front;
     }
 
     public boolean getFrontRightDown() {
@@ -79,6 +77,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean getRearUp() {
-        return rearUpSolenoid.get();
+        boolean rear = !rearUpSolenoid.get();
+        SmartDashboard.putBoolean("get rear up", rear);
+        return rear;
     }
 }
