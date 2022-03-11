@@ -73,7 +73,8 @@ public class RobotContainer {
     final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     public final IntakeSubsystem intake = new IntakeSubsystem();
-    private DoubleSupplier intakePower = () -> feedOut.get() ? 1 : intake.getRearUp() && intake.getFrontUp() ? 0 : -1;
+    private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()
+            - driverController.getRightTriggerAxis();
 
     // Driving
     private DoubleSupplier throttle = () -> driverController.getLeftY();
@@ -275,15 +276,15 @@ public class RobotContainer {
                         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1)),
-                new AutoTurn(drivetrain, 60, 10, 0.6, 6),
-                new IntakeCommand(intake, () -> -1, true, false).withTimeout(0.1),
-                new AutoForward(drivetrain, 5, 2, -0.6, 5),
-                new TurretCommand(turret, true, -1000).withTimeout(0.6),
+                        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1)));
+        // new AutoTurn(drivetrain, 60, 10, 0.6, 6),
+        // new IntakeCommand(intake, () -> -1, true, false).withTimeout(0.1),
+        // new AutoForward(drivetrain, 5, 2, -0.6, 5),
+        // new TurretCommand(turret, true, -1000).withTimeout(0.6),
 
-                new LauncherCommand(launcher, () -> 8000).withTimeout(1),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4),
-                new InstantCommand(colorSensor::setActiveTrue, colorSensor));
+        // new LauncherCommand(launcher, () -> 8000).withTimeout(1),
+        // new IndexerCommand(indexer, () -> 0.75).withTimeout(0.4),
+        // new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
         Command nullAuto = null;
 
