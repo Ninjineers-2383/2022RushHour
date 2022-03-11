@@ -85,6 +85,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
 
+    SmartDashboard.putNumber("Velocity", getAverageVelocity());
+    SmartDashboard.putBoolean("Stopped", Math.abs(getAverageVelocity()) < 0.1);
+
     SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Left Follower Senser Pos", leftFollowerMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Right Master Sensor Pos", rightMasterMotor.getSelectedSensorPosition());
