@@ -270,23 +270,23 @@ public class RobotContainer {
       new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
       new ParallelRaceGroup(
         autoLimelight2,
-        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65, () -> autoLimelight2.getTurretSeek(), true).withTimeout(1.2),
-        new AutoForward(drivetrain, 4, 2, -0.88, 2)
-      ),
-      new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek(), true).withTimeout(0.5),
-      new ParallelCommandGroup(   // Shoot two ballsez
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
-        new SequentialCommandGroup(
-          new WaitCommand(0.4), 
-          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
-          new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-          new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.2),
-          new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
-          new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
-        )
-      ),
-      new InstantCommand(colorSensor::setActiveTrue, colorSensor)
+        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65, () -> autoLimelight2.getTurretSeek(), true).withTimeout(1.2)
+        // new AutoForward(drivetrain, 4, 2, -0.88, 2)
+      )
+    //   new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek(), true).withTimeout(0.5),
+    //   new ParallelCommandGroup(   // Shoot two ballsez
+    //     new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() - 1000).withTimeout(2),
+    //     new SequentialCommandGroup(
+    //       new WaitCommand(0.4), 
+    //       new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.1),
+    //       new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+    //       new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+    //       new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.2),
+    //       new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05),
+    //       new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)
+    //     )
+    //   ),
+    //   new InstantCommand(colorSensor::setActiveTrue, colorSensor)
     );
 
     Command twoBallAuto = new SequentialCommandGroup(
