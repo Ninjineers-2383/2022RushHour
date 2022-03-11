@@ -26,7 +26,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
   SlewRateLimiter throttleF = new SlewRateLimiter(2);
-  SlewRateLimiter turnF = new SlewRateLimiter(2);
+  // SlewRateLimiter turnF = new SlewRateLimiter(2);
   
   private DifferentialDrive drive;
 
@@ -131,8 +131,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void drive(double power, double turn){
     
     double driveOutput = throttleF.calculate(power);
-    double turnOutput = turnF.calculate(turn * 0.9);
-
+    // double turnOutput = turnF.calculate(turn * 0.9);
+    double turnOutput = turn * 0.9;
+    
     drive.arcadeDrive(driveOutput, turnOutput);
     //drive.arcadeDrive(power, 0.9 * turn);
   }
