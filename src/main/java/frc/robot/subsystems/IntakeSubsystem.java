@@ -24,8 +24,6 @@ public class IntakeSubsystem extends SubsystemBase {
             Intake.FRONT_RIGHT_SOLENOID_PORT);
     private static final Solenoid rearDownSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM,
             Intake.REAR_RIGHT_SOLENOID_PORT);
-    private boolean frontDown = false;
-    private boolean rearDown = false;
 
     public IntakeSubsystem() {
         frontMotor.setInverted(false);
@@ -36,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // deployed intakes turn on
     public void setPower(Double power) {
         // No need to wast battery power if the intake is not in use
-        if (!frontDown && !rearDown) {
+        if (getFrontUp() && getRearUp()) {
             frontMotor.set(ControlMode.PercentOutput, 0);
             rearMotor.set(ControlMode.PercentOutput, 0);
         }
@@ -56,8 +54,7 @@ public class IntakeSubsystem extends SubsystemBase {
         frontDownSolenoid.set(!down);
         SmartDashboard.putBoolean("Front Left Feeder State", frontUpSolenoid.get());
         SmartDashboard.putBoolean("Front Right Feeder State", frontDownSolenoid.get());
-        rearDown = down;
-        SmartDashboard.putBoolean("rearDown", rearDown);
+        SmartDashboard.putBoolean("rearDown", down);
     }
 
     public void setRearDown(Boolean down) {
@@ -65,16 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
         rearDownSolenoid.set(!down);
         SmartDashboard.putBoolean("Rear Left Feeder State", rearUpSolenoid.get());
         SmartDashboard.putBoolean("Rear Right Feeder State", rearDownSolenoid.get());
-        frontDown = down;
-        SmartDashboard.putBoolean("frontDown", frontDown);
-    }
-
-    public boolean getFrontDown() {
-        return frontDown;
-    }
-
-    public boolean getRearDown() {
-        return rearDown;
+        SmartDashboard.putBoolean("frontDown", down);
     }
 
     public boolean getFrontUp() {
