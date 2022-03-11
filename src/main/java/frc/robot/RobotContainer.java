@@ -290,7 +290,7 @@ public class RobotContainer {
       ),    // drives back and intakes human player ball
       new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
       new AutoTurn(drivetrain, 27, 10, 0.6, 5),
-      new AutoForward(drivetrain, 0.8, 0.5, 0.6, 2),
+      new AutoForward(drivetrain, 0.8, 0.5, 0.45, 2),
       new WaitCommand(0.2),
       new ParallelCommandGroup(
         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
