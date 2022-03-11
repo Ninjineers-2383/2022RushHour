@@ -17,6 +17,6 @@ public class FeedOut extends Trigger {
             return true;
         }
         return false;
-    
+
     }
 }

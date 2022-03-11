@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-
 public class ClimberSubsystem extends SubsystemBase {
 
     private final CANSparkMax right_climber = new CANSparkMax(Constants.Climber.RIGHT_PORT, MotorType.kBrushless);
@@ -24,7 +23,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private final int RIGHTLIMIT = 159;
     private final int LEFTLIMIT = 157;
     private final double PASSIVESPEED = -0.2;
-    
+
     // Climber subsystem constructor
     public ClimberSubsystem() {
         right_climber.setInverted(true);
@@ -78,11 +77,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public void setPower(double left, double right, double hookPower) {
         hook.set(ControlMode.PercentOutput, hookPower);
-        if(left_encoder.getPosition() < 3) {
+        if (left_encoder.getPosition() < 3) {
             left_climber.set(left * 0.5);
             right_climber.set(right * 0.5);
-        }
-        else {
+        } else {
             left_climber.set(left);
             right_climber.set(right);
         }
@@ -93,5 +91,5 @@ public class ClimberSubsystem extends SubsystemBase {
         left_climber.setIdleMode(mode);
         right_climber.setIdleMode(mode);
         hook.setNeutralMode(isBrake ? NeutralMode.Brake : NeutralMode.Coast);
-      }
+    }
 }

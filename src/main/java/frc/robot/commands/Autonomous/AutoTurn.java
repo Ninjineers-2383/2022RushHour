@@ -8,31 +8,30 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class AutoTurn extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+
   private final DrivetrainSubsystem drivetrainSubsystem;
 
   private final double ADJUSTED_MAX_POWER;
 
-  
   final private double TARGET_HEADING;
   final private double ACCELERATION_INTERVAL;
   final private double TIMEOUT;
   final private Timer TIMER;
-  
+
   private boolean done = false;
   double startHeading;
-  private int profileState = 0; //Finite State Machine
-
+  private int profileState = 0; // Finite State Machine
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AutoTurn(DrivetrainSubsystem subsystem, double targetHeading, double accelerationInterval, double maxPower, double timeout) {
+  public AutoTurn(DrivetrainSubsystem subsystem, double targetHeading, double accelerationInterval, double maxPower,
+      double timeout) {
     drivetrainSubsystem = subsystem;
-    this.ADJUSTED_MAX_POWER = maxPower - Math.signum(maxPower) * Drivetrain.ksPercentTurn;                      // Friction
+    this.ADJUSTED_MAX_POWER = maxPower - Math.signum(maxPower) * Drivetrain.ksPercentTurn; // Friction
 
     this.TARGET_HEADING = targetHeading;
     this.ACCELERATION_INTERVAL = accelerationInterval;
@@ -63,22 +62,22 @@ public class AutoTurn extends CommandBase {
       profileState = 3;
     }
 
-    switch (profileState) {  // Piece-wise Trapezoidal motion profile
+    switch (profileState) { // Piece-wise Trapezoidal motion profile
       case 0: // Ramp Up
-        final double a =  offsetHeading / ACCELERATION_INTERVAL;
+        final double a = offsetHeading / ACCELERATION_INTERVAL;
 
         output = a;
 
         if (offsetHeading > ACCELERATION_INTERVAL) {
-          profileState ++;
+          profileState++;
         } else {
           break;
         }
-      
+
       case 1: // Max Voltage
         output = 1;
         if (offsetHeading > TARGET_HEADING - ACCELERATION_INTERVAL) {
-          profileState ++;
+          profileState++;
         } else {
           break;
         }
@@ -89,7 +88,7 @@ public class AutoTurn extends CommandBase {
         output = (1 - b);
 
         if (offsetHeading >= TARGET_HEADING) {
-          profileState ++;
+          profileState++;
         } else {
           break;
         }
@@ -98,13 +97,11 @@ public class AutoTurn extends CommandBase {
         done = true;
     }
 
-    output *= ADJUSTED_MAX_POWER;                                                   // Multiply by max voltage
+    output *= ADJUSTED_MAX_POWER; // Multiply by max voltage
 
     output += Math.signum(ADJUSTED_MAX_POWER) * Drivetrain.ksPercentTurn;
     drivetrainSubsystem.tankDrive(-output, output);
   }
-
-
 
   // Called once the command ends or is interrupted.
   @Override

@@ -16,59 +16,53 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 
-
 public class DrivetrainSubsystem extends SubsystemBase {
 
-  
-  private final WPI_TalonFX rightMasterMotor    = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
-  private final WPI_TalonFX rightFollowerMotor  = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
-  private final WPI_TalonFX leftMasterMotor     = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
-  private final WPI_TalonFX leftFollowerMotor   = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+  private final WPI_TalonFX rightMasterMotor = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
+  private final WPI_TalonFX rightFollowerMotor = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
+  private final WPI_TalonFX leftMasterMotor = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
+  private final WPI_TalonFX leftFollowerMotor = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
   SlewRateLimiter throttleF = new SlewRateLimiter(2);
   SlewRateLimiter turnF = new SlewRateLimiter(2);
-  
+
   private DifferentialDrive drive;
 
   // The left-side drive encoder
-  private final Encoder m_leftEncoder =
-      new Encoder(Drivetrain.LEFT_MASTER_PORT,
+  private final Encoder m_leftEncoder = new Encoder(Drivetrain.LEFT_MASTER_PORT,
       Drivetrain.LEFT_FOLLOWER_PORT);
 
   // The right-side drive encoder
-  private final Encoder m_rightEncoder =
-      new Encoder(Drivetrain.RIGHT_MASTER_PORT,
+  private final Encoder m_rightEncoder = new Encoder(Drivetrain.RIGHT_MASTER_PORT,
       Drivetrain.RIGHT_FOLLOWER_PORT);
-  
-    // The gyro sensor
-    public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
 
-  
+  // The gyro sensor
+  public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
+
   public DrivetrainSubsystem() {
-    
-    rightMasterMotor  .configFactoryDefault();
+
+    rightMasterMotor.configFactoryDefault();
     rightFollowerMotor.configFactoryDefault();
-    leftMasterMotor   .configFactoryDefault();
-    leftFollowerMotor .configFactoryDefault();
+    leftMasterMotor.configFactoryDefault();
+    leftFollowerMotor.configFactoryDefault();
 
-    rightMasterMotor  .setSelectedSensorPosition(0);
+    rightMasterMotor.setSelectedSensorPosition(0);
     rightFollowerMotor.setSelectedSensorPosition(0);
-    leftMasterMotor   .setSelectedSensorPosition(0);
-    leftFollowerMotor .setSelectedSensorPosition(0);
+    leftMasterMotor.setSelectedSensorPosition(0);
+    leftFollowerMotor.setSelectedSensorPosition(0);
 
-
-    rightMasterMotor  .setInverted(true);
+    rightMasterMotor.setInverted(true);
     rightFollowerMotor.setInverted(true);
-    leftMasterMotor   .setInverted(false);
-    leftFollowerMotor .setInverted(false);
+    leftMasterMotor.setInverted(false);
+    leftFollowerMotor.setInverted(false);
 
-    rightMasterMotor  .setNeutralMode(NeutralMode.Brake);
+    rightMasterMotor.setNeutralMode(NeutralMode.Brake);
     rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
-    leftMasterMotor   .setNeutralMode(NeutralMode.Brake);
-    leftFollowerMotor .setNeutralMode(NeutralMode.Brake);
+    leftMasterMotor.setNeutralMode(NeutralMode.Brake);
+    leftFollowerMotor.setNeutralMode(NeutralMode.Brake);
 
     rightFollowerMotor.follow(rightMasterMotor);
-    leftFollowerMotor .follow(leftMasterMotor);
+    leftFollowerMotor.follow(leftMasterMotor);
 
     drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
 
@@ -109,7 +103,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
   }
 
-  //defining the maximum output
+  // defining the maximum output
   public void setMaxOutput(double maxOutput) {
     drive.setMaxOutput(maxOutput);
   }
@@ -127,37 +121,37 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return -m_gyro.getRate();
   }
 
-  // Arcade drive method. Forward and backward on left joystick and turn on right joystick.
-  public void drive(double power, double turn){
-    
+  // Arcade drive method. Forward and backward on left joystick and turn on right
+  // joystick.
+  public void drive(double power, double turn) {
+
     double driveOutput = throttleF.calculate(power);
     double turnOutput = turnF.calculate(turn * 0.9);
 
     drive.arcadeDrive(driveOutput, turnOutput);
-    //drive.arcadeDrive(power, 0.9 * turn);
+    // drive.arcadeDrive(power, 0.9 * turn);
   }
 
   // reset encoder positions to 0
   public void zeroEncoders() {
-		leftMasterMotor.setSelectedSensorPosition(0);
-		rightMasterMotor.setSelectedSensorPosition(0);
+    leftMasterMotor.setSelectedSensorPosition(0);
+    rightMasterMotor.setSelectedSensorPosition(0);
   }
-  
-  
+
   public double getLeftPosition() {
     SmartDashboard.putNumber("left pos", leftMasterMotor.getSelectedSensorPosition());
-		return leftMasterMotor.getSelectedSensorPosition();
-	}
+    return leftMasterMotor.getSelectedSensorPosition();
+  }
 
-	public double getRightPosition() {
+  public double getRightPosition() {
     SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
-		return rightMasterMotor.getSelectedSensorPosition();
+    return rightMasterMotor.getSelectedSensorPosition();
   }
 
   public double getAverageVelocity() {
     return (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
   }
-  
+
   public class SlewRateLimiter {
     private final double m_rateLimit;
     private double m_prevVal;
@@ -168,6 +162,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       m_prevVal = initialValue;
       m_prevTime = WPIUtilJNI.now() * 1e-6;
     }
+
     public SlewRateLimiter(double rateLimit) {
       this(rateLimit, 0);
     }
@@ -176,11 +171,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - m_prevTime;
       if (input > m_prevVal && m_prevVal > 0 || input < m_prevVal && m_prevVal < 0) {
-        m_prevVal +=
-          MathUtil.clamp(input - m_prevVal, 1.3 * -m_rateLimit * elapsedTime, 1.3 * m_rateLimit * elapsedTime);
+        m_prevVal += MathUtil.clamp(input - m_prevVal, 1.3 * -m_rateLimit * elapsedTime,
+            1.3 * m_rateLimit * elapsedTime);
       }
-      m_prevVal +=
-          MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
+      m_prevVal += MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
       m_prevTime = currentTime;
       return m_prevVal;
     }

@@ -8,10 +8,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Turret;
 import frc.robot.subsystems.LimelightSubsystem;
 
-
 public class LimelightCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+
   private final LimelightSubsystem limelight;
 
   private double turretPower = 0;
@@ -24,49 +23,45 @@ public class LimelightCommand extends CommandBase {
 
   public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
     this.limelight = limelight;
-    
+
     addRequirements(limelight);
   }
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity, boolean velocityCompensation) {
+  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity,
+      boolean velocityCompensation) {
     this.limelight = limelight;
     addRequirements(limelight);
   }
 
-  
   public void periodic() {
     SmartDashboard.putBoolean("Locked On", turretSeek);
-    
-  }
-  
 
-  //fix bounds issue!
+  }
+
+  // fix bounds issue!
   @Override
   public void execute() {
     kickerOn = false;
     turretSeek = false;
-    
+
     double error = limelight.getX();
 
-    if(limelight.getTargetVisible()){
+    if (limelight.getTargetVisible()) {
       limelight.setLimelight(true);
       turretPower = -Turret.kP * error;
-    } else  {
+    } else {
       // no target present
       turretSeek = true;
     }
   }
 
-
   public double getTurretPower() {
     return turretPower;
   }
 
-
   public boolean getTurretSeek() {
     return turretSeek;
   }
-
 
   public boolean getKickerOn() {
     return kickerOn;

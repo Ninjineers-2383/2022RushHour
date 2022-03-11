@@ -23,12 +23,13 @@ public class IndexerSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Indexer Velocity", indexer.getSelectedSensorVelocity());
     }
 
-    // method that returns nothing (void) but sets the kicker at a set power in the inverval of [-1, 1]
+    // method that returns nothing (void) but sets the kicker at a set power in the
+    // inverval of [-1, 1]
     public void setPower(Double power) {
         indexer.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("Indexer power", power);
     }
-    
+
     // method that returns nothing (void) but sets the kicker at a set velocity.
     public void setVelocity(Double velocity) {
         indexer.set(ControlMode.Velocity, velocity);

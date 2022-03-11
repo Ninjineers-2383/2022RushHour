@@ -3,13 +3,12 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class DrivetrainCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+
   private final DrivetrainSubsystem drivetrainSubsystem;
   private DoubleSupplier throttle;
   private DoubleSupplier turn;
@@ -24,13 +23,14 @@ public class DrivetrainCommand extends CommandBase {
     this.throttle = throttle;
     this.turn = turn;
     // Use addRequirements() here to declare subsystem dependencies.
-    
+
     addRequirements(subsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -41,7 +41,8 @@ public class DrivetrainCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

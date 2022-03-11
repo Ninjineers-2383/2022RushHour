@@ -16,7 +16,7 @@ public class FeedIn extends Trigger {
         if (colorSensor.colorCheck().equals(colorSensor.getTeamColor())) {
             return true;
         }
-            return false;
-    
+        return false;
+
     }
 }

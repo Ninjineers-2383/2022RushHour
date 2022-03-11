@@ -4,11 +4,10 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import frc.robot.subsystems.TurretSubsystem;
 
 public class TurretCommand extends CommandBase {
-    @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private final TurretSubsystem turret;
     private final DoubleSupplier speed;
@@ -25,7 +24,7 @@ public class TurretCommand extends CommandBase {
         this.position = 6300;
         this.flipSeek = flipSeek;
         addRequirements(turret);
-    } 
+    }
 
     public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek) {
         this.turret = turret;
@@ -45,9 +44,7 @@ public class TurretCommand extends CommandBase {
         this.position = position;
         this.flipSeek = false;
         addRequirements(turret);
-    } 
-    
-
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override

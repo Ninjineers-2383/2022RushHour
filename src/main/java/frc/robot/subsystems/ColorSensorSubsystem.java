@@ -21,9 +21,8 @@ public class ColorSensorSubsystem extends SubsystemBase {
     private final ColorSensorV3 colorSensor;
     private final IntakeSubsystem intake;
     private final ChimneySubsystem chimney;
-    private boolean active; //pretty much if auto is finished or not. no pooping during auto
-    
-    
+    private boolean active; // pretty much if auto is finished or not. no pooping during auto
+
     // Chimney subsystem constructor
     public ColorSensorSubsystem(IntakeSubsystem intake, ChimneySubsystem chimney) {
         colorSensor = new ColorSensorV3(I2C.Port.kMXP);
@@ -54,22 +53,21 @@ public class ColorSensorSubsystem extends SubsystemBase {
         return DriverStation.getAlliance() == Alliance.Red ? Alliance.Blue : Alliance.Red;
     }
 
-
-    //int 0 
+    // int 0
     public Alliance colorCheck() {
         int distance = colorSensor.getProximity();
         int red = colorSensor.getRed();
         int blue = colorSensor.getBlue();
         // System.out.println(teamColor);
         Alliance detectedColor = Alliance.Invalid;
-        
+
         if (distance > 50 && active) {
-            if(red > blue) {
+            if (red > blue) {
                 detectedColor = Alliance.Red;
-                //System.out.println("red");
+                // System.out.println("red");
             } else {
                 detectedColor = Alliance.Blue;
-                //System.out.println("blue");
+                // System.out.println("blue");
             }
         }
 
@@ -80,20 +78,19 @@ public class ColorSensorSubsystem extends SubsystemBase {
     public Command loadIn(boolean frontDown, boolean rearDown) {
         double p = 1;
         return new SequentialCommandGroup(
-            new DoubleIntakeCommand(intake, ()-> -1,() -> -1).withTimeout(0.1 * p),
-            new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5 * p),
-            new DoubleIntakeCommand(intake, ()-> 0,() -> 0).withTimeout(0.05 * p),
-            new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05 * p)
-        );
+                new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1 * p),
+                new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5 * p),
+                new DoubleIntakeCommand(intake, () -> 0, () -> 0).withTimeout(0.05 * p),
+                new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05 * p));
     }
 
-    //true means front down, false means back.
+    // true means front down, false means back.
     public Command loadOut(BooleanSupplier frontDown) {
-        double p = 10;        
+        double p = 10;
         return new ParallelCommandGroup(
-                new DoubleIntakeCommand(intake, ()-> (frontDown.getAsBoolean() ? 1:-1) ,() -> (frontDown.getAsBoolean() ? -1:1)).withTimeout(0.1 * p),
-                new ChimneyCommand(chimney, ()-> 0.2, intake).withTimeout(0.05 * p)
-            );
+                new DoubleIntakeCommand(intake, () -> (frontDown.getAsBoolean() ? 1 : -1),
+                        () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(0.1 * p),
+                new ChimneyCommand(chimney, () -> 0.2, intake).withTimeout(0.05 * p));
     }
 
     @Override

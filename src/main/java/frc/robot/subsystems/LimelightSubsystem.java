@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Limelight;
 
-
 public class LimelightSubsystem extends SubsystemBase {
     // private final MedianFilter filteredX = new MedianFilter(5);
 
@@ -21,7 +20,6 @@ public class LimelightSubsystem extends SubsystemBase {
     private boolean targetValid = false;
     private double targetX;
     private double targetY;
-
 
     @Override
     public void periodic() {
@@ -32,8 +30,7 @@ public class LimelightSubsystem extends SubsystemBase {
             PhotonTrackedTarget bestTarget = res.getBestTarget();
             targetX = bestTarget.getYaw();
             targetY = bestTarget.getPitch();
-        }
-        else {
+        } else {
             targetValid = false;
         }
 
@@ -42,7 +39,6 @@ public class LimelightSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Target Y", targetY);
         SmartDashboard.putBoolean("Ready To Fire", Math.abs(getX()) < Limelight.LIMELIGHT_AIM_TOLERANCE && targetValid);
     }
-
 
     public double getX() {
         return targetX;
@@ -54,25 +50,25 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public double getLaunchingVelocity() {
         double x = getY();
-        //furthest for OG curve: -1.437
+        // furthest for OG curve: -1.437
         if (getY() < 5.96) {
-            return 14152 -236 * x + 22 * x * x;
-        }
-        else {
+            return 14152 - 236 * x + 22 * x * x;
+        } else {
             return -200 * x + 14900;
         }
         // if (getY() > -1.437 && getY() < 16.5) {
-        //     return 14000 - 165 * getY();
+        // return 14000 - 165 * getY();
         // } else {
-        //     return 15000 - 165 * getY();
+        // return 15000 - 165 * getY();
         // }
     }
 
     public boolean getTargetVisible() {
         return targetValid;
     }
+
     public void setLimelight(boolean isOn) {
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        table.getEntry("ledMode").setNumber(isOn ? 0:2);
+        table.getEntry("ledMode").setNumber(isOn ? 0 : 2);
     }
 }
