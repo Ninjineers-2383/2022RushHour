@@ -62,9 +62,13 @@ public class LimelightSubsystem extends SubsystemBase {
         //     return -200 * x + 14900;
         // }
         if (getY() > -1.437 && getY() < 16.5) {
-            return 14000 - 165 * getY();
-        } else {
-            return 15000 - 165 * getY();
+            return 14250 - 165 * getY(); // Close
+        } else if (getY() < -8.6) {
+            return 18500 - 165 * getY(); // Far
+        } else if (getY() < -4.5) {
+            return 17000 - 165 * getY(); // Mid-Far
+        } else {    
+            return 16000 - 165 * getY(); // Mid
         }
     }
 
