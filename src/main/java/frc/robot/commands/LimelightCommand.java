@@ -21,15 +21,21 @@ public class LimelightCommand extends CommandBase {
 
   MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
-    this.limelight = limelight;
+  DoubleSupplier driveVelocity;
 
+  DoubleSupplier turretTicks;
+
+  public LimelightCommand(LimelightSubsystem limelight) {
+    this.limelight = limelight;
+    this.driveVelocity = () -> 0;
+    this.turretTicks = () -> 0;
     addRequirements(limelight);
   }
 
-  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity,
-      boolean velocityCompensation) {
+  public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks, DoubleSupplier drivetrainVelocity) {
     this.limelight = limelight;
+    this.driveVelocity = drivetrainVelocity;
+    this.turretTicks = turretTicks;
     addRequirements(limelight);
   }
 
@@ -44,7 +50,10 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
 
-    double error = limelight.getX();
+    final double CompensationAuthority = 0.0001;
+
+    double error = limelight.getX() - CompensationAuthority * drivetrainVelocityF.calculate(driveVelocity.getAsDouble())
+        * Math.cos(turretTicks.getAsDouble() * Math.PI / Turret.FULL_ROTATION);
 
     if (limelight.getTargetVisible()) {
       limelight.setLimelight(true);
