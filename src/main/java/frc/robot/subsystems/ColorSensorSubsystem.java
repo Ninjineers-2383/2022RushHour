@@ -63,7 +63,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         // System.out.println(teamColor);
         Alliance detectedColor = Alliance.Invalid;
         
-        if (distance > 50 && active) {
+        if (distance > 65 && active) {
             if(red > blue) {
                 detectedColor = Alliance.Red;
                 //System.out.println("red");
