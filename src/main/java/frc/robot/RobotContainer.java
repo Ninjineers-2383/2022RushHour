@@ -100,6 +100,17 @@ public class RobotContainer {
   public final FeedIn pooperIn = new FeedIn(colorSensor);
   public final FeedOut pooperOut = new FeedOut(colorSensor);
 
+  // Required robot state
+  private boolean shouldAdjustTurret = false;
+
+  private void setIsShooting() {
+    shouldAdjustTurret = false;
+  }
+
+  private void setNotIsShooting() {
+    shouldAdjustTurret = true;
+  }
+
   // Auto Chooser
   SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -140,9 +151,11 @@ public class RobotContainer {
      * launching a ball on target lock
      */
     limelightTarget.whileHeld(new ParallelCommandGroup(
-        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity()),
-        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek()),
-        new StartEndCommand(() -> SmartDashboard.putBoolean("Aim Active", true),
+        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity(), () -> shouldAdjustTurret),
+        new TurretCommand(turret, () -> aimCommand.getTurretPower(), () -> aimCommand.getTurretSeek(),
+            () -> shouldAdjustTurret),
+        new StartEndCommand(
+            () -> SmartDashboard.putBoolean("Aim Active", true),
             () -> SmartDashboard.putBoolean("Aim Active", false))));
 
     limelightYeet.whileHeld(new ParallelCommandGroup(
@@ -152,7 +165,9 @@ public class RobotContainer {
     launchLowButton.whileHeld(new LauncherCommand(launcher, () -> 6000));
 
     // backup kicker control if limelight fails
-    indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
+    indexerUp.whileHeld(new ParallelCommandGroup(new IndexerCommand(indexer, () -> 1),
+        new StartEndCommand(() -> setIsShooting(), () -> setNotIsShooting())));
+
     indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
     indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
@@ -162,6 +177,8 @@ public class RobotContainer {
         new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
         new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.05),
         new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2)));
+
+    indexerUpTwoBall.whileHeld(new StartEndCommand(() -> setIsShooting(), () -> setNotIsShooting()));
 
     lowerFrontFeeder.toggleWhenPressed(
         new StartEndCommand(

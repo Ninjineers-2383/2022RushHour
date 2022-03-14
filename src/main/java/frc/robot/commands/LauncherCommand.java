@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -14,6 +15,8 @@ public class LauncherCommand extends CommandBase {
 
   private final DoubleSupplier m_speed;
 
+  private final BooleanSupplier m_shouldChangeSpeed;
+
   double timeOut;
 
   Timer timer = new Timer();
@@ -25,6 +28,15 @@ public class LauncherCommand extends CommandBase {
   public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed) {
     m_subsystem = subsystem;
     m_speed = speed;
+    m_shouldChangeSpeed = () -> true;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+  }
+
+  public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed) {
+    m_subsystem = subsystem;
+    m_speed = speed;
+    m_shouldChangeSpeed = shouldChangeSpeed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -32,6 +44,7 @@ public class LauncherCommand extends CommandBase {
   public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, double timeOut) {
     m_subsystem = subsystem;
     m_speed = speed;
+    m_shouldChangeSpeed = () -> true;
     timer.reset();
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -47,7 +60,9 @@ public class LauncherCommand extends CommandBase {
   @Override
   public void execute() {
     // see LauncherSubsystem.java for more details on how spin() method works
-    m_subsystem.spin(m_speed.getAsDouble());
+    if (m_shouldChangeSpeed.getAsBoolean()) {
+      m_subsystem.spin(m_speed.getAsDouble());
+    }
   }
 
   public double speed() {
