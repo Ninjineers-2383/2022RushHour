@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DrivetrainCommand;
@@ -73,8 +74,8 @@ public class RobotContainer {
   final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
   final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
   public final IntakeSubsystem intake = new IntakeSubsystem();
-  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis()
-      - driverController.getRightTriggerAxis();
+  private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis() * -1
+      + driverController.getRightTriggerAxis() * -1;
 
   // Driving
   private DoubleSupplier throttle = () -> driverController.getLeftY();
@@ -95,6 +96,9 @@ public class RobotContainer {
       () -> drivetrain.getAverageVelocity());
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
   private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
+
+  private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.5);
+  private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.5);
 
   // Custom Triggers
   public final FeedIn pooperIn = new FeedIn(colorSensor);
@@ -180,15 +184,31 @@ public class RobotContainer {
 
     indexerUpTwoBall.whileHeld(new StartEndCommand(() -> setIsShooting(), () -> setNotIsShooting()));
 
-    lowerFrontFeeder.toggleWhenPressed(
-        new StartEndCommand(
-            () -> intakeCommand.setFrontDown(false),
+    // lowerFrontFeeder.toggleWhenPressed(
+    // new StartEndCommand(
+    // () -> intakeCommand.setFrontDown(false),
+    // () -> intakeCommand.setFrontDown(true)));
+
+    // lowerBackFeeder.toggleWhenPressed(
+    // new StartEndCommand(
+    // () -> intakeCommand.setRearDown(false),
+    // () -> intakeCommand.setRearDown(true)));
+
+    driverFrontFeed.whenActive(
+        new InstantCommand(
             () -> intakeCommand.setFrontDown(true)));
 
-    lowerBackFeeder.toggleWhenPressed(
-        new StartEndCommand(
-            () -> intakeCommand.setRearDown(false),
+    driverFrontFeed.whenInactive(
+        new InstantCommand(
+            () -> intakeCommand.setFrontDown(false)));
+
+    driverBackFeed.whenActive(
+        new InstantCommand(
             () -> intakeCommand.setRearDown(true)));
+
+    driverBackFeed.whenInactive(
+        new InstantCommand(
+            () -> intakeCommand.setRearDown(false)));
 
     pooperPanicButton.toggleWhenPressed(
         new StartEndCommand(
