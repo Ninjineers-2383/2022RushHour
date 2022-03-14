@@ -15,6 +15,7 @@ public class TurretCommand extends CommandBase {
     private final Boolean center;
     private final Boolean flipSeek;
     private final int position;
+    private final BooleanSupplier shouldMove;
 
     public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek, boolean flipSeek) {
         this.turret = turret;
@@ -23,6 +24,19 @@ public class TurretCommand extends CommandBase {
         this.center = false;
         this.position = 6300;
         this.flipSeek = flipSeek;
+        this.shouldMove = () -> true;
+        addRequirements(turret);
+    }
+
+    public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek,
+            BooleanSupplier shouldMove) {
+        this.turret = turret;
+        this.speed = power;
+        this.seek = seek;
+        this.center = false;
+        this.position = 6300;
+        this.flipSeek = false;
+        this.shouldMove = shouldMove;
         addRequirements(turret);
     }
 
@@ -33,6 +47,7 @@ public class TurretCommand extends CommandBase {
         this.center = false;
         this.position = 6300;
         this.flipSeek = false;
+        this.shouldMove = () -> true;
         addRequirements(turret);
     }
 
@@ -43,21 +58,26 @@ public class TurretCommand extends CommandBase {
         this.center = center;
         this.position = position;
         this.flipSeek = false;
+        this.shouldMove = () -> true;
         addRequirements(turret);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // 1 degree of rotation = 145.695364 ticks
-        if (center) {
-            turret.runToPosition(position);
-        } else {
-            if (seek.getAsBoolean()) {
-                turret.seek(flipSeek);
+        if (this.shouldMove.getAsBoolean()) {
+            // 1 degree of rotation = 145.695364 ticks
+            if (center) {
+                turret.runToPosition(position);
             } else {
-                turret.setPower(speed.getAsDouble());
+                if (seek.getAsBoolean()) {
+                    turret.seek(flipSeek);
+                } else {
+                    turret.setPower(speed.getAsDouble());
+                }
             }
+        } else {
+            turret.setPower(0.0);
         }
     }
 
