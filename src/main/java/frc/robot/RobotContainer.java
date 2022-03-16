@@ -82,7 +82,7 @@ public class RobotContainer {
 
         // Driving
         private DoubleSupplier throttle = () -> driverController.getLeftY();
-        private DoubleSupplier turn = () -> driverController.getRightX();
+        private DoubleSupplier turn = () -> driverController.getRightX() * 0.8;
 
         // defining subsystems
         public final LimelightSubsystem limelight = new LimelightSubsystem();

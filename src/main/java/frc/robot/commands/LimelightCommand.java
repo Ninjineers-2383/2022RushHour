@@ -19,7 +19,7 @@ public class LimelightCommand extends CommandBase {
 
   private boolean kickerOn = false;
 
-  MedianFilter drivetrainVelocityF = new MedianFilter(10);
+  MedianFilter limelightF = new MedianFilter(5);
 
   DoubleSupplier driveVelocity;
 
@@ -52,7 +52,7 @@ public class LimelightCommand extends CommandBase {
 
     final double CompensationAuthority = 0.0035;
 
-    double error = limelight.getX() - CompensationAuthority * driveVelocity.getAsDouble()
+    double error = limelightF.calculate(limelight.getX()) - CompensationAuthority * driveVelocity.getAsDouble()
         * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS);
     SmartDashboard.putNumber("Compensation", error);
     if (limelight.getTargetVisible()) {
