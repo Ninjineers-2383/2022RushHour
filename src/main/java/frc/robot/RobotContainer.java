@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -190,14 +191,23 @@ public class RobotContainer {
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
         indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    setIsShooting();
+                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                }),
                 new ChimneyCommand(chimney, () -> -0.4, intake).withTimeout(0.1),
                 new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
                 new IndexerCommand(indexer, () -> 0).withTimeout(0.22),
                 new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
                 new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.05),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2)));
+                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                new InstantCommand(() -> {
+                    driverController.setRumble(RumbleType.kLeftRumble, 0);
+                    driverController.setRumble(RumbleType.kRightRumble, 0);
+                    setNotIsShooting();
+                })));
 
-        indexerUpTwoBall.whileHeld(new StartEndCommand(() -> setIsShooting(), () -> setNotIsShooting()));
         // lowerFrontFeeder.toggleWhenPressed(
         // new StartEndCommand(
         // () -> intakeCommand.setFrontDown(false),
