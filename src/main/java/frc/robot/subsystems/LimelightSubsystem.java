@@ -49,7 +49,6 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double getLaunchingVelocity() {
-        double x = getY();
         // furthest for OG curve: -1.437
         // if (getY() < 5.96) {
         // return 14152 - 236 * x + 22 * x * x;

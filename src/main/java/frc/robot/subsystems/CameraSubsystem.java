@@ -18,10 +18,8 @@ public class CameraSubsystem extends SubsystemBase {
     private boolean targetValid = false;
     private double targetX;
     private double targetY;
-    private String direction;
 
     public CameraSubsystem(String direction) {
-        this.direction = direction;
         if (direction.equals("front")) {
             camera = new PhotonCamera(NetworkTableInstance.getDefault(), "Front Camera");
         } else if (direction.equals("rear")) {
@@ -60,5 +58,5 @@ public class CameraSubsystem extends SubsystemBase {
     public boolean getValid() {
         return targetValid;
     }
-    
+
 }
