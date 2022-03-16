@@ -28,6 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
             Intake.REAR_RIGHT_SOLENOID_PORT);
 
     public IntakeSubsystem() {
+        // frontMotor.setSafetyEnabled();
         frontMotor.setInverted(false);
         rearMotor.setInverted(false);
         pump.enableDigital();
@@ -36,8 +37,16 @@ public class IntakeSubsystem extends SubsystemBase {
     // deployed intakes turn on
     public void setPower(Double power) {
         // No need to wast battery power if the intake is not in use
-        rearMotor.set(ControlMode.PercentOutput, power);
-        frontMotor.set(ControlMode.PercentOutput, power);
+        if (!getFrontDown()) {
+            rearMotor.set(ControlMode.PercentOutput, power);
+            // frontMotor.set(ControlMode.PercentOutput, power/2);
+
+        }
+        if (!getRearDown()) {
+            frontMotor.set(ControlMode.PercentOutput, power);
+            // rearMotor.set(ControlMode.PercentOutput, power/2);
+
+        }
     }
 
     public void setPower2(Double frontPower, Double rearPower) {
@@ -68,11 +77,11 @@ public class IntakeSubsystem extends SubsystemBase {
         return front;
     }
 
-    public boolean getFrontRightDown() {
+    public boolean getFrontDown() {
         return frontDownSolenoid.get();
     }
 
-    public boolean getRearRightDown() {
+    public boolean getRearDown() {
         return rearDownSolenoid.get();
     }
 

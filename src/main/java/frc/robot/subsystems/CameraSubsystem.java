@@ -6,22 +6,31 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Limelight;
 
-public class LimelightSubsystem extends SubsystemBase {
+public class CameraSubsystem extends SubsystemBase {
     // private final MedianFilter filteredX = new MedianFilter(5);
 
-    private final PhotonCamera camera = new PhotonCamera(NetworkTableInstance.getDefault(), "limelight");
+    private final PhotonCamera camera;
 
     private boolean targetValid = false;
     private double targetX;
     private double targetY;
+    private String direction;
 
-    @Override
+    public CameraSubsystem(String direction) {
+        this.direction = direction;
+        if (direction.equals("front")) {
+            camera = new PhotonCamera(NetworkTableInstance.getDefault(), "Front Camera");
+        } else if (direction.equals("rear")) {
+            camera = new PhotonCamera(NetworkTableInstance.getDefault(), "Rear Camera");
+        } else {
+            camera = null;
+        }
+    }
+
     public void periodic() {
         PhotonPipelineResult res = camera.getLatestResult();
         List<PhotonTrackedTarget> targets = res.targets;
@@ -37,7 +46,7 @@ public class LimelightSubsystem extends SubsystemBase {
         // post to smart dashboard
         SmartDashboard.putNumber("Target X", targetX);
         SmartDashboard.putNumber("Target Y", targetY);
-        SmartDashboard.putBoolean("Ready To Fire", Math.abs(getX()) < Limelight.LIMELIGHT_AIM_TOLERANCE && targetValid);
+        SmartDashboard.putBoolean("Camera targetValid", targetValid);
     }
 
     public double getX() {
@@ -48,29 +57,8 @@ public class LimelightSubsystem extends SubsystemBase {
         return targetY;
     }
 
-    public double getLaunchingVelocity() {
-        double x = getY();
-        // furthest for OG curve: -1.437
-        // if (getY() < 5.96) {
-        // return 14152 - 236 * x + 22 * x * x;
-        // } else {
-        // return -200 * x + 14900;
-        // }
-        // if (getY() > -1.437 && getY() < 16.5) {
-        // return 14000 - 165 * getY();
-        // } else {
-        // return 15000 - 165 * getY();
-        // }
-
-        return -230 * getY() + 13020;
-    }
-
-    public boolean getTargetVisible() {
+    public boolean getValid() {
         return targetValid;
     }
-
-    public void setLimelight(boolean isOn) {
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        table.getEntry("ledMode").setNumber(isOn ? 0 : 2);
-    }
+    
 }

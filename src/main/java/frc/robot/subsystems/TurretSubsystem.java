@@ -60,7 +60,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void runToPosition(int position) {
-        setPower(MathUtil.clamp(Turret.kPCenter * (this.getCurrentPosition() - position) / Turret.FULL_ROTATION, -0.5,
+        setPower(MathUtil.clamp(Turret.kPCenter * (this.getCurrentPosition() - position), -0.5,
                 0.5));
     }
 

@@ -13,13 +13,13 @@ public final class Constants {
     // Hood angle: 90-16.1 degrees
     public final static class Turret {
         public final static int PORT = 3;
-        public final static int FULL_ROTATION = 46640;
-        public final static int BOUNDS = FULL_ROTATION;
+        public final static int FULL_ROTATION = 30000;
+        public final static int BOUNDS = 37600;
         public final static double SEEKING_POWER = 1;
         public final static double kP = 0.02;
-        public final static double kPCenter = 1;
+        public final static double kPCenter = 0.0001;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
-        public final static double OFFSET_TICKS = -1000;
+        public final static int OFFSET_TICKS = -8500;
     }
 
     public final static class Drivetrain {

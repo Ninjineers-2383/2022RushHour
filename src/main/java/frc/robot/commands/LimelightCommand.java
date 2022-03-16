@@ -50,11 +50,11 @@ public class LimelightCommand extends CommandBase {
     kickerOn = false;
     turretSeek = false;
 
-    final double CompensationAuthority = 0.0001;
+    final double CompensationAuthority = 0.0035;
 
-    double error = limelight.getX() - CompensationAuthority * drivetrainVelocityF.calculate(driveVelocity.getAsDouble())
-        * Math.cos(turretTicks.getAsDouble() * Math.PI / Turret.FULL_ROTATION);
-
+    double error = limelight.getX() - CompensationAuthority * driveVelocity.getAsDouble()
+        * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS);
+    SmartDashboard.putNumber("Compensation", error);
     if (limelight.getTargetVisible()) {
       limelight.setLimelight(true);
       turretPower = -Turret.kP * error;

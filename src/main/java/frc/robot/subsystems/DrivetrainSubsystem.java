@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
@@ -74,6 +76,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   }
 
+  public void driveFeed() {
+    drive.feed();
+  }
+
   public void switchBrakeCoast(boolean isBrake) {
     NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
     leftFollowerMotor.setNeutralMode(mode);
@@ -85,8 +91,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
 
-    SmartDashboard.putNumber("Velocity", getAverageVelocity());
-    SmartDashboard.putBoolean("Stopped", Math.abs(getAverageVelocity()) < 0.1);
+    SmartDashboard.putNumber("Velocity", getAverageVelocity().getAsDouble());
+    SmartDashboard.putBoolean("Stopped", Math.abs(getAverageVelocity().getAsDouble()) < 0.1);
 
     SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
     SmartDashboard.putNumber("Left Follower Senser Pos", leftFollowerMotor.getSelectedSensorPosition());
@@ -151,8 +157,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return rightMasterMotor.getSelectedSensorPosition();
   }
 
-  public double getAverageVelocity() {
-    return (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
+  public DoubleSupplier getAverageVelocity() {
+    return () -> (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
   }
 
   public class SlewRateLimiter {
