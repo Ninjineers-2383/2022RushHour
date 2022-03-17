@@ -57,7 +57,7 @@ public class RobotContainer {
                                                                                                       // button
     // Hook
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
-    final JoystickButton autoAlign = new JoystickButton(operatorController, Button.kB.value);
+    final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
     private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
     private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : -0.1;
 
@@ -78,6 +78,7 @@ public class RobotContainer {
     final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
     final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
+    final JoystickButton chimUp = new JoystickButton(driverController, Button.kY.value);
     public final IntakeSubsystem intake = new IntakeSubsystem();
     private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis() * -1
             + driverController.getRightTriggerAxis() * -1;
@@ -136,15 +137,14 @@ public class RobotContainer {
         // default commands for functions
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         limelight.setDefaultCommand(aimCommand);
-        turret.setDefaultCommand(new TurretCommand(turret, true, Turret.OFFSET_TICKS));
+        turret.setDefaultCommand(new TurretCommand(turret, Turret.OFFSET_TICKS));
         indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0));
         launcher.setDefaultCommand(
                 new LauncherCommand(launcher,
                         () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
         chimney.setDefaultCommand(
                 new ChimneyCommand(chimney,
-                        () -> colorSensor.getActive() ? -0.16 : intakePower.getAsDouble(),
-                        intake));
+                        () -> colorSensor.getActive() ? -0.16 : intakePower.getAsDouble()));
         intake.setDefaultCommand(intakeCommand);
         climber.setDefaultCommand(climberCommand);
         SmartDashboard.putBoolean("Aim Active", false);
@@ -154,11 +154,15 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
 
-        autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera));
+        autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera, throttle, turn));
 
         pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(), !intake.getRearUp()));
 
         pooperOut.whenActive(colorSensor.loadOut(() -> !intake.getFrontUp()));
+
+        // feedOut.whenActive(new ParallelCommandGroup(
+        // new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1),
+        // new ChimneyCommand(chimney, () -> 1).withTimeout(0.1)));
 
         /*
          * parallel command that runs:
@@ -192,20 +196,25 @@ public class RobotContainer {
 
         indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
                 new InstantCommand(() -> {
-                    setIsShooting();
+                    // setIsShooting();
                     driverController.setRumble(RumbleType.kLeftRumble, 1.0);
                     driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
+                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
                 }),
-                new ChimneyCommand(chimney, () -> -0.4, intake).withTimeout(0.1),
+                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
                 new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
-                new IndexerCommand(indexer, () -> 0).withTimeout(0.22),
-                new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
-                new ChimneyCommand(chimney, () -> -0.5, intake).withTimeout(0.05),
+                new ParallelCommandGroup(
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.22)),
+                new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.05),
                 new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
                 new InstantCommand(() -> {
                     driverController.setRumble(RumbleType.kLeftRumble, 0);
                     driverController.setRumble(RumbleType.kRightRumble, 0);
-                    setNotIsShooting();
+                    operatorController.setRumble(RumbleType.kLeftRumble, 0);
+                    operatorController.setRumble(RumbleType.kRightRumble, 0);
+                    // setNotIsShooting();
                 })));
 
         // lowerFrontFeeder.toggleWhenPressed(
@@ -273,7 +282,7 @@ public class RobotContainer {
 
         Command fourBallAuto = new SequentialCommandGroup(
                 new ParallelCommandGroup( // Intake system activate and intake first ball
-                        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 5)),
@@ -289,14 +298,14 @@ public class RobotContainer {
                                                 .withTimeout(1.2)),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new ChimneyCommand(chimney, () -> 0, intake)
+                                new ChimneyCommand(chimney, () -> 0)
                                         .withTimeout(0.1),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.4),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1, intake)
+                                new ChimneyCommand(chimney, () -> -1)
                                         .withTimeout(0.3),
-                                new ChimneyCommand(chimney, () -> -0.5, intake)
+                                new ChimneyCommand(chimney, () -> -0.5)
                                         .withTimeout(0.15),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.4))),
@@ -304,50 +313,48 @@ public class RobotContainer {
                         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -0.8, intake).withTimeout(0.1),
-                        new AutoTurn(drivetrain, 13, 8, -0.4, 5)), // drives back and intakes
-                                                                   // human player ball
+                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
+                        new AutoTurn(drivetrain, 24, 8, -0.4, 5)), // drives back and intakes
+                // human player ball
                 new AutoForward(drivetrain, 11, 2.5, 0.9, 5),
-                new AutoTurn(drivetrain, 29, 10, 0.6, 5),
+                // new AutoTurn(drivetrain, 29, 10, 0.6, 5),
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new AutoAlign(drivetrain, rearCamera, -0.5).withTimeout(2),
                 new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
-                new WaitCommand(0.2),
+                new WaitCommand(0.4),
                 new ParallelCommandGroup(
                         new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-                        new AutoTurn(drivetrain, 24, 10, -0.6, 2)),
-                new AutoForward(drivetrain, 9.5, 2, -0.88, 2),
+                        new AutoTurn(drivetrain, 25, 10, -0.6, 2.5)),
+                new AutoForward(drivetrain, 11.5, 1.5, -0.88, 2),
                 new ParallelRaceGroup(
                         autoLimelight2,
-                        new TurretCommand(turret, () -> autoLimelight2.getTurretPower() * 0.65,
+                        new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),
                                 () -> autoLimelight2.getTurretSeek(), true)
-                                        .withTimeout(1.2),
-                        new AutoForward(drivetrain, 4, 2, -0.88, 2)),
+                                        .withTimeout(2),
+                        new LauncherCommand(launcher,
+                                () -> limelight.getLaunchingVelocity())
+                                        .withTimeout(2),
+                        new AutoForward(drivetrain, 6, 1.5, -0.88, 2)),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(), true)
-                                .withTimeout(0.5),
-                new ParallelCommandGroup( // Shoot two balls
-                        new LauncherCommand(launcher,
-                                () -> limelight.getLaunchingVelocity() - 1000)
-                                        .withTimeout(2),
-                        new SequentialCommandGroup(
-                                new WaitCommand(0.4),
-                                new ChimneyCommand(chimney, () -> 0, intake)
-                                        .withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                                new ChimneyCommand(chimney, () -> -1, intake)
-                                        .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0, intake)
-                                        .withTimeout(0.05),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3))),
-                new InstantCommand(colorSensor::setActiveTrue, colorSensor));
+                                .withTimeout(0.2),
+                new ChimneyCommand(chimney, () -> 0)
+                        .withTimeout(0.1),
+                new IndexerCommand(indexer, () -> 0.75)
+                        .withTimeout(0.3),
+                new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                new ChimneyCommand(chimney, () -> -1)
+                        .withTimeout(0.2),
+                new ChimneyCommand(chimney, () -> 0)
+                        .withTimeout(0.05),
+                new IndexerCommand(indexer, () -> 0.75)
+                        .withTimeout(0.5));
 
         Command twoBallAuto = new SequentialCommandGroup(
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.75, 5),
                         new WaitCommand(0.5)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
@@ -361,14 +368,14 @@ public class RobotContainer {
                                                 .withTimeout(1.2)),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new ChimneyCommand(chimney, () -> 0, intake)
+                                new ChimneyCommand(chimney, () -> 0)
                                         .withTimeout(0.1),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.5),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1, intake)
+                                new ChimneyCommand(chimney, () -> -1)
                                         .withTimeout(0.3),
-                                new ChimneyCommand(chimney, () -> -0.5, intake)
+                                new ChimneyCommand(chimney, () -> -0.5)
                                         .withTimeout(0.15),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.5))),
@@ -376,7 +383,7 @@ public class RobotContainer {
                         new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.1)));
+                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.1)));
         // new AutoTurn(drivetrain, 60, 10, 0.6, 6),
         // new IntakeCommand(intake, () -> -1, true, false).withTimeout(0.1),
         // new AutoForward(drivetrain, 5, 2, -0.6, 5),

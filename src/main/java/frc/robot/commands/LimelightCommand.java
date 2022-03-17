@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -52,12 +53,13 @@ public class LimelightCommand extends CommandBase {
 
     final double CompensationAuthority = 0.0035;
 
-    double error = limelightF.calculate(limelight.getX()) - CompensationAuthority * driveVelocity.getAsDouble()
-        * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS);
+    double error = MathUtil
+        .clamp(limelightF.calculate(limelight.getX()) - CompensationAuthority * driveVelocity.getAsDouble()
+            * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS), -25, 25);
     SmartDashboard.putNumber("Compensation", error);
     if (limelight.getTargetVisible()) {
       limelight.setLimelight(true);
-      turretPower = -Turret.kP * error;
+      turretPower = -((Math.abs(error) > 1) ? 1 : 0) * (Turret.kP * error);
     } else {
       // no target present
       turretSeek = true;

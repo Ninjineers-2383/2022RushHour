@@ -79,9 +79,9 @@ public class ColorSensorSubsystem extends SubsystemBase {
         double p = 1;
         return new SequentialCommandGroup(
                 new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1 * p),
-                new ChimneyCommand(chimney, () -> -1, intake).withTimeout(0.5 * p),
+                new ChimneyCommand(chimney, () -> -1).withTimeout(0.5 * p),
                 new DoubleIntakeCommand(intake, () -> 0, () -> 0).withTimeout(0.05 * p),
-                new ChimneyCommand(chimney, () -> 0, intake).withTimeout(0.05 * p));
+                new ChimneyCommand(chimney, () -> 0).withTimeout(0.05 * p));
     }
 
     // true means front down, false means back.
@@ -90,7 +90,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         return new ParallelCommandGroup(
                 new DoubleIntakeCommand(intake, () -> (frontDown.getAsBoolean() ? 1 : -1),
                         () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(0.1 * p),
-                new ChimneyCommand(chimney, () -> 0.2, intake).withTimeout(0.05 * p));
+                new ChimneyCommand(chimney, () -> 0.2).withTimeout(0.05 * p));
     }
 
     @Override

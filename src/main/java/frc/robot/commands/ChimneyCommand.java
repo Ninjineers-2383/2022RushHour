@@ -4,7 +4,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ChimneySubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
 
 public class ChimneyCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
@@ -16,7 +15,7 @@ public class ChimneyCommand extends CommandBase {
     // actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs
     // Chimney subsystem actions.
-    public ChimneyCommand(ChimneySubsystem chimney, DoubleSupplier power, IntakeSubsystem intake) {
+    public ChimneyCommand(ChimneySubsystem chimney, DoubleSupplier power) {
         this.chimney = chimney;
         this.power = power;
         addRequirements(chimney);

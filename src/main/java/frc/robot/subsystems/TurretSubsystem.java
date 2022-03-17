@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Turret;
@@ -60,13 +59,12 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void runToPosition(int position) {
-        setPower(MathUtil.clamp(Turret.kPCenter * (this.getCurrentPosition() - position), -0.5,
-                0.5));
-    }
-
-    public void center() {
-        setPower(MathUtil.clamp(Turret.kPCenter * (this.getCurrentPosition() - 6_300) / Turret.FULL_ROTATION, -0.5,
-                0.5));
+        double error = this.getCurrentPosition() - position;
+        if (Math.abs(error) > 100) {
+            setPower(Turret.kP_CENTER * error + Turret.kS * Math.signum(error));
+        } else {
+            setPower(0.0);
+        }
     }
 
     public double getCurrentPosition() {

@@ -16,6 +16,7 @@ public class TurretCommand extends CommandBase {
     private final Boolean flipSeek;
     private final int position;
     private final BooleanSupplier shouldMove;
+    private boolean done = false;
 
     public TurretCommand(TurretSubsystem turret, DoubleSupplier power, BooleanSupplier seek, boolean flipSeek) {
         this.turret = turret;
@@ -51,11 +52,11 @@ public class TurretCommand extends CommandBase {
         addRequirements(turret);
     }
 
-    public TurretCommand(TurretSubsystem turret, boolean center, int position) {
+    public TurretCommand(TurretSubsystem turret, int position) {
         this.turret = turret;
         this.speed = () -> 0;
         this.seek = () -> false;
-        this.center = center;
+        this.center = true;
         this.position = position;
         this.flipSeek = false;
         this.shouldMove = () -> true;
@@ -68,7 +69,11 @@ public class TurretCommand extends CommandBase {
         if (this.shouldMove.getAsBoolean()) {
             // 1 degree of rotation = 145.695364 ticks
             if (center) {
-                turret.runToPosition(position);
+                if (Math.abs(turret.getCurrentPosition()) > 150) {
+                    turret.runToPosition(position);
+                } else {
+                    done = true;
+                }
             } else {
                 if (seek.getAsBoolean()) {
                     turret.seek(flipSeek);
@@ -84,5 +89,10 @@ public class TurretCommand extends CommandBase {
     @Override
     public void end(boolean force) {
         turret.setPower(0.0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return done;
     }
 }

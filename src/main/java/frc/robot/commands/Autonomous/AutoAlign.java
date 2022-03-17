@@ -1,5 +1,7 @@
 package frc.robot.commands.Autonomous;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -13,6 +15,9 @@ public class AutoAlign extends CommandBase {
 
   private boolean done = false;
   double startHeading;
+  DoubleSupplier forward;
+  DoubleSupplier turn;
+  double firstTurn = 0;
 
   /**
    * Creates a new ExampleCommand.
@@ -22,6 +27,34 @@ public class AutoAlign extends CommandBase {
   public AutoAlign(DrivetrainSubsystem drivetrain, CameraSubsystem camera) {
     this.drivetrain = drivetrain;
     this.camera = camera;
+    this.forward = () -> 0;
+    this.turn = () -> 0;
+    this.firstTurn = 0;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(drivetrain);
+
+  }
+
+  public AutoAlign(DrivetrainSubsystem drivetrain, CameraSubsystem camera, DoubleSupplier forward,
+      DoubleSupplier turn) {
+    this.drivetrain = drivetrain;
+    this.camera = camera;
+    this.forward = forward;
+    this.turn = turn;
+    this.firstTurn = 0;
+
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(drivetrain);
+
+  }
+
+  public AutoAlign(DrivetrainSubsystem drivetrain, CameraSubsystem camera, double firstTurn) {
+    this.drivetrain = drivetrain;
+    this.camera = camera;
+    this.forward = () -> 0;
+    this.turn = () -> 0;
+    this.firstTurn = firstTurn;
+
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
 
@@ -35,17 +68,26 @@ public class AutoAlign extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (camera.getValid()) {
-      if (camera.getX() > 10) {
-        drivetrain.drive(0, 0.3);
-      } else if (camera.getX() < -10) {
-        drivetrain.drive(0, -0.3);
-      } else {
-        drivetrain.drive(0, 0);
-      }
+    double kp = 0.005;
+    if (firstTurn == 0) {
+      drivetrain.drive(forward.getAsDouble(),
+          ((camera.getValid() && (Math.abs(camera.getX()) > 1) ? 1 : 0))
+              * (kp * camera.getX() + Math.signum(camera.getX()) * 0.3) + turn.getAsDouble());
     } else {
-      drivetrain.drive(0, 0);
+      if (camera.getValid()) {
+        if (Math.abs(camera.getX()) > 2) {
+          drivetrain.drive(0,
+              (kp * camera.getX() + Math.signum(camera.getX()) * 0.3));
+        } else {
+          done = true;
+        }
+
+      } else {
+        drivetrain.drive(0, firstTurn);
+      }
+
     }
+
     drivetrain.driveFeed();
   }
 

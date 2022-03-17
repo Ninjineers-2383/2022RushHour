@@ -17,9 +17,10 @@ public final class Constants {
         public final static int BOUNDS = 37600;
         public final static double SEEKING_POWER = 1;
         public final static double kP = 0.02;
-        public final static double kPCenter = 0.0001;
+        public final static double kP_CENTER = 0.00005;
+        public final static double kS = 0.04;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
-        public final static int OFFSET_TICKS = -8500;
+        public final static int OFFSET_TICKS = -10000;
     }
 
     public final static class Drivetrain {

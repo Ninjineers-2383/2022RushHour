@@ -96,7 +96,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    brakeMotors();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -104,7 +103,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
+    brakeMotors();
     SendableChooser<String> teamColorChooser = new SendableChooser<>();
     teamColorChooser.setDefaultOption("Blue", "blue");
     teamColorChooser.addOption("Red", "red");
@@ -113,6 +112,7 @@ public class Robot extends TimedRobot {
     // Alliance alliance = DriverStation.getAlliance();
     // m_robotContainer.colorSensor.setColor(alliance == Alliance.Blue ? "blue" :
     // alliance == Alliance.Red ? "red" : "invalid");
+    m_robotContainer.intake.setPower(0.0);
   }
 
   public void brakeMotors() {
