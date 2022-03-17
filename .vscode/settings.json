@@ -34,5 +34,10 @@
     "source.organizeImports": true
   },
   "editor.defaultFormatter": "redhat.java",
-  "editor.tabSize": 4
+  "editor.tabSize": 4,
+  "[java]": {
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.detectIndentation": false
+  },
+  "wpilib.autoStartRioLog": false
 }

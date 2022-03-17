@@ -30,7 +30,6 @@ import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoAlign;
 import frc.robot.commands.Autonomous.AutoForward;
-import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
@@ -287,44 +286,39 @@ public class RobotContainer {
                         new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 5)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
-                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                .withTimeout(0.6),
                         new ParallelRaceGroup(
                                 autoLimelight,
                                 new TurretCommand(turret,
-                                        () -> autoLimelight.getTurretPower()
-                                                * 0.65,
+                                        () -> autoLimelight.getTurretPower(),
                                         () -> autoLimelight.getTurretSeek())
                                                 .withTimeout(1.2)),
                         new SequentialCommandGroup(
-                                new WaitCommand(0.3),
+                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                        .withTimeout(0.2),
                                 new ChimneyCommand(chimney, () -> 0)
                                         .withTimeout(0.1),
                                 new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.4),
+                                        .withTimeout(0.3),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
                                 new ChimneyCommand(chimney, () -> -1)
-                                        .withTimeout(0.3),
+                                        .withTimeout(0.2),
                                 new ChimneyCommand(chimney, () -> -0.5)
                                         .withTimeout(0.15),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.4))),
                 new ParallelCommandGroup( // Stop launch system
-                        new TurretCommand(turret, () -> 0, () -> false).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
                         new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
-                        new AutoTurn(drivetrain, 24, 8, -0.4, 5)), // drives back and intakes
+                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                        new SequentialCommandGroup(
+                                new WaitCommand(0.3),
+                                new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
+                        )),
                 // human player ball
-                new AutoForward(drivetrain, 11, 2.5, 0.9, 5),
-                // new AutoTurn(drivetrain, 29, 10, 0.6, 5),
-                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
-                new AutoAlign(drivetrain, rearCamera, -0.5).withTimeout(2),
-                new AutoForward(drivetrain, 1.3, 0.5, 0.6, 2),
+                new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
                 new WaitCommand(0.4),
-                new ParallelCommandGroup(
-                        new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-                        new AutoTurn(drivetrain, 25, 10, -0.6, 2.5)),
+                new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
                 new AutoForward(drivetrain, 11.5, 1.5, -0.88, 2),
                 new ParallelRaceGroup(
                         autoLimelight2,
