@@ -317,11 +317,12 @@ public class RobotContainer {
                                 new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
                         )),
                 // human player ball
-                new AutoForwardAim(drivetrain, rearCamera, 12, 2.5, 0.8, 50),
+                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.5, 0.8, 50),
                 new ParallelRaceGroup(
-                        new TurretCommand(turret, Turret.FOWARD_OFFSET_TICKS),
-                        new AutoForwardAim(drivetrain, rearCamera, 0.7, 11.5, 1.5, -0.88, 20, -0.1, 0)),
-                new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
+                        new LauncherCommand(launcher, () -> 16500),
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek(), true),
+                        new AutoForward(drivetrain, 11.5, 1.5, -0.88, 20)),
                 new ParallelRaceGroup(
                         autoLimelight2,
                         new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),
