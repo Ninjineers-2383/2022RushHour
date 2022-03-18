@@ -190,7 +190,8 @@ public class RobotContainer {
 
         // backup kicker control if limelight fails
         indexerUp.whileHeld(new ParallelCommandGroup(new IndexerCommand(indexer, () -> 1),
-                new StartEndCommand(() -> setIsShooting(), () -> setNotIsShooting())));
+                new InstantCommand(() -> setNotIsShooting()))).whenInactive(new InstantCommand(
+                        () -> setNotIsShooting()));
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
@@ -322,7 +323,7 @@ public class RobotContainer {
                         new LauncherCommand(launcher, () -> 16500),
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek(), true),
-                        new AutoForward(drivetrain, 11.5, 1.5, -0.88, 20)),
+                        new AutoForward(drivetrain, 13, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
                         autoLimelight2,
                         new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),

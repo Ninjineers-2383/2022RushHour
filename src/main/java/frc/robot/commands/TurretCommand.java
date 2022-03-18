@@ -69,10 +69,11 @@ public class TurretCommand extends CommandBase {
         if (this.shouldMove.getAsBoolean()) {
             // 1 degree of rotation = 145.695364 ticks
             if (center) {
-                if (Math.abs(turret.getCurrentPosition() - position) > 600) {
+                if (Math.abs(turret.getCurrentPosition() - position) > 300) {
                     turret.runToPosition(position);
                 } else {
-                    done = true;
+                    turret.setPower(0.0);
+                    done = false;
                 }
             } else {
                 if (seek.getAsBoolean()) {
