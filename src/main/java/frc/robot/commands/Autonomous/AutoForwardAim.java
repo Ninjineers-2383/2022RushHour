@@ -4,23 +4,30 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class AutoForward extends CommandBase {
+public class AutoForwardAim extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private final DrivetrainSubsystem drivetrainSubsystem;
 
-    private final double kP_HEADING_CORRECTION = 9.8; // Strength of heading correction
+    private final double kP_HEADING_CORRECTION = 0.01; // Strength of heading correction
     private final double adjustedMaxOutput;
 
     final private double DISTANCE_TICKS;
     final private double ACCELERATION_INTERVAL;
     final private double TIMEOUT;
     final private Timer TIMER;
+    final private CameraSubsystem camera;
+
+    private double leftBias = 0;
+    private double rightBias = 0;
 
     final private double[] OFFSET_TICKS = new double[2];
+
+    final private double aimStartTime;
 
     private boolean done = false;
     private int profileState = 0; // Finite State Machine
@@ -30,7 +37,8 @@ public class AutoForward extends CommandBase {
      *
      * @param subsystem The subsystem used by this command.
      */
-    public AutoForward(DrivetrainSubsystem subsystem, double distanceFeet, double accelerationIntervalFeet,
+    public AutoForwardAim(DrivetrainSubsystem subsystem, CameraSubsystem camera, double distanceFeet,
+            double accelerationIntervalFeet,
             double maxOutput, double timeout) {
         drivetrainSubsystem = subsystem;
         this.adjustedMaxOutput = maxOutput - Math.signum(maxOutput) * (Drivetrain.ksPercent); // Friction
@@ -40,6 +48,51 @@ public class AutoForward extends CommandBase {
 
         this.TIMEOUT = timeout;
         this.TIMER = new Timer();
+        this.TIMER.start();
+        this.camera = camera;
+        this.aimStartTime = -1;
+        // Use addRequirements() here to declare subsystem dependencies.
+
+        addRequirements(subsystem);
+    }
+
+    public AutoForwardAim(DrivetrainSubsystem subsystem, CameraSubsystem camera, double startAimAfter,
+            double distanceFeet,
+            double accelerationIntervalFeet,
+            double maxOutput, double timeout) {
+        drivetrainSubsystem = subsystem;
+        this.adjustedMaxOutput = maxOutput - Math.signum(maxOutput) * (Drivetrain.ksPercent); // Friction
+
+        this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
+        this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
+
+        this.TIMEOUT = timeout;
+        this.TIMER = new Timer();
+        this.TIMER.start();
+        this.camera = camera;
+        this.aimStartTime = startAimAfter;
+        // Use addRequirements() here to declare subsystem dependencies.
+
+        addRequirements(subsystem);
+    }
+
+    public AutoForwardAim(DrivetrainSubsystem subsystem, CameraSubsystem camera, double startAimAfter,
+            double distanceFeet,
+            double accelerationIntervalFeet,
+            double maxOutput, double timeout, double leftBias, double rightBias) {
+        drivetrainSubsystem = subsystem;
+        this.adjustedMaxOutput = maxOutput - Math.signum(maxOutput) * (Drivetrain.ksPercent); // Friction
+
+        this.DISTANCE_TICKS = (int) (distanceFeet * Drivetrain.TICKS_PER_FOOT);
+        this.ACCELERATION_INTERVAL = (int) (accelerationIntervalFeet * Drivetrain.TICKS_PER_FOOT);
+
+        this.TIMEOUT = timeout;
+        this.TIMER = new Timer();
+        this.TIMER.start();
+        this.camera = camera;
+        this.aimStartTime = startAimAfter;
+        this.leftBias = leftBias;
+        this.rightBias = rightBias;
         // Use addRequirements() here to declare subsystem dependencies.
 
         addRequirements(subsystem);
@@ -58,8 +111,6 @@ public class AutoForward extends CommandBase {
     @Override
     public void execute() {
         System.out.println(profileState);
-
-        double startHeading = drivetrainSubsystem.getHeading();
         double leftOutput = 0;
         double rightOutput = 0;
 
@@ -112,18 +163,20 @@ public class AutoForward extends CommandBase {
                 done = true;
         }
 
-        leftOutput += kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading); // Compensation for
-                                                                                                 // unwanted turn
-        rightOutput -= kP_HEADING_CORRECTION * (drivetrainSubsystem.getHeading() - startHeading);
+        double error = ((camera.getValid() && TIMER.get() > aimStartTime && (Math.abs(camera.getX()) > 1) ? 1 : 0))
+                * (kP_HEADING_CORRECTION * camera.getX());
+
+        leftOutput += error;
+        rightOutput -= error;
+
+        leftOutput += leftBias;
+        rightOutput += rightBias;
 
         leftOutput *= adjustedMaxOutput; // Multiply by max output
         rightOutput *= adjustedMaxOutput;
 
         leftOutput += Math.signum(adjustedMaxOutput) * (Drivetrain.ksPercent);
         rightOutput += Math.signum(adjustedMaxOutput) * (Drivetrain.ksPercent);
-
-        // leftOutput /= 12;
-        // rightOutput /= 12;
 
         SmartDashboard.putNumber("left", leftOutput);
         SmartDashboard.putNumber("right", rightOutput);

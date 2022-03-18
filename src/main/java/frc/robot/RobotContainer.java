@@ -30,6 +30,7 @@ import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoAlign;
 import frc.robot.commands.Autonomous.AutoForward;
+import frc.robot.commands.Autonomous.AutoForwardAim;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
@@ -281,10 +282,10 @@ public class RobotContainer {
 
         Command fourBallAuto = new SequentialCommandGroup(
                 new ParallelCommandGroup( // Intake system activate and intake first ball
-                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
-                        new AutoForward(drivetrain, 5.3, 2, 0.88, 5)),
+                        new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
                                 autoLimelight,
@@ -301,7 +302,7 @@ public class RobotContainer {
                                         .withTimeout(0.3),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
                                 new ChimneyCommand(chimney, () -> -1)
-                                        .withTimeout(0.2),
+                                        .withTimeout(0.5),
                                 new ChimneyCommand(chimney, () -> -0.5)
                                         .withTimeout(0.15),
                                 new IndexerCommand(indexer, () -> 0.75)
@@ -316,10 +317,11 @@ public class RobotContainer {
                                 new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
                         )),
                 // human player ball
-                new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
-                new WaitCommand(0.4),
+                new AutoForwardAim(drivetrain, rearCamera, 12, 2.5, 0.8, 50),
+                new ParallelRaceGroup(
+                        new TurretCommand(turret, Turret.FOWARD_OFFSET_TICKS),
+                        new AutoForwardAim(drivetrain, rearCamera, 0.7, 11.5, 1.5, -0.88, 20, -0.1, 0)),
                 new LauncherCommand(launcher, () -> 16500).withTimeout(0.1),
-                new AutoForward(drivetrain, 11.5, 1.5, -0.88, 2),
                 new ParallelRaceGroup(
                         autoLimelight2,
                         new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),
@@ -327,8 +329,7 @@ public class RobotContainer {
                                         .withTimeout(2),
                         new LauncherCommand(launcher,
                                 () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(2),
-                        new AutoForward(drivetrain, 6, 1.5, -0.88, 2)),
+                                        .withTimeout(2)),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(), true)
                                 .withTimeout(0.2),
@@ -407,16 +408,9 @@ public class RobotContainer {
                 new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
         Command testAuto = new SequentialCommandGroup(
-                new ParallelCommandGroup( // Shoot two balls after feeding one
-                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                .withTimeout(0.9),
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5,
-                                () -> aimCommand.getTurretSeek())
-                                        .withTimeout(1.2),
-                        new SequentialCommandGroup(
-                                new WaitCommand(0.3),
-                                new IndexerCommand(indexer, () -> 0.75).withTimeout(2)),
-                        new InstantCommand(colorSensor::setActiveTrue, colorSensor)));
+                new TurretCommand(turret, Turret.OFFSET_TICKS),
+                new TurretCommand(turret, Turret.FOWARD_OFFSET_TICKS),
+                new TurretCommand(turret, Turret.OFFSET_TICKS));
 
         autoChooser.setDefaultOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);

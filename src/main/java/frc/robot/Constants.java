@@ -21,6 +21,7 @@ public final class Constants {
         public final static double kS = 0.04;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static int OFFSET_TICKS = -10000;
+        public final static int FOWARD_OFFSET_TICKS = 22000;
     }
 
     public final static class Drivetrain {
