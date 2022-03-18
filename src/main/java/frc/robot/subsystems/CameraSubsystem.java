@@ -7,6 +7,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -27,6 +29,8 @@ public class CameraSubsystem extends SubsystemBase {
         } else {
             camera = null;
         }
+
+        camera.setPipelineIndex(DriverStation.getAlliance() == Alliance.Red ? 0 : 1);
     }
 
     public void periodic() {
