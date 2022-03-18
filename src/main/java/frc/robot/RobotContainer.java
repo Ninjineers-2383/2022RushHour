@@ -409,10 +409,7 @@ public class RobotContainer {
                                         .withTimeout(2))),
                 new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
-        Command testAuto = new SequentialCommandGroup(
-                new TurretCommand(turret, Turret.OFFSET_TICKS),
-                new TurretCommand(turret, Turret.FOWARD_OFFSET_TICKS),
-                new TurretCommand(turret, Turret.OFFSET_TICKS));
+        Command testAuto = new SequentialCommandGroup(new AutoAlign(drivetrain, rearCamera, 0.0).withTimeout(2));
 
         autoChooser.setDefaultOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);

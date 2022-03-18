@@ -141,6 +141,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // drive.arcadeDrive(power, 0.9 * turn);
     }
 
+    public void driveSquared(double power, double turn) {
+
+        double driveOutput = throttleF.calculate(power);
+        double turnOutput = turnF.calculate(turn * 0.9);
+
+        drive.arcadeDrive(driveOutput, turnOutput);
+        // drive.arcadeDrive(power, 0.9 * turn);
+    }
+
     // reset encoder positions to 0,
     public void zeroEncoders() {
         leftMasterMotor.setSelectedSensorPosition(0);
