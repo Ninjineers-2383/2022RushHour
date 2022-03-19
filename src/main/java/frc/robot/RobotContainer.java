@@ -165,7 +165,7 @@ public class RobotContainer {
 
         // pooperOut.whenActive(colorSensor.loadOut(() -> !intake.getFrontUp()));
 
-        barfOut.whenActive(colorSensor.shootOut());
+        // barfOut.whenActive(colorSensor.shootOut());
 
         // feedOut.whenActive(new ParallelCommandGroup(
         // new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1),
@@ -179,7 +179,10 @@ public class RobotContainer {
          */
         limelightTarget.whileHeld(new ParallelCommandGroup(
                 new LauncherCommand(launcher,
-                        () -> ((barfOut.get() ? limelight.getLaunchingVelocity() : 4000)),
+                        () -> (limelight
+                                .getLaunchingVelocity()
+                                * (barfOut.get() ? 1.2
+                                        : 1)),
                         () -> shouldAdjustTurret),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(),
