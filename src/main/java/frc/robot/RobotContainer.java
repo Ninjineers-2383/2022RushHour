@@ -18,10 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Turret;
+import frc.robot.commands.BarfOutCommand;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DrivetrainCommand;
-import frc.robot.commands.FeedIn;
 import frc.robot.commands.FeedOut;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
@@ -73,12 +73,14 @@ public class RobotContainer {
 
     // Driver Controls - Driving, feeding
     // Feeders
-    final JoystickButton pooperPanicButton = new JoystickButton(driverController, Button.kBack.value); // left
-                                                                                                       // special
+    // final JoystickButton pooperPanicButton = new JoystickButton(driverController,
+    // Button.kBack.value); // left
+    // special
     final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
     final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     final JoystickButton chimUp = new JoystickButton(driverController, Button.kY.value);
+    final JoystickButton barfToggle = new JoystickButton(operatorController, Button.kStart.value);
     public final IntakeSubsystem intake = new IntakeSubsystem();
     private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis() * -1
             + driverController.getRightTriggerAxis() * -1;
@@ -96,7 +98,9 @@ public class RobotContainer {
     public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     public final ChimneySubsystem chimney = new ChimneySubsystem();
     public final ClimberSubsystem climber = new ClimberSubsystem();
-    public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney);
+    public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(launcher, indexer); // was intake
+                                                                                                 // and
+    // chimney subsystems
     public final CameraSubsystem rearCamera = new CameraSubsystem("rear");
 
     // defining premeditated commands
@@ -106,10 +110,12 @@ public class RobotContainer {
     private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
+    private final BarfOutCommand barfOutCommand = new BarfOutCommand(colorSensor);
 
     // Custom Triggers
-    public final FeedIn pooperIn = new FeedIn(colorSensor);
-    public final FeedOut pooperOut = new FeedOut(colorSensor);
+    // public final FeedIn pooperIn = new FeedIn(colorSensor);
+    // public final FeedOut pooperOut = new FeedOut(colorSensor);
+    public final FeedOut barfOut = new FeedOut(colorSensor);
 
     // Required robot state
     private boolean shouldAdjustTurret = false;
@@ -144,7 +150,7 @@ public class RobotContainer {
                         () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
         chimney.setDefaultCommand(
                 new ChimneyCommand(chimney,
-                        () -> colorSensor.getActive() ? -0.16 : intakePower.getAsDouble()));
+                        intakePower));
         intake.setDefaultCommand(intakeCommand);
         climber.setDefaultCommand(climberCommand);
         SmartDashboard.putBoolean("Aim Active", false);
@@ -156,9 +162,12 @@ public class RobotContainer {
 
         autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera, throttle, turn));
 
-        pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(), !intake.getRearUp()));
+        // pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(),
+        // !intake.getRearUp()));
 
-        pooperOut.whenActive(colorSensor.loadOut(() -> !intake.getFrontUp()));
+        // pooperOut.whenActive(colorSensor.loadOut(() -> !intake.getFrontUp()));
+
+        barfOut.whenActive(colorSensor.shootOut());
 
         // feedOut.whenActive(new ParallelCommandGroup(
         // new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1),
@@ -172,7 +181,7 @@ public class RobotContainer {
          */
         limelightTarget.whileHeld(new ParallelCommandGroup(
                 new LauncherCommand(launcher,
-                        () -> (limelight.getLaunchingVelocity()),
+                        () -> ((barfOut.get() ? limelight.getLaunchingVelocity() : 4000)),
                         () -> shouldAdjustTurret),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(),
@@ -254,15 +263,20 @@ public class RobotContainer {
                         () -> intakeCommand.setRearDown(false),
                         () -> intakeCommand.setRearDown(true)));
 
-        pooperPanicButton.toggleWhenPressed(
-                new StartEndCommand(
-                        () -> colorSensor.setActiveFalse(),
-                        () -> colorSensor.setActiveTrue()));
+        // pooperPanicButton.toggleWhenPressed(
+        // new StartEndCommand(
+        // () -> colorSensor.setActiveFalse(),
+        // () -> colorSensor.setActiveTrue()));
 
         climberInvert.toggleWhenPressed(
                 new StartEndCommand(
                         () -> climber.invertMotorPowers(),
                         () -> climber.unInvertMotorPower()));
+
+        barfToggle.toggleWhenPressed(
+                new StartEndCommand(
+                        () -> colorSensor.setActiveFalse(),
+                        () -> colorSensor.setActiveTrue()));
     }
 
     public Command getAutonomousCommand() {

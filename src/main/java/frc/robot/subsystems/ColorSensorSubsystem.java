@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,25 +7,38 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ChimneyCommand;
-import frc.robot.commands.DoubleIntakeCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.IndexerCommand;
+import frc.robot.commands.LauncherCommand;
 
 public class ColorSensorSubsystem extends SubsystemBase {
 
     // create motor instance that uses a TalonSRX motor controller.
     private final ColorSensorV3 colorSensor;
-    private final IntakeSubsystem intake;
-    private final ChimneySubsystem chimney;
+    // private final IntakeSubsystem intake;
+    // private final ChimneySubsystem chimney;
+    private final IndexerSubsystem indexer;
+    private final LauncherSubsystem launcher;
     private boolean active; // pretty much if auto is finished or not. no pooping during auto
 
-    // Chimney subsystem constructor
-    public ColorSensorSubsystem(IntakeSubsystem intake, ChimneySubsystem chimney) {
+    // // Chimney subsystem constructor
+    // public ColorSensorSubsystem(IntakeSubsystem intake, ChimneySubsystem chimney)
+    // {
+    // colorSensor = new ColorSensorV3(I2C.Port.kMXP);
+    // this.intake = intake;
+    // this.chimney = chimney;
+    // this.launcher = null;
+    // this.indexer = null;
+    // active = false;
+    // }
+
+    public ColorSensorSubsystem(LauncherSubsystem launcher, IndexerSubsystem indexer) {
         colorSensor = new ColorSensorV3(I2C.Port.kMXP);
-        this.intake = intake;
-        this.chimney = chimney;
+        this.indexer = indexer;
+        this.launcher = launcher;
         active = false;
     }
 
@@ -61,7 +72,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         // System.out.println(teamColor);
         Alliance detectedColor = Alliance.Invalid;
 
-        if (distance > 50 && active) {
+        if (distance > 100 && active) {
             if (red > blue) {
                 detectedColor = Alliance.Red;
                 // System.out.println("red");
@@ -75,22 +86,33 @@ public class ColorSensorSubsystem extends SubsystemBase {
         return detectedColor;
     }
 
-    public Command loadIn(boolean frontDown, boolean rearDown) {
-        double p = 1;
-        return new SequentialCommandGroup(
-                new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1 * p),
-                new ChimneyCommand(chimney, () -> -1).withTimeout(0.5 * p),
-                new DoubleIntakeCommand(intake, () -> 0, () -> 0).withTimeout(0.05 * p),
-                new ChimneyCommand(chimney, () -> 0).withTimeout(0.05 * p));
-    }
+    // public Command loadIn(boolean frontDown, boolean rearDown) {
+    // double p = 1;
+    // return new SequentialCommandGroup(
+    // new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1 * p),
+    // new ChimneyCommand(chimney, () -> -1).withTimeout(0.5 * p),
+    // new DoubleIntakeCommand(intake, () -> 0, () -> 0).withTimeout(0.05 * p),
+    // new ChimneyCommand(chimney, () -> 0).withTimeout(0.05 * p));
+    // }
 
-    // true means front down, false means back.
-    public Command loadOut(BooleanSupplier frontDown) {
-        double p = 10;
-        return new ParallelCommandGroup(
-                new DoubleIntakeCommand(intake, () -> (frontDown.getAsBoolean() ? 1 : -1),
-                        () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(0.1 * p),
-                new ChimneyCommand(chimney, () -> 0.2).withTimeout(0.05 * p));
+    // // true means front down, false means back.
+    // public Command loadOut(BooleanSupplier frontDown) {
+    // double p = 10;
+    // return new ParallelCommandGroup(
+    // new DoubleIntakeCommand(intake, () -> (frontDown.getAsBoolean() ? 1 : -1),
+    // () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(0.1 * p),
+    // new ChimneyCommand(chimney, () -> 0.2).withTimeout(0.05 * p));
+    // }
+
+    public Command shootOut() {
+        return new ParallelRaceGroup(
+                new LauncherCommand(launcher, () -> 4000),
+                new SequentialCommandGroup(
+                        new WaitCommand(1),
+                        // new ParallelRaceGroup(
+                        new IndexerCommand(indexer, () -> 1).withTimeout(1)
+                // new ChimneyCommand(chimney, () -> -0.5)
+                ));
     }
 
     @Override
