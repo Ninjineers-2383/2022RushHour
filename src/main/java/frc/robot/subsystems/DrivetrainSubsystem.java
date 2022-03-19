@@ -25,7 +25,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final WPI_TalonFX leftMasterMotor = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
     private final WPI_TalonFX leftFollowerMotor = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
-    SlewRateLimiter throttleF = new SlewRateLimiter(2);
+    private boolean tippingProtectionEnabled = true;
+
+    SlewRateLimiter throttleF = new SlewRateLimiter(3);
     SlewRateLimiter turnF = new SlewRateLimiter(2);
 
     private DifferentialDrive drive;
@@ -39,7 +41,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
             Drivetrain.RIGHT_FOLLOWER_PORT);
 
     // The gyro sensor
-    public final Gyro m_gyro = new AHRS(SPI.Port.kMXP);
+    private final AHRS rawGyro = new AHRS(SPI.Port.kMXP);
+    public final Gyro m_gyro = rawGyro;
 
     public DrivetrainSubsystem() {
 
@@ -90,6 +93,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void periodic() {
         SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
+        SmartDashboard.putNumber("Gyro pitch", rawGyro.getPitch());
+        SmartDashboard.putNumber("Gyro yaw", rawGyro.getYaw());
+        SmartDashboard.putNumber("Gyro roll", rawGyro.getRoll());
+        SmartDashboard.putBoolean("tippingProtectionEnabled", tippingProtectionEnabled);
 
         SmartDashboard.putNumber("Velocity", getAverageVelocity().getAsDouble());
         SmartDashboard.putBoolean("Stopped", Math.abs(getAverageVelocity().getAsDouble()) < 0.1);
@@ -130,15 +137,37 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return -m_gyro.getRate();
     }
 
+    public double getPitch() {
+        return rawGyro.getPitch();
+    }
+
+    public double getRoll() {
+        return rawGyro.getRoll();
+    }
+
     // Arcade drive method. Forward and backward on left joystick and turn on right
     // joystick.
     public void drive(double power, double turn) {
 
         double driveOutput = throttleF.calculate(power);
+        double kP = 0.02;
         double turnOutput = turnF.calculate(turn * 0.9);
+        double roll = getRoll() * (Math.abs(getRoll()) > 2 ? kP : 0);
 
-        drive.arcadeDrive(driveOutput, turnOutput, false);
+        if (tippingProtectionEnabled) {
+            drive.arcadeDrive(driveOutput - roll, turnOutput, false);
+        } else {
+            drive.arcadeDrive(driveOutput, turnOutput, false);
+        }
         // drive.arcadeDrive(power, 0.9 * turn);
+    }
+
+    public void toggleTippingEnabled() {
+        tippingProtectionEnabled = true;
+    }
+
+    public void toggleTippingDisabled() {
+        tippingProtectionEnabled = false;
     }
 
     public void driveSquared(double power, double turn) {
