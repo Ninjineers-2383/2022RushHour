@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Turret;
-import frc.robot.commands.BarfOutCommand;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DrivetrainCommand;
@@ -110,7 +109,6 @@ public class RobotContainer {
     private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
-    private final BarfOutCommand barfOutCommand = new BarfOutCommand(colorSensor);
 
     // Custom Triggers
     // public final FeedIn pooperIn = new FeedIn(colorSensor);
