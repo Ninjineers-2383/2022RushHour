@@ -1,5 +1,7 @@
 package frc.robot.commands.Autonomous;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -105,6 +107,8 @@ public class AutoForwardAim extends CommandBase {
         TIMER.reset();
         OFFSET_TICKS[0] = drivetrainSubsystem.getLeftPosition();
         OFFSET_TICKS[1] = drivetrainSubsystem.getRightPosition();
+
+        camera.setPipeline(DriverStation.getAlliance() == Alliance.Red ? 0 : 1);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

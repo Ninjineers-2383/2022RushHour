@@ -47,6 +47,10 @@ public class CameraSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Camera targetValid", targetValid);
     }
 
+    public void setPipeline(int index) {
+        camera.setPipelineIndex(index);
+    }
+
     public double getX() {
         return targetX;
     }

@@ -44,7 +44,6 @@ public class TurretSubsystem extends SubsystemBase {
             this.side = false;
         }
         motor.set(ControlMode.PercentOutput, power);
-
         SmartDashboard.putNumber("446pm", power);
         SmartDashboard.putBoolean("Side", side);
     }
