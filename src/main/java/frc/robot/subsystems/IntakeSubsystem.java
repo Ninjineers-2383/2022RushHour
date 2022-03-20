@@ -36,17 +36,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // deployed intakes turn on
     public void setPower(Double power) {
-        // No need to wast battery power if the intake is not in use
-        if (!getFrontDown()) {
-            rearMotor.set(ControlMode.PercentOutput, power);
-            // frontMotor.set(ControlMode.PercentOutput, power/2);
-
-        }
-        if (!getRearDown()) {
-            frontMotor.set(ControlMode.PercentOutput, power);
-            // rearMotor.set(ControlMode.PercentOutput, power/2);
-
-        }
+        rearMotor.set(ControlMode.PercentOutput, power * (getFrontDown() ? 0.2 : 1));
+        frontMotor.set(ControlMode.PercentOutput, power * (getRearDown() ? 0.2 : 1));
     }
 
     public void setPower2(Double frontPower, Double rearPower) {
