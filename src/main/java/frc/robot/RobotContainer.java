@@ -72,7 +72,8 @@ public class RobotContainer {
 
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
-    final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
+    // final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
+    final POVButton fixedHighGoal = new POVButton(operatorController, 90, 0);
 
     // Driver Controls - Driving, feeding
     // Feeders
@@ -164,16 +165,16 @@ public class RobotContainer {
 
         autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera, throttle, turn));
 
-        pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(),
-                !intake.getRearUp()));
+        pooperIn.whileActiveContinuous(colorSensor.loadIn(intake.getFrontUp(),
+                !intake.getRearUp()), false);
 
-        pooperOut.whenActive(colorSensor.loadOut(() -> (!intake.getFrontUp())));
+        pooperOut.whileActiveContinuous(colorSensor.loadOut(() -> (!intake.getFrontUp())), false);
 
         // barfOut.whenActive(colorSensor.shootOut());
 
-        feedOut.whenActive(new ParallelCommandGroup(
-                new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1),
-                new ChimneyCommand(chimney, () -> 1).withTimeout(0.1)));
+        feedOut.whileHeld(new ParallelCommandGroup(
+                new DoubleIntakeCommand(intake, () -> 1, () -> -1),
+                new ChimneyCommand(chimney, () -> 1)));
 
         /*
          * parallel command that runs:
@@ -193,10 +194,12 @@ public class RobotContainer {
                         () -> SmartDashboard.putBoolean("Aim Active", true),
                         () -> SmartDashboard.putBoolean("Aim Active", false))));
 
-        limelightYeet.whileHeld(new ParallelCommandGroup(
-                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
-                new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                        () -> aimCommand.getTurretSeek())));
+        // limelightYeet.whileHeld(new ParallelCommandGroup(
+        // new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
+        // new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+        // () -> aimCommand.getTurretSeek())));
+
+        fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 13000));
 
         launchLowButton.whileHeld(new LauncherCommand(launcher, () -> 6000));
 
@@ -311,11 +314,10 @@ public class RobotContainer {
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
-                                autoLimelight,
                                 new TurretCommand(turret,
-                                        () -> autoLimelight.getTurretPower(),
-                                        () -> autoLimelight.getTurretSeek())
-                                                .withTimeout(1.2)),
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
+                                                .withTimeout(1.5)),
                         new SequentialCommandGroup(
                                 new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                         .withTimeout(0.2),
@@ -340,20 +342,19 @@ public class RobotContainer {
                                 new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
                         )),
                 // human player ball
-                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.5, 0.8, 50),
+                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
+                new WaitCommand(0.4),
                 new ParallelRaceGroup(
                         new LauncherCommand(launcher, () -> 16500),
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek(), true),
+                        new TurretCommand(turret,
+                                -18000),
                         new AutoForward(drivetrain, 13, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
-                        autoLimelight2,
-                        new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),
-                                () -> autoLimelight2.getTurretSeek(), true)
-                                        .withTimeout(2),
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek(), true)
+                                        .withTimeout(1),
                         new LauncherCommand(launcher,
-                                () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(2)),
+                                () -> limelight.getLaunchingVelocity())),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(), true)
                                 .withTimeout(0.2),
@@ -380,10 +381,9 @@ public class RobotContainer {
                         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                 .withTimeout(0.9),
                         new ParallelRaceGroup(
-                                autoLimelight3,
                                 new TurretCommand(turret,
-                                        () -> autoLimelight3.getTurretPower(),
-                                        () -> autoLimelight3.getTurretSeek())
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
                                                 .withTimeout(1.2)),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
@@ -431,7 +431,10 @@ public class RobotContainer {
                                         .withTimeout(2))),
                 new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
-        Command testAuto = new SequentialCommandGroup(new AutoAlign(drivetrain, rearCamera, 0.0).withTimeout(2));
+        Command testAuto = new TurretCommand(turret,
+                () -> aimCommand.getTurretPower(),
+                () -> aimCommand.getTurretSeek())
+                        .withTimeout(3);
 
         autoChooser.setDefaultOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);

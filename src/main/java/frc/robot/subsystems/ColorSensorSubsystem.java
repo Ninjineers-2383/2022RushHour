@@ -77,7 +77,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
         // System.out.println(teamColor);
         Alliance detectedColor = Alliance.Invalid;
 
-        if (distance > 100 && active) {
+        if (distance > 80 && active) {
             if (red > blue) {
                 detectedColor = Alliance.Red;
                 // System.out.println("red");
@@ -105,7 +105,7 @@ public class ColorSensorSubsystem extends SubsystemBase {
     public Command loadOut(BooleanSupplier frontDown) {
         return new ParallelRaceGroup(
                 new DoubleIntakeCommand(intake, () -> (frontDown.getAsBoolean() ? 1 : -1),
-                        () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(1),
+                        () -> (frontDown.getAsBoolean() ? -1 : 1)).withTimeout(2),
                 new ChimneyCommand(chimney, () -> 0.4));
     }
 
