@@ -65,6 +65,7 @@ public class LimelightCommand extends CommandBase {
         } else {
             // no target present
             turretSeek = true;
+            
         }
     }
 

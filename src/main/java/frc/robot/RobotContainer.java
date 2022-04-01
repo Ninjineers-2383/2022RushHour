@@ -58,7 +58,7 @@ public class RobotContainer {
                                                                                                       // button
     final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
 
-    // Hook
+    // Climber Hook
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
     private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
@@ -210,28 +210,29 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    // setIsShooting();
-                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
-                }),
-                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
-                new ParallelCommandGroup(
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.22)),
-                new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.05),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
-                new InstantCommand(() -> {
-                    driverController.setRumble(RumbleType.kLeftRumble, 0);
-                    driverController.setRumble(RumbleType.kRightRumble, 0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 0);
-                    // setNotIsShooting();
-                })));
+        indexerUpTwoBall.whenPressed(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> {
+                            // setIsShooting();
+                            driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                            driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                            operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
+                            operatorController.setRumble(RumbleType.kRightRumble, 1.0);
+                        }),
+                        new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
+                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                        new ParallelCommandGroup(
+                                new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                                new ChimneyCommand(chimney, () -> -1).withTimeout(0.22)),
+                        new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.05),
+                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                        new InstantCommand(() -> {
+                            driverController.setRumble(RumbleType.kLeftRumble, 0);
+                            driverController.setRumble(RumbleType.kRightRumble, 0);
+                            operatorController.setRumble(RumbleType.kLeftRumble, 0);
+                            operatorController.setRumble(RumbleType.kRightRumble, 0);
+                            // setNotIsShooting();
+                        })));
 
         // lowerFrontFeeder.toggleWhenPressed(
         // new StartEndCommand(
@@ -307,6 +308,7 @@ public class RobotContainer {
                 drivetrain.getAverageVelocity(), false);
 
         Command fourBallAuto = new SequentialCommandGroup(
+            new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
@@ -339,7 +341,7 @@ public class RobotContainer {
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
+                                new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(1) // drives back and intakes
                         )),
                 // human player ball
                 new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
@@ -371,6 +373,7 @@ public class RobotContainer {
                         .withTimeout(0.5));
 
         Command twoBallAuto = new SequentialCommandGroup(
+            new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
@@ -415,6 +418,7 @@ public class RobotContainer {
         Command nullAuto = null;
 
         Command oneBallAuto = new SequentialCommandGroup(
+            new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.75, 5),
