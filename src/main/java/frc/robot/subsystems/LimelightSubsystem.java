@@ -61,7 +61,7 @@ public class LimelightSubsystem extends SubsystemBase {
         // return 15000 - 165 * getY();
         // }
 
-        return -230 * getY() + 12200;
+        return -230 * getY() + 12100;
     }
 
     public boolean getTargetVisible() {
