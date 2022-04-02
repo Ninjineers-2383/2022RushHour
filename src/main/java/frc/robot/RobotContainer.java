@@ -32,6 +32,7 @@ import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoAlign;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.commands.Autonomous.AutoForwardAim;
+import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
@@ -60,12 +61,13 @@ public class RobotContainer {
 
     // Climber Hook
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
+    final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
     private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
-    private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : -0.1;
+    private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : hookDown.get() ? -0.7 : -0.1;
 
     // Shooting
-    final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
+    //final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
     final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kLeftBumper.value);
     final JoystickButton indexerUpTwoBall = new JoystickButton(operatorController, Button.kRightBumper.value);
     final POVButton indexerDown = new POVButton(operatorController, 0, 0);
@@ -73,7 +75,7 @@ public class RobotContainer {
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
     // final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
-    final POVButton fixedHighGoal = new POVButton(operatorController, 90, 0);
+    final POVButton fixedHighGoal = new POVButton(operatorController, 180, 0);
 
     // Driver Controls - Driving, feeding
     // Feeders
@@ -201,7 +203,7 @@ public class RobotContainer {
 
         fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 13000));
 
-        launchLowButton.whileHeld(new LauncherCommand(launcher, () -> 6000));
+        fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 14000));
 
         // backup kicker control if limelight fails
         indexerUp.whileHeld(new ParallelCommandGroup(new IndexerCommand(indexer, () -> 1),
@@ -223,7 +225,7 @@ public class RobotContainer {
                         new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
                         new ParallelCommandGroup(
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                                new ChimneyCommand(chimney, () -> -1).withTimeout(0.22)),
+                                new ChimneyCommand(chimney, () -> -1).withTimeout(0.23)),
                         new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.05),
                         new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
                         new InstantCommand(() -> {
@@ -341,16 +343,24 @@ public class RobotContainer {
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(1) // drives back and intakes
+                                // new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(0.75) // drives back and intakes
+                                new AutoTurn(drivetrain, 13.5, 8, -0.4, 5)
                         )),
                 // human player ball
-                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
-                new WaitCommand(0.4),
+                // new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
+                // new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
+                // new AutoTurn(drivetrain, 27, 10, 0.6, 5),
+                new AutoForward(drivetrain, 11.6, 2.5, 0.9, 5).withTimeout(5),
+                //new AutoTurn(drivetrain, 21, 10, 0.6, 5),
+                // new AutoForward(drivetrain, 0.8, 0.5, 0.45, 2).withTimeout(1),
+                //new AutoForwardAim(drivetrain, rearCamera, 0.8, 0.5, 0.45,2).withTimeout(1.7),
+                new WaitCommand(1.5),
+                //new AutoTurn(drivetrain, 21, 10, -0.6, 5),
                 new ParallelRaceGroup(
                         new LauncherCommand(launcher, () -> 16500),
                         new TurretCommand(turret,
                                 -18000),
-                        new AutoForward(drivetrain, 13, 1.7, -0.88, 20)),
+                        new AutoForward(drivetrain, 11.5, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek(), true)
@@ -435,10 +445,11 @@ public class RobotContainer {
                                         .withTimeout(2))),
                 new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
-        Command testAuto = new TurretCommand(turret,
-                () -> aimCommand.getTurretPower(),
-                () -> aimCommand.getTurretSeek())
-                        .withTimeout(3);
+        Command testAuto = new SequentialCommandGroup(
+            new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.75),
+                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.4, 50)
+        );
+        
 
         autoChooser.setDefaultOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);
