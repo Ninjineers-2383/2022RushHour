@@ -125,8 +125,6 @@ public class RobotContainer {
     // Required robot state
     private boolean shouldAdjustTurret = false;
 
-    private static double shootVelocity = 0;
-
     private void setIsShooting() {
         shouldAdjustTurret = false;
     }
@@ -186,7 +184,7 @@ public class RobotContainer {
          * launcher rev
          * launching a ball on target lock
          */
-        limelightTarget.and(indexerUpTwoBall.negate()).whileActiveContinuous(
+        limelightTarget.whileActiveContinuous(
                 (new ParallelCommandGroup(
                         new LauncherCommand(launcher,
                                 () -> (limelight
@@ -204,8 +202,6 @@ public class RobotContainer {
         // new TurretCommand(turret, () -> aimCommand.getTurretPower(),
         // () -> aimCommand.getTurretSeek())));
 
-        fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 13000));
-
         fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 14000));
 
         // backup kicker control if limelight fails
@@ -215,28 +211,27 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        indexerUpTwoBall.whenPressed(
+        indexerUpTwoBall.whenPressed((new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    // setIsShooting();
+                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
+                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
+                }),
+                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
+                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
                 new ParallelRaceGroup(
-                        new LauncherCommand(launcher, () -> shootVelocity), // Lock Power
-                        new TurretCommand(turret, () -> 0, () -> false), // Lock Turret
-                        new ChimneyCommand(chimney, () -> -0.3),
-                        new SequentialCommandGroup(
-                                new InstantCommand(() -> {
-                                    // setIsShooting();
-                                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
-                                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
-                                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
-                                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
-                                }),
-                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.8))))
-                // Update velocity value
-                .whenInactive(new InstantCommand(() -> {
-                    shootVelocity = limelight.getLaunchingVelocity();
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -1)),
+                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                new InstantCommand(() -> {
                     driverController.setRumble(RumbleType.kLeftRumble, 0);
                     driverController.setRumble(RumbleType.kRightRumble, 0);
                     operatorController.setRumble(RumbleType.kLeftRumble, 0);
                     operatorController.setRumble(RumbleType.kRightRumble, 0);
-                }));
+                    // setNotIsShooting();
+                }))));
 
         // lowerFrontFeeder.toggleWhenPressed(
         // new StartEndCommand(
