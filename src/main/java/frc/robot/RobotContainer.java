@@ -22,8 +22,6 @@ import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.DrivetrainCommand;
-import frc.robot.commands.FeedIn;
-import frc.robot.commands.FeedOut;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
@@ -34,6 +32,9 @@ import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.commands.Autonomous.AutoForwardAim;
 import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
+import frc.robot.commands.triggers.AutoShoot;
+import frc.robot.commands.triggers.FeedIn;
+import frc.robot.commands.triggers.FeedOut;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -120,6 +121,9 @@ public class RobotContainer {
     // Custom Triggers
     public final FeedIn pooperIn = new FeedIn(colorSensor);
     public final FeedOut pooperOut = new FeedOut(colorSensor);
+    public final AutoShoot autoShoot = new AutoShoot(() -> aimCommand.getLockedOn() && limelight.getTargetVisible(),
+            () -> launcher.isReady());
+    private double launchVelocity = 0;
     // public final FeedOut barfOut = new FeedOut(colorSensor);
 
     // Required robot state
@@ -184,7 +188,7 @@ public class RobotContainer {
          * launcher rev
          * launching a ball on target lock
          */
-        limelightTarget.whileActiveContinuous(
+        indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
                 (new ParallelCommandGroup(
                         new LauncherCommand(launcher,
                                 () -> (limelight
@@ -211,27 +215,44 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        indexerUpTwoBall.whenPressed((new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    // setIsShooting();
-                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
-                }),
-                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+        indexerUpTwoBall.and(autoShoot).whenActive((new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek()).withTimeout(1),
+                        new LauncherCommand(launcher,
+                                () -> (limelight.getLaunchingVelocity()),
+                                () -> shouldAdjustTurret).withTimeout(
+                                        1),
+                        new InstantCommand(() -> launchVelocity = limelight
+                                .getLaunchingVelocity())),
                 new ParallelRaceGroup(
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1)),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
-                new InstantCommand(() -> {
-                    driverController.setRumble(RumbleType.kLeftRumble, 0);
-                    driverController.setRumble(RumbleType.kRightRumble, 0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 0);
-                    // setNotIsShooting();
-                }))));
+                        new ParallelCommandGroup(
+                                new TurretCommand(turret, () -> 0,
+                                        () -> false),
+                                new LauncherCommand(launcher,
+                                        () -> (launchVelocity),
+                                        () -> shouldAdjustTurret)),
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> {
+                                    // setIsShooting();
+                                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+                                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
+                                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
+                                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
+                                }),
+                                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
+                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                                new ParallelRaceGroup(
+                                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                                        new ChimneyCommand(chimney, () -> -1)),
+                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+                                new InstantCommand(() -> {
+                                    driverController.setRumble(RumbleType.kLeftRumble, 0);
+                                    driverController.setRumble(RumbleType.kRightRumble, 0);
+                                    operatorController.setRumble(RumbleType.kLeftRumble, 0);
+                                    operatorController.setRumble(RumbleType.kRightRumble, 0);
+                                    // setNotIsShooting();
+                                }))))));
 
         // lowerFrontFeeder.toggleWhenPressed(
         // new StartEndCommand(
