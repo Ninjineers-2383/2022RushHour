@@ -7,15 +7,16 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.Drivetrain;
 
 public class DrivetrainSubsystem extends SubsystemBase {
@@ -25,27 +26,27 @@ public class DrivetrainSubsystem extends SubsystemBase {
     private final WPI_TalonFX leftMasterMotor = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
     private final WPI_TalonFX leftFollowerMotor = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
 
+    private final MotorControllerGroup leftMotors = new MotorControllerGroup(
+            leftMasterMotor,
+            leftFollowerMotor);
+    private final MotorControllerGroup rightMotors = new MotorControllerGroup(
+            leftMasterMotor,
+            leftFollowerMotor);
+
+    private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+
     private boolean tippingProtectionEnabled = true;
 
     SlewRateLimiter throttleF = new SlewRateLimiter(3);
     SlewRateLimiter turnF = new SlewRateLimiter(2);
 
-    private DifferentialDrive drive;
-
-    // The left-side drive encoder
-    private final Encoder m_leftEncoder = new Encoder(Drivetrain.LEFT_MASTER_PORT,
-            Drivetrain.LEFT_FOLLOWER_PORT);
-
-    // The right-side drive encoder
-    private final Encoder m_rightEncoder = new Encoder(Drivetrain.RIGHT_MASTER_PORT,
-            Drivetrain.RIGHT_FOLLOWER_PORT);
+    private final DifferentialDriveOdometry odometry;
 
     // The gyro sensor
     private final AHRS rawGyro = new AHRS(SPI.Port.kMXP);
     public final Gyro m_gyro = rawGyro;
 
     public DrivetrainSubsystem() {
-
         rightMasterMotor.configFactoryDefault();
         rightFollowerMotor.configFactoryDefault();
         leftMasterMotor.configFactoryDefault();
@@ -56,10 +57,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
         leftMasterMotor.setSelectedSensorPosition(0);
         leftFollowerMotor.setSelectedSensorPosition(0);
 
-        rightMasterMotor.setInverted(true);
-        rightFollowerMotor.setInverted(true);
-        leftMasterMotor.setInverted(false);
-        leftFollowerMotor.setInverted(false);
+        rightMotors.setInverted(true);
+        leftMotors.setInverted(false);
 
         rightMasterMotor.setNeutralMode(NeutralMode.Brake);
         rightFollowerMotor.setNeutralMode(NeutralMode.Brake);
@@ -69,14 +68,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         rightFollowerMotor.follow(rightMasterMotor);
         leftFollowerMotor.follow(leftMasterMotor);
 
-        drive = new DifferentialDrive(leftMasterMotor, rightMasterMotor);
-
-        // Sets the distance per pulse for the encoders
-        m_leftEncoder.setDistancePerPulse(Constants.Drivetrain.ENCODER_DISTANCE_PER_PULSE);
-        m_rightEncoder.setDistancePerPulse(Constants.Drivetrain.ENCODER_DISTANCE_PER_PULSE);
-        m_leftEncoder.reset();
-        m_rightEncoder.reset();
-
+        odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
     }
 
     public void driveFeed() {
@@ -92,6 +84,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void periodic() {
+        odometry.update(
+                m_gyro.getRotation2d(), -encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()),
+                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
+
+        SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
+        SmartDashboard.putNumber("Left Encoder Meters",
+                -encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()));
+        SmartDashboard.putNumber("Right Encoder Meters",
+                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
+
         SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
         SmartDashboard.putNumber("Gyro pitch", rawGyro.getPitch());
         SmartDashboard.putNumber("Gyro yaw", rawGyro.getYaw());
@@ -107,8 +109,34 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right Follower Sensor Pos", rightFollowerMotor.getSelectedSensorPosition());
     }
 
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+    }
+
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-        return new DifferentialDriveWheelSpeeds(m_leftEncoder.getRate(), m_rightEncoder.getRate());
+        return new DifferentialDriveWheelSpeeds(
+                -encoderTicksToMeters(leftMasterMotor.getSelectedSensorVelocity()),
+                encoderTicksToMeters(rightMasterMotor.getSelectedSensorVelocity()));
+    }
+
+    public double encoderTicksToMeters(double ticks) {
+        return ticks / 8.33 / 2048 * 0.3204;
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        resetEncoders();
+        odometry.resetPosition(pose, m_gyro.getRotation2d());
+    }
+
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        leftMotors.setVoltage(leftVolts);
+        rightMotors.setVoltage(rightVolts);
+        drive.feed();
+    }
+
+    public void resetEncoders() {
+        leftMasterMotor.setSelectedSensorPosition(0);
+        rightMasterMotor.setSelectedSensorPosition(0);
     }
 
     public void tankDrive(double left, double right) {
@@ -116,10 +144,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public double getAverageEncoderDistance() {
-        return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2.0;
+        return (-encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()) +
+                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition())) / 2.0;
     }
 
-    // defining the maximum output
+    /**
+     * Sets the max output of the drive. Useful for scaling the drive to drive more
+     * slowly.
+     *
+     * @param maxOutput the maximum output to which the drive will be constrained
+     */
     public void setMaxOutput(double maxOutput) {
         drive.setMaxOutput(maxOutput);
     }
@@ -129,10 +163,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_gyro.reset();
     }
 
+    /**
+     * Returns the heading of the robot.
+     *
+     * @return the robot's heading in degrees, from -180 to 180
+     */
     public double getHeading() {
         return m_gyro.getRotation2d().getDegrees();
     }
 
+    /**
+     * Returns the turn rate of the robot.
+     *
+     * @return The turn rate of the robot, in degrees per second
+     */
     public double getTurnRate() {
         return -m_gyro.getRate();
     }

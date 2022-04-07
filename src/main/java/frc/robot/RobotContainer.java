@@ -1,7 +1,16 @@
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -11,12 +20,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
@@ -288,7 +300,37 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        Trajectory trajectory = new Trajectory();
+
+        try {
+            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve("path.json");
+            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+        } catch (IOException ex) {
+            DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
+        }
+
+        RamseteCommand ramseteCommand = new RamseteCommand(
+                trajectory,
+                drivetrain::getPose,
+                new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
+                new SimpleMotorFeedforward(
+                        DriveConstants.ksVolts,
+                        DriveConstants.kvVoltSecondsPerMeter,
+                        DriveConstants.kaVoltSecondsSquaredPerMeter),
+                DriveConstants.kDriveKinematics,
+                drivetrain::getWheelSpeeds,
+                new PIDController(DriveConstants.kPDriveVel, 0, 0),
+                new PIDController(DriveConstants.kPDriveVel, 0, 0),
+                // RamseteCommand passes volts to the callback
+                drivetrain::tankDriveVolts,
+                drivetrain);
+
+        // Reset odometry to the starting pose of the trajectory.
+        drivetrain.resetOdometry(trajectory.getInitialPose());
+
+        // Run path following command, then stop at the end.
+        return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
+        // return autoChooser.getSelected();
     }
 
     public void SetAutoCommands() {

@@ -24,6 +24,19 @@ public final class Constants {
         public final static int FOWARD_OFFSET_TICKS = 22000;
     }
 
+    public static final class DriveConstants {
+        public static final double kTrackwidthMeters = 0.69;
+        public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
+                kTrackwidthMeters);
+
+        public static final double ksVolts = 1.0403;
+        public static final double kvVoltSecondsPerMeter = 3.5216;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.57978;
+
+        // Example value only - as above, this must be tuned for your drive!
+        public static final double kPDriveVel = 2.0956;
+    }
+
     public final static class Drivetrain {
         // average encoder ticks per foot travelled.
         public static final double TICKS_PER_FOOT = 16200;
@@ -35,7 +48,7 @@ public final class Constants {
         public static final double Motor_kI = 0;
         public static final double Motor_kD = 0;
 
-        public static final double kTrackwidthMeters = 0.62865;
+        public static final double kTrackwidthMeters = 0.64;
         public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
                 kTrackwidthMeters);
 
