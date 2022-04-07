@@ -2,7 +2,6 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,8 +21,6 @@ import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.DrivetrainCommand;
-import frc.robot.commands.FeedIn;
-import frc.robot.commands.FeedOut;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
@@ -32,7 +29,10 @@ import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoAlign;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.commands.Autonomous.AutoForwardAim;
+import frc.robot.commands.Autonomous.AutoTurn;
 import frc.robot.commands.Autonomous.LimelightCommandAuto;
+import frc.robot.commands.triggers.FeedIn;
+import frc.robot.commands.triggers.FeedOut;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -58,21 +58,23 @@ public class RobotContainer {
                                                                                                       // button
     final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
 
-    // Hook
+    // Climber Hook
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
+    final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
     private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
-    private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : -0.1;
+    private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : hookDown.get() ? -0.7 : -0.1;
 
     // Shooting
-    final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
+    // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
     final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kLeftBumper.value);
     final JoystickButton indexerUpTwoBall = new JoystickButton(operatorController, Button.kRightBumper.value);
     final POVButton indexerDown = new POVButton(operatorController, 0, 0);
 
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
-    final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
+    // final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
+    final POVButton fixedHighGoal = new POVButton(operatorController, 180, 0);
 
     // Driver Controls - Driving, feeding
     // Feeders
@@ -117,10 +119,13 @@ public class RobotContainer {
     // Custom Triggers
     public final FeedIn pooperIn = new FeedIn(colorSensor);
     public final FeedOut pooperOut = new FeedOut(colorSensor);
+    public final Trigger autoShoot = new Trigger(
+            () -> aimCommand.getLockedOn() && limelight.getTargetVisible() && launcher.isReady());
+    private double launchVelocity = 0;
     // public final FeedOut barfOut = new FeedOut(colorSensor);
 
     // Required robot state
-    private boolean shouldAdjustTurret = false;
+    private boolean shouldAdjustTurret = true;
 
     private void setIsShooting() {
         shouldAdjustTurret = false;
@@ -152,7 +157,7 @@ public class RobotContainer {
                         () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
         chimney.setDefaultCommand(
                 new ChimneyCommand(chimney,
-                        () -> ((barfToggle.get() ? 0 : intakePower.getAsDouble()))));
+                        () -> (-.55)));
         intake.setDefaultCommand(intakeCommand);
         climber.setDefaultCommand(climberCommand);
         SmartDashboard.putBoolean("Aim Active", false);
@@ -164,16 +169,16 @@ public class RobotContainer {
 
         autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera, throttle, turn));
 
-        pooperIn.whenActive(colorSensor.loadIn(intake.getFrontUp(),
-                !intake.getRearUp()));
+        pooperIn.whileActiveContinuous(colorSensor.loadIn(intake.getFrontUp(),
+                !intake.getRearUp()), false);
 
-        pooperOut.whenActive(colorSensor.loadOut(() -> (!intake.getFrontUp())));
+        pooperOut.whileActiveContinuous(colorSensor.loadOut(() -> (!intake.getFrontUp())), false);
 
         // barfOut.whenActive(colorSensor.shootOut());
 
-        feedOut.whenActive(new ParallelCommandGroup(
-                new DoubleIntakeCommand(intake, () -> -1, () -> -1).withTimeout(0.1),
-                new ChimneyCommand(chimney, () -> 1).withTimeout(0.1)));
+        feedOut.whileHeld(new ParallelCommandGroup(
+                new DoubleIntakeCommand(intake, () -> 1, () -> -1),
+                new ChimneyCommand(chimney, () -> 1)));
 
         /*
          * parallel command that runs:
@@ -181,24 +186,13 @@ public class RobotContainer {
          * launcher rev
          * launching a ball on target lock
          */
-        limelightTarget.whileHeld(new ParallelCommandGroup(
-                new LauncherCommand(launcher,
-                        () -> (limelight
-                                .getLaunchingVelocity()),
-                        () -> shouldAdjustTurret),
-                new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                        () -> aimCommand.getTurretSeek(),
-                        () -> shouldAdjustTurret),
-                new StartEndCommand(
-                        () -> SmartDashboard.putBoolean("Aim Active", true),
-                        () -> SmartDashboard.putBoolean("Aim Active", false))));
 
-        limelightYeet.whileHeld(new ParallelCommandGroup(
-                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
-                new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                        () -> aimCommand.getTurretSeek())));
+        // limelightYeet.whileHeld(new ParallelCommandGroup(
+        // new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity() + 4000),
+        // new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+        // () -> aimCommand.getTurretSeek())));
 
-        launchLowButton.whileHeld(new LauncherCommand(launcher, () -> 6000));
+        fixedHighGoal.whileHeld(new LauncherCommand(launcher, () -> 14000));
 
         // backup kicker control if limelight fails
         indexerUp.whileHeld(new ParallelCommandGroup(new IndexerCommand(indexer, () -> 1),
@@ -207,28 +201,61 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        indexerUpTwoBall.whenPressed(new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    // setIsShooting();
-                    driverController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    driverController.setRumble(RumbleType.kRightRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 1.0);
-                }),
-                new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.1),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+        indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
+                (new ParallelCommandGroup(
+                        new LauncherCommand(launcher,
+                                () -> (limelight
+                                        .getLaunchingVelocity()),
+                                () -> shouldAdjustTurret),
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek(),
+                                () -> shouldAdjustTurret),
+                        new StartEndCommand(
+                                () -> SmartDashboard.putBoolean("Aim Active", true),
+                                () -> SmartDashboard.putBoolean("Aim Active", false)))));
+
+        indexerUpTwoBall.and(autoShoot).whenActive((new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.22)),
-                new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.05),
-                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
-                new InstantCommand(() -> {
-                    driverController.setRumble(RumbleType.kLeftRumble, 0);
-                    driverController.setRumble(RumbleType.kRightRumble, 0);
-                    operatorController.setRumble(RumbleType.kLeftRumble, 0);
-                    operatorController.setRumble(RumbleType.kRightRumble, 0);
-                    // setNotIsShooting();
-                })));
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek()).withTimeout(0.1),
+                        new LauncherCommand(launcher,
+                                () -> (limelight.getLaunchingVelocity()),
+                                () -> shouldAdjustTurret).withTimeout(
+                                        0.1),
+                        new InstantCommand(() -> launchVelocity = limelight
+                                .getLaunchingVelocity())),
+                new ParallelRaceGroup(
+                        new ParallelCommandGroup(
+                                new TurretCommand(turret, () -> 0,
+                                        () -> false),
+                                new LauncherCommand(launcher,
+                                        () -> (launchVelocity),
+                                        () -> shouldAdjustTurret)),
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> setIsShooting()),
+                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0),
+                                new ChimneyCommand(chimney, () -> -1).withTimeout(0),
+                                new WaitCommand(0.2),
+                                new InstantCommand(() -> setNotIsShooting()))))));
+        // new InstantCommand(() -> {
+        // // setIsShooting();
+        // driverController.setRumble(RumbleType.kLeftRumble, 1.0);
+        // driverController.setRumble(RumbleType.kRightRumble, 1.0);
+        // operatorController.setRumble(RumbleType.kLeftRumble, 1.0);
+        // operatorController.setRumble(RumbleType.kRightRumble, 1.0);
+        // }),
+        // new ChimneyCommand(chimney, () -> -0.4).withTimeout(0.05),
+        // new IndexerCommand(indexer, () -> 0.75).withTimeout(0.2),
+        // new ParallelRaceGroup(
+        // new IndexerCommand(indexer, () -> 0).withTimeout(0.01),
+        // new ChimneyCommand(chimney, () -> -1)),
+        // new InstantCommand(() -> {
+        // driverController.setRumble(RumbleType.kLeftRumble, 0);
+        // driverController.setRumble(RumbleType.kRightRumble, 0);
+        // operatorController.setRumble(RumbleType.kLeftRumble, 0);
+        // operatorController.setRumble(RumbleType.kRightRumble, 0);
+        // // setNotIsShooting();
+        // }))))));
 
         // lowerFrontFeeder.toggleWhenPressed(
         // new StartEndCommand(
@@ -304,6 +331,7 @@ public class RobotContainer {
                 drivetrain.getAverageVelocity(), false);
 
         Command fourBallAuto = new SequentialCommandGroup(
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
@@ -311,11 +339,10 @@ public class RobotContainer {
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
-                                autoLimelight,
                                 new TurretCommand(turret,
-                                        () -> autoLimelight.getTurretPower(),
-                                        () -> autoLimelight.getTurretSeek())
-                                                .withTimeout(1.2)),
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
+                                                .withTimeout(1.5)),
                         new SequentialCommandGroup(
                                 new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                         .withTimeout(0.2),
@@ -337,23 +364,31 @@ public class RobotContainer {
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(2) // drives back and intakes
-                        )),
+                                // new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(0.75) // drives back
+                                // and intakes
+                                new AutoTurn(drivetrain, 13.5, 8, -0.4, 5))),
                 // human player ball
-                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.5, 0.8, 50),
+                // new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
+                // new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
+                // new AutoTurn(drivetrain, 27, 10, 0.6, 5),
+                new AutoForward(drivetrain, 11.6, 2.5, 0.9, 5).withTimeout(5),
+                // new AutoTurn(drivetrain, 21, 10, 0.6, 5),
+                // new AutoForward(drivetrain, 0.8, 0.5, 0.45, 2).withTimeout(1),
+                // new AutoForwardAim(drivetrain, rearCamera, 0.8, 0.5,
+                // 0.45,2).withTimeout(1.7),
+                new WaitCommand(1.5),
+                // new AutoTurn(drivetrain, 21, 10, -0.6, 5),
                 new ParallelRaceGroup(
                         new LauncherCommand(launcher, () -> 16500),
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek(), true),
-                        new AutoForward(drivetrain, 13, 1.7, -0.88, 20)),
+                        new TurretCommand(turret,
+                                -18000),
+                        new AutoForward(drivetrain, 11.5, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
-                        autoLimelight2,
-                        new TurretCommand(turret, () -> autoLimelight2.getTurretPower(),
-                                () -> autoLimelight2.getTurretSeek(), true)
-                                        .withTimeout(2),
+                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
+                                () -> aimCommand.getTurretSeek(), true)
+                                        .withTimeout(1),
                         new LauncherCommand(launcher,
-                                () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(2)),
+                                () -> limelight.getLaunchingVelocity())),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(), true)
                                 .withTimeout(0.2),
@@ -370,6 +405,7 @@ public class RobotContainer {
                         .withTimeout(0.5));
 
         Command twoBallAuto = new SequentialCommandGroup(
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new IntakeCommand(intake, () -> -1, false, true).withTimeout(0.1),
@@ -380,10 +416,9 @@ public class RobotContainer {
                         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                 .withTimeout(0.9),
                         new ParallelRaceGroup(
-                                autoLimelight3,
                                 new TurretCommand(turret,
-                                        () -> autoLimelight3.getTurretPower(),
-                                        () -> autoLimelight3.getTurretSeek())
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
                                                 .withTimeout(1.2)),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
@@ -415,6 +450,7 @@ public class RobotContainer {
         Command nullAuto = null;
 
         Command oneBallAuto = new SequentialCommandGroup(
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.75, 5),
@@ -431,7 +467,9 @@ public class RobotContainer {
                                         .withTimeout(2))),
                 new InstantCommand(colorSensor::setActiveTrue, colorSensor));
 
-        Command testAuto = new SequentialCommandGroup(new AutoAlign(drivetrain, rearCamera, 0.0).withTimeout(2));
+        Command testAuto = new SequentialCommandGroup(
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.75),
+                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.4, 50));
 
         autoChooser.setDefaultOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);

@@ -86,7 +86,7 @@ public class AutoAlign extends CommandBase {
                 }
 
             } else {
-                drivetrain.driveSquared(0, firstTurn);
+                drivetrain.driveSquared(0, firstTurn * 0.8);
             }
 
         }

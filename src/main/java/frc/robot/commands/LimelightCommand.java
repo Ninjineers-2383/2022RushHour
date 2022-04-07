@@ -18,7 +18,7 @@ public class LimelightCommand extends CommandBase {
 
     private boolean turretSeek = false;
 
-    private boolean kickerOn = false;
+    private boolean lockedOn = false;
 
     MedianFilter limelightF = new MedianFilter(5);
 
@@ -49,7 +49,6 @@ public class LimelightCommand extends CommandBase {
     // fix bounds issue!
     @Override
     public void execute() {
-        kickerOn = false;
         turretSeek = false;
 
         final double CompensationAuthority = 0.0035;
@@ -58,6 +57,7 @@ public class LimelightCommand extends CommandBase {
                 .clamp(limelightF.calculate(limelight.getX()) - CompensationAuthority * driveVelocity.getAsDouble()
                         * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS), -25, 25);
         SmartDashboard.putNumber("Compensation", error);
+        lockedOn = error < 0.5;
         if (limelight.getTargetVisible()) {
             limelight.setLimelight(true);
             turretPower = -MathUtil.clamp(((Math.abs(error) > 1) ? 1 : 0) * (Turret.kP * error), -Turret.SEEKING_POWER,
@@ -76,8 +76,8 @@ public class LimelightCommand extends CommandBase {
         return turretSeek;
     }
 
-    public boolean getKickerOn() {
-        return kickerOn;
+    public boolean getLockedOn() {
+        return lockedOn;
     }
 
 }
