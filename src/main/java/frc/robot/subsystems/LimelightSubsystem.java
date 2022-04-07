@@ -10,7 +10,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Limelight;
 
 public class LimelightSubsystem extends SubsystemBase {
     // private final MedianFilter filteredX = new MedianFilter(5);
@@ -37,7 +36,6 @@ public class LimelightSubsystem extends SubsystemBase {
         // post to smart dashboard
         SmartDashboard.putNumber("Target X", targetX);
         SmartDashboard.putNumber("Target Y", targetY);
-        SmartDashboard.putBoolean("Ready To Fire", Math.abs(getX()) < Limelight.LIMELIGHT_AIM_TOLERANCE && targetValid);
     }
 
     public double getX() {
@@ -61,7 +59,7 @@ public class LimelightSubsystem extends SubsystemBase {
         // return 15000 - 165 * getY();
         // }
 
-        return -230 * getY() + 12400;
+        return -230 * getY() + 13500;
     }
 
     public boolean getTargetVisible() {
