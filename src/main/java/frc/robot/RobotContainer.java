@@ -213,12 +213,22 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
+        autoShoot.whileActiveContinuous(new SequentialCommandGroup(
+                new WaitCommand(0.5),
+                new ParallelCommandGroup(
+                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.5),
+                        new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.5)),
+                new ParallelCommandGroup(
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.5),
+                        new ChimneyCommand(chimney, () -> 0).withTimeout(0.5))),
+                false);
+
         indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
                 (new ParallelCommandGroup(
-                        // new LauncherCommand(launcher,
-                        // () -> (limelight
-                        // .getLaunchingVelocity()),
-                        // () -> shouldAdjustTurret),
+                        new LauncherCommand(launcher,
+                                () -> (limelight
+                                        .getLaunchingVelocity()),
+                                () -> shouldAdjustTurret),
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek(),
                                 () -> shouldAdjustTurret),
@@ -230,24 +240,24 @@ public class RobotContainer {
                 new ParallelCommandGroup(
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek()).withTimeout(0.5),
-                        // new LauncherCommand(launcher,
-                        // () -> (limelight.getLaunchingVelocity()),
-                        // () -> shouldAdjustTurret).withTimeout(
-                        // 0.1),
+                        new LauncherCommand(launcher,
+                                () -> (limelight.getLaunchingVelocity()),
+                                () -> shouldAdjustTurret).withTimeout(
+                                        0.1),
                         new InstantCommand(() -> launchVelocity = limelight
                                 .getLaunchingVelocity())),
-                new ParallelRaceGroup(
-                        new ParallelCommandGroup(
-                                new TurretCommand(turret, () -> 0,
-                                        () -> false),
-                                // new LauncherCommand(launcher,
-                                // () -> (launchVelocity),
-                                // () -> shouldAdjustTurret)),
-                                new SequentialCommandGroup(
-                                        new InstantCommand(() -> setIsShooting()),
-                                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
-                                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.3),
-                                        new InstantCommand(() -> setNotIsShooting())))))));
+                // new ParallelRaceGroup(
+                new ParallelCommandGroup(
+                        new TurretCommand(turret, () -> 0,
+                                () -> false),
+                        new LauncherCommand(launcher,
+                                () -> (launchVelocity),
+                                () -> shouldAdjustTurret)
+                // new SequentialCommandGroup(
+                // new InstantCommand(() -> setIsShooting()),
+                // new ChimneyCommand(chimney, () -> -1).withTimeout(0.3),
+                // new InstantCommand(() -> setNotIsShooting()))))));
+                ))));
         // new InstantCommand(() -> {
         // // setIsShooting();
         // driverController.setRumble(RumbleType.kLeftRumble, 1.0);

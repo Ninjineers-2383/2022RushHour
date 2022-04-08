@@ -42,7 +42,7 @@ public class LimelightCommand extends CommandBase {
     }
 
     public void periodic() {
-        SmartDashboard.putBoolean("Locked On", turretSeek);
+        SmartDashboard.putBoolean("Locked On", lockedOn);
 
     }
 
