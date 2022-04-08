@@ -16,7 +16,7 @@ public final class Constants {
         public final static int FULL_ROTATION = 30000;
         public final static int BOUNDS = 37600;
         public final static double SEEKING_POWER = 0.6;
-        public final static double kP = 0.015;
+        public final static double kP = 0.009;
         public final static double kP_CENTER = 0.00005;
         public final static double kS = 0.04;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
@@ -29,12 +29,11 @@ public final class Constants {
         public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
                 kTrackwidthMeters);
 
-        public static final double ksVolts = 1.0403;
-        public static final double kvVoltSecondsPerMeter = 3.5216;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.57978;
+        public static final double ksVolts = 0.66601;
+        public static final double kvVoltSecondsPerMeter = 0.89484;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.12357;
 
-        // Example value only - as above, this must be tuned for your drive!
-        public static final double kPDriveVel = 2.0956;
+        public static final double kPDriveVel = 1.2218;
     }
 
     public final static class Drivetrain {
@@ -77,8 +76,8 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxSpeedMetersPerSecond = 0.5;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5;
 
         // Reasonable baseline values for a RAMSETE follower in units of meters and
         // seconds

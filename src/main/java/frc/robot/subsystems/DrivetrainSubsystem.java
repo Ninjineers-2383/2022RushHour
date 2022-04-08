@@ -30,8 +30,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
             leftMasterMotor,
             leftFollowerMotor);
     private final MotorControllerGroup rightMotors = new MotorControllerGroup(
-            leftMasterMotor,
-            leftFollowerMotor);
+            rightMasterMotor,
+            rightFollowerMotor);
 
     private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
 
@@ -85,14 +85,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public void periodic() {
         odometry.update(
-                m_gyro.getRotation2d(), -encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()),
-                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
+                m_gyro.getRotation2d(), encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()),
+                -encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
 
         SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
         SmartDashboard.putNumber("Left Encoder Meters",
-                -encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()));
+                encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()));
         SmartDashboard.putNumber("Right Encoder Meters",
-                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
+                -encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition()));
 
         SmartDashboard.putString("Gyro", m_gyro.getRotation2d().toString());
         SmartDashboard.putNumber("Gyro pitch", rawGyro.getPitch());
@@ -115,8 +115,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(
-                -encoderTicksToMeters(leftMasterMotor.getSelectedSensorVelocity()),
-                encoderTicksToMeters(rightMasterMotor.getSelectedSensorVelocity()));
+                encoderTicksToMeters(leftMasterMotor.getSelectedSensorVelocity()),
+                -encoderTicksToMeters(rightMasterMotor.getSelectedSensorVelocity()));
     }
 
     public double encoderTicksToMeters(double ticks) {
@@ -144,8 +144,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public double getAverageEncoderDistance() {
-        return (-encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()) +
-                encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition())) / 2.0;
+        return (encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()) +
+                -encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition())) / 2.0;
     }
 
     /**

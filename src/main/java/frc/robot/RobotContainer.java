@@ -169,7 +169,7 @@ public class RobotContainer {
                         () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
         chimney.setDefaultCommand(
                 new ChimneyCommand(chimney,
-                        () -> (-.55)));
+                        () -> (0)));
         intake.setDefaultCommand(intakeCommand);
         climber.setDefaultCommand(climberCommand);
         SmartDashboard.putBoolean("Aim Active", false);
@@ -215,10 +215,10 @@ public class RobotContainer {
 
         indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
                 (new ParallelCommandGroup(
-                        new LauncherCommand(launcher,
-                                () -> (limelight
-                                        .getLaunchingVelocity()),
-                                () -> shouldAdjustTurret),
+                        // new LauncherCommand(launcher,
+                        // () -> (limelight
+                        // .getLaunchingVelocity()),
+                        // () -> shouldAdjustTurret),
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek(),
                                 () -> shouldAdjustTurret),
@@ -229,26 +229,25 @@ public class RobotContainer {
         indexerUpTwoBall.and(autoShoot).whenActive((new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek()).withTimeout(0.1),
-                        new LauncherCommand(launcher,
-                                () -> (limelight.getLaunchingVelocity()),
-                                () -> shouldAdjustTurret).withTimeout(
-                                        0.1),
+                                () -> aimCommand.getTurretSeek()).withTimeout(0.5),
+                        // new LauncherCommand(launcher,
+                        // () -> (limelight.getLaunchingVelocity()),
+                        // () -> shouldAdjustTurret).withTimeout(
+                        // 0.1),
                         new InstantCommand(() -> launchVelocity = limelight
                                 .getLaunchingVelocity())),
                 new ParallelRaceGroup(
                         new ParallelCommandGroup(
                                 new TurretCommand(turret, () -> 0,
                                         () -> false),
-                                new LauncherCommand(launcher,
-                                        () -> (launchVelocity),
-                                        () -> shouldAdjustTurret)),
-                        new SequentialCommandGroup(
-                                new InstantCommand(() -> setIsShooting()),
-                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0),
-                                new ChimneyCommand(chimney, () -> -1).withTimeout(0),
-                                new WaitCommand(0.2),
-                                new InstantCommand(() -> setNotIsShooting()))))));
+                                // new LauncherCommand(launcher,
+                                // () -> (launchVelocity),
+                                // () -> shouldAdjustTurret)),
+                                new SequentialCommandGroup(
+                                        new InstantCommand(() -> setIsShooting()),
+                                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+                                        new ChimneyCommand(chimney, () -> -1).withTimeout(0.3),
+                                        new InstantCommand(() -> setNotIsShooting())))))));
         // new InstantCommand(() -> {
         // // setIsShooting();
         // driverController.setRumble(RumbleType.kLeftRumble, 1.0);
@@ -326,17 +325,8 @@ public class RobotContainer {
                         () -> drivetrain.toggleTippingDisabled()));
     }
 
-    public Command getAutonomousCommand() {
-        Trajectory trajectory = new Trajectory();
-
-        try {
-            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve("path.json");
-            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-        } catch (IOException ex) {
-            DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
-        }
-
-        RamseteCommand ramseteCommand = new RamseteCommand(
+    private Command getCommand(Trajectory trajectory) {
+        return new RamseteCommand(
                 trajectory,
                 drivetrain::getPose,
                 new RamseteController(AutoConstants.kRamseteB, AutoConstants.kRamseteZeta),
@@ -351,12 +341,113 @@ public class RobotContainer {
                 // RamseteCommand passes volts to the callback
                 drivetrain::tankDriveVolts,
                 drivetrain);
+    }
+
+    public Command getAutonomousCommand() {
+        Trajectory trajectory1 = new Trajectory();
+        Trajectory trajectory2 = new Trajectory();
+        Trajectory trajectory3 = new Trajectory();
+        Trajectory trajectory4 = new Trajectory();
+
+        try {
+            Path trajectoryPath = Filesystem.getDeployDirectory().toPath();
+            trajectory1 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/First Ball.wpilib.json"));
+            trajectory2 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/Second Ball.wpilib.json"));
+            trajectory3 = TrajectoryUtil
+                    .fromPathweaverJson(trajectoryPath.resolve("output/Third and Fourth Ball.wpilib.json"));
+            trajectory4 = TrajectoryUtil
+                    .fromPathweaverJson(trajectoryPath.resolve("output/Final Shots.wpilib.json"));
+        } catch (IOException ex) {
+            DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
+        }
 
         // Reset odometry to the starting pose of the trajectory.
-        drivetrain.resetOdometry(trajectory.getInitialPose());
+        drivetrain.resetOdometry(trajectory1.getInitialPose());
 
         // Run path following command, then stop at the end.
-        return ramseteCommand.andThen(() -> drivetrain.tankDriveVolts(0, 0));
+        return new SequentialCommandGroup(
+                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new ParallelCommandGroup( // Intake system activate and intake first ball
+                        new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
+                        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
+                        new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+                        getCommand(trajectory1)),
+                new ParallelCommandGroup( // Shoot two balls after feeding one
+                        new ParallelRaceGroup(
+                                new TurretCommand(turret,
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
+                                                .withTimeout(1.5)),
+                        new SequentialCommandGroup(
+                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                        .withTimeout(0.2),
+                                new ChimneyCommand(chimney, () -> 0)
+                                        .withTimeout(0.1),
+                                new IndexerCommand(indexer, () -> 0.75)
+                                        .withTimeout(0.3),
+                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+                                new ChimneyCommand(chimney, () -> -1)
+                                        .withTimeout(0.5),
+                                new ChimneyCommand(chimney, () -> -0.5)
+                                        .withTimeout(0.15),
+                                new IndexerCommand(indexer, () -> 0.75)
+                                        .withTimeout(0.4))),
+                new ParallelCommandGroup( // Stop launch system
+                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
+                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)),
+                getCommand(trajectory2),
+
+                new ParallelCommandGroup( // Shoot one ball
+                        new ParallelRaceGroup(
+                                new TurretCommand(turret,
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
+                                                .withTimeout(1.5)),
+                        new SequentialCommandGroup(
+                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                        .withTimeout(0.2),
+                                new ChimneyCommand(chimney, () -> 0)
+                                        .withTimeout(0.1),
+                                new IndexerCommand(indexer, () -> 0.75)
+                                        .withTimeout(0.3),
+                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05))),
+                new ParallelCommandGroup( // Stop launch system
+                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
+                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)),
+
+                getCommand(trajectory3),
+                getCommand(trajectory4),
+                new ParallelCommandGroup( // Shoot two balls after feeding one
+                        new ParallelRaceGroup(
+                                new TurretCommand(turret,
+                                        () -> aimCommand.getTurretPower(),
+                                        () -> aimCommand.getTurretSeek())
+                                                .withTimeout(1.5)),
+                        new SequentialCommandGroup(
+                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                        .withTimeout(0.2),
+                                new ChimneyCommand(chimney, () -> 0)
+                                        .withTimeout(0.1),
+                                new IndexerCommand(indexer, () -> 0.75)
+                                        .withTimeout(0.3),
+                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+                                new ChimneyCommand(chimney, () -> -1)
+                                        .withTimeout(0.5),
+                                new ChimneyCommand(chimney, () -> -0.5)
+                                        .withTimeout(0.15),
+                                new IndexerCommand(indexer, () -> 0.75)
+                                        .withTimeout(0.4))),
+                new ParallelCommandGroup( // Stop launch system
+                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
+                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)))
+                                .andThen(() -> drivetrain.tankDriveVolts(0, 0));
+
         // return autoChooser.getSelected();
     }
 
