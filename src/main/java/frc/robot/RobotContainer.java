@@ -248,7 +248,7 @@ public class RobotContainer {
                                 .getLaunchingVelocity())),
                 new ParallelRaceGroup(
                         new IndexerCommand(indexer, () -> 0.75),
-                        new ChimneyCommand(chimney, () -> -0.4).withTimeout(2),
+                        new ChimneyCommand(chimney, () -> -0.45).withTimeout(1),
                         new ParallelCommandGroup(
                                 new TurretCommand(turret, () -> 0,
                                         () -> false),
