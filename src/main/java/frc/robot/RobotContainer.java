@@ -87,6 +87,7 @@ public class RobotContainer {
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
     // final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
     final POVButton fixedHighGoal = new POVButton(operatorController, 180, 0);
+    final POVButton testDoubleShot = new POVButton(operatorController, 90, 0);
 
     // Driver Controls - Driving, feeding
     // Feeders
@@ -213,15 +214,14 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        autoShoot.whileActiveContinuous(new SequentialCommandGroup(
-                new WaitCommand(0.5),
-                new ParallelCommandGroup(
-                        new IndexerCommand(indexer, () -> 0.75).withTimeout(0.5),
-                        new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.5)),
-                new ParallelCommandGroup(
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.5),
-                        new ChimneyCommand(chimney, () -> 0).withTimeout(0.5))),
-                false);
+        // autoShoot.whileActiveContinuous(new SequentialCommandGroup(
+        // new ParallelCommandGroup(
+        // new IndexerCommand(indexer, () -> 0).withTimeout(0.5),
+        // new ChimneyCommand(chimney, () -> 0).withTimeout(0.5)),
+        // new ParallelCommandGroup(
+        // new IndexerCommand(indexer, () -> 0.75).withTimeout(0.5),
+        // new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.5))),
+        // false);
 
         indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
                 (new ParallelCommandGroup(
@@ -236,28 +236,38 @@ public class RobotContainer {
                                 () -> SmartDashboard.putBoolean("Aim Active", true),
                                 () -> SmartDashboard.putBoolean("Aim Active", false)))));
 
-        indexerUpTwoBall.and(autoShoot).whenActive((new SequentialCommandGroup(
-                new ParallelCommandGroup(
+        indexerUpTwoBall.and(autoShoot).whenActive(new SequentialCommandGroup(
+                new ParallelRaceGroup(
                         new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                                 () -> aimCommand.getTurretSeek()).withTimeout(0.5),
                         new LauncherCommand(launcher,
                                 () -> (limelight.getLaunchingVelocity()),
                                 () -> shouldAdjustTurret).withTimeout(
-                                        0.1),
+                                        0.5),
                         new InstantCommand(() -> launchVelocity = limelight
                                 .getLaunchingVelocity())),
-                // new ParallelRaceGroup(
-                new ParallelCommandGroup(
-                        new TurretCommand(turret, () -> 0,
-                                () -> false),
-                        new LauncherCommand(launcher,
-                                () -> (launchVelocity),
-                                () -> shouldAdjustTurret)
+                new ParallelRaceGroup(
+                        new IndexerCommand(indexer, () -> 0.75),
+                        new ChimneyCommand(chimney, () -> -0.4).withTimeout(2),
+                        new ParallelCommandGroup(
+                                new TurretCommand(turret, () -> 0,
+                                        () -> false),
+                                new LauncherCommand(launcher,
+                                        () -> (launchVelocity),
+                                        () -> shouldAdjustTurret))
                 // new SequentialCommandGroup(
                 // new InstantCommand(() -> setIsShooting()),
-                // new ChimneyCommand(chimney, () -> -1).withTimeout(0.3),
-                // new InstantCommand(() -> setNotIsShooting()))))));
-                ))));
+                // new WaitCommand(2),
+                // // new IndexerCommand(indexer, () -> -0.75).withTimeout(0.5),
+                // // new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.3),
+                // new InstantCommand(() -> setNotIsShooting()))
+                )));
+
+        // testDoubleShot.whenHeld(new ParallelCommandGroup(
+        // new IndexerCommand(indexer, () -> 0.75),
+        // new ChimneyCommand(chimney, () -> -0.3)));
+
+        // ))));
         // new InstantCommand(() -> {
         // // setIsShooting();
         // driverController.setRumble(RumbleType.kLeftRumble, 1.0);
