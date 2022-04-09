@@ -171,7 +171,7 @@ public class RobotContainer {
                         () -> SmartDashboard.getNumber("Launcher Velocity", 0.0)));
         chimney.setDefaultCommand(
                 new ChimneyCommand(chimney,
-                        () -> (0)));
+                        intakePower));
         intake.setDefaultCommand(intakeCommand);
         climber.setDefaultCommand(climberCommand);
         SmartDashboard.putBoolean("Aim Active", false);
@@ -252,7 +252,7 @@ public class RobotContainer {
                                 new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0),
                                 new ChimneyCommand(chimney, () -> -1).withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0).withTimeout(0),
+                                new ChimneyCommand(chimney, () -> 0).withTimeout(0.1),
                                 new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)),
                         new InstantCommand(() -> launchVelocity = limelight
                                 .getLaunchingVelocity()),
