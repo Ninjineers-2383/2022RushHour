@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -244,24 +245,24 @@ public class RobotContainer {
                                 () -> (limelight.getLaunchingVelocity()),
                                 () -> shouldAdjustTurret).withTimeout(
                                         0.5),
+                        new ChimneyCommand(chimney, () -> -0.75)),
+                new ParallelDeadlineGroup(
+                        new SequentialCommandGroup(
+                                new ChimneyCommand(chimney, () -> 0).withTimeout(0),
+                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
+                                new IndexerCommand(indexer, () -> 0).withTimeout(0),
+                                new ChimneyCommand(chimney, () -> -1).withTimeout(0.2),
+                                new ChimneyCommand(chimney, () -> 0).withTimeout(0),
+                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)),
                         new InstantCommand(() -> launchVelocity = limelight
-                                .getLaunchingVelocity())),
-                new ParallelRaceGroup(
-                        new IndexerCommand(indexer, () -> 0.75),
-                        new ChimneyCommand(chimney, () -> -0.45).withTimeout(1),
+                                .getLaunchingVelocity()),
                         new ParallelCommandGroup(
                                 new TurretCommand(turret, () -> 0,
                                         () -> false),
                                 new LauncherCommand(launcher,
                                         () -> (launchVelocity),
-                                        () -> shouldAdjustTurret))
-                // new SequentialCommandGroup(
-                // new InstantCommand(() -> setIsShooting()),
-                // new WaitCommand(2),
-                // // new IndexerCommand(indexer, () -> -0.75).withTimeout(0.5),
-                // // new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.3),
-                // new InstantCommand(() -> setNotIsShooting()))
-                )));
+                                        () -> shouldAdjustTurret)))),
+                false);
 
         // testDoubleShot.whenHeld(new ParallelCommandGroup(
         // new IndexerCommand(indexer, () -> 0.75),
@@ -417,6 +418,8 @@ public class RobotContainer {
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
                         new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)),
+                new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
+
                 getCommand(trajectory2),
 
                 new ParallelCommandGroup( // Shoot one ball

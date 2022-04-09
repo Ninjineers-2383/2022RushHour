@@ -38,11 +38,13 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public boolean isReady() {
-        final int THRESHOLD = 1000;
+        final int THRESHOLD = 500;
+        boolean ready = false;
         if (masterMotor.getControlMode() == ControlMode.Velocity) {
-            return masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - THRESHOLD
+            ready = masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - THRESHOLD
                     && masterMotor.getSelectedSensorVelocity() <= masterMotor.getClosedLoopTarget() + THRESHOLD;
         }
-        return false;
+        SmartDashboard.putBoolean("Launcher Is Ready", ready);
+        return ready;
     }
 }

@@ -41,14 +41,11 @@ public class LimelightCommand extends CommandBase {
         addRequirements(limelight);
     }
 
-    public void periodic() {
-        SmartDashboard.putBoolean("Locked On", lockedOn);
-
-    }
-
     // fix bounds issue!
     @Override
     public void execute() {
+        SmartDashboard.putBoolean("Locked On", lockedOn);
+
         turretSeek = false;
 
         final double CompensationAuthority = 0.0035;
