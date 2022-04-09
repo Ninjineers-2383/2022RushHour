@@ -380,10 +380,11 @@ public class RobotContainer {
 
                 new ParallelDeadlineGroup(
                         getCommand(trajectory2),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand))),
+                        // new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                        // aimCommand))
+                        new TurretCommand(turret, 10500)),
 
-                new SeekCommand(launcher, limelight, turret, aimCommand),
+                new SeekCommand(launcher, limelight, turret, aimCommand).withTimeout(0.4),
 
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
                         limelight),
@@ -392,10 +393,13 @@ public class RobotContainer {
 
                 getCommand(trajectory3),
 
+                new WaitCommand(0.5),
+
                 new ParallelDeadlineGroup(
                         getCommand(trajectory4),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand))),
+                        // new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                        // aimCommand))
+                        new TurretCommand(turret, 19600)),
 
                 new SeekCommand(launcher, limelight, turret, aimCommand).withTimeout(0.4),
 

@@ -30,7 +30,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
                                 () -> (limelight.getLaunchingVelocity()),
                                 () -> true).withTimeout(
                                         0.5),
-                        new ChimneyCommand(chimney, () -> -0.75)),
+                        new ChimneyCommand(chimney, () -> -0.9)),
                 new ParallelDeadlineGroup(
                         new SequentialCommandGroup(
                                 new ChimneyCommand(chimney, () -> 0).withTimeout(0),
