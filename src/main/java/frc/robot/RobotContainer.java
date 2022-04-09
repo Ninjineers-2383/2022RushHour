@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -33,11 +34,14 @@ import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DoubleIntakeCommand;
+import frc.robot.commands.DoubleShotCommand;
 import frc.robot.commands.DrivetrainCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
+import frc.robot.commands.SeekCommand;
+import frc.robot.commands.StopLaunchCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoAlign;
 import frc.robot.commands.Autonomous.AutoForward;
@@ -224,44 +228,11 @@ public class RobotContainer {
         // new ChimneyCommand(chimney, () -> -0.5).withTimeout(0.5))),
         // false);
 
-        indexerUpTwoBall.and(autoShoot.negate()).whileActiveContinuous(
-                (new ParallelCommandGroup(
-                        new LauncherCommand(launcher,
-                                () -> (limelight
-                                        .getLaunchingVelocity()),
-                                () -> shouldAdjustTurret),
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek(),
-                                () -> shouldAdjustTurret),
-                        new StartEndCommand(
-                                () -> SmartDashboard.putBoolean("Aim Active", true),
-                                () -> SmartDashboard.putBoolean("Aim Active", false)))));
+        indexerUpTwoBall.and(autoShoot.negate())
+                .whileActiveContinuous(new SeekCommand(launcher, limelight, turret, aimCommand));
 
-        indexerUpTwoBall.and(autoShoot).whenActive(new SequentialCommandGroup(
-                new ParallelRaceGroup(
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek()).withTimeout(0.5),
-                        new LauncherCommand(launcher,
-                                () -> (limelight.getLaunchingVelocity()),
-                                () -> shouldAdjustTurret).withTimeout(
-                                        0.5),
-                        new ChimneyCommand(chimney, () -> -0.75)),
-                new ParallelDeadlineGroup(
-                        new SequentialCommandGroup(
-                                new ChimneyCommand(chimney, () -> 0).withTimeout(0),
-                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0),
-                                new ChimneyCommand(chimney, () -> -1).withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0).withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75).withTimeout(0.3)),
-                        new InstantCommand(() -> launchVelocity = limelight
-                                .getLaunchingVelocity()),
-                        new ParallelCommandGroup(
-                                new TurretCommand(turret, () -> 0,
-                                        () -> false),
-                                new LauncherCommand(launcher,
-                                        () -> (launchVelocity),
-                                        () -> shouldAdjustTurret)))),
+        indexerUpTwoBall.and(autoShoot).whenActive(
+                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight),
                 false);
 
         // testDoubleShot.whenHeld(new ParallelCommandGroup(
@@ -364,7 +335,12 @@ public class RobotContainer {
                 drivetrain);
     }
 
+    public Command getAutonomousCommand1() {
+        return new IntakeCommand(intake, () -> -0.8, true, true).withTimeout(100);
+    }
+
     public Command getAutonomousCommand() {
+        // return new IntakeCommand(intake, () -> -0.8, true, true).withTimeout(1);
         Trajectory trajectory1 = new Trajectory();
         Trajectory trajectory2 = new Trajectory();
         Trajectory trajectory3 = new Trajectory();
@@ -387,89 +363,47 @@ public class RobotContainer {
 
         // Run path following command, then stop at the end.
         return new SequentialCommandGroup(
-                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
-                new ParallelCommandGroup( // Intake system activate and intake first ball
-                        new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
-                        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
-                        new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
-                        getCommand(trajectory1)),
-                new ParallelCommandGroup( // Shoot two balls after feeding one
-                        new ParallelRaceGroup(
-                                new TurretCommand(turret,
-                                        () -> aimCommand.getTurretPower(),
-                                        () -> aimCommand.getTurretSeek())
-                                                .withTimeout(1.5)),
-                        new SequentialCommandGroup(
-                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0)
-                                        .withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1)
-                                        .withTimeout(0.5),
-                                new ChimneyCommand(chimney, () -> -0.5)
-                                        .withTimeout(0.15),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.4))),
-                new ParallelCommandGroup( // Stop launch system
-                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
-                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)),
+                new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+
+                new ParallelDeadlineGroup( // Intake system activate and intake first ball
+                        getCommand(trajectory1),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                                aimCommand))),
+
+                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
+                        limelight),
+
+                new StopLaunchCommand(launcher, indexer, chimney, turret),
+                // new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
+
                 new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
 
-                getCommand(trajectory2),
+                new ParallelDeadlineGroup(
+                        getCommand(trajectory2),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                                aimCommand))),
 
-                new ParallelCommandGroup( // Shoot one ball
-                        new ParallelRaceGroup(
-                                new TurretCommand(turret,
-                                        () -> aimCommand.getTurretPower(),
-                                        () -> aimCommand.getTurretSeek())
-                                                .withTimeout(1.5)),
-                        new SequentialCommandGroup(
-                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0)
-                                        .withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05))),
-                new ParallelCommandGroup( // Stop launch system
-                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
-                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)),
+                new SeekCommand(launcher, limelight, turret, aimCommand),
+
+                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
+                        limelight),
+
+                new StopLaunchCommand(launcher, indexer, chimney, turret),
 
                 getCommand(trajectory3),
-                getCommand(trajectory4),
-                new ParallelCommandGroup( // Shoot two balls after feeding one
-                        new ParallelRaceGroup(
-                                new TurretCommand(turret,
-                                        () -> aimCommand.getTurretPower(),
-                                        () -> aimCommand.getTurretSeek())
-                                                .withTimeout(1.5)),
-                        new SequentialCommandGroup(
-                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0)
-                                        .withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1)
-                                        .withTimeout(0.5),
-                                new ChimneyCommand(chimney, () -> -0.5)
-                                        .withTimeout(0.15),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.4))),
-                new ParallelCommandGroup( // Stop launch system
-                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
-                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5)))
-                                .andThen(() -> drivetrain.tankDriveVolts(0, 0));
+
+                new ParallelDeadlineGroup(
+                        getCommand(trajectory4),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                                aimCommand))),
+
+                new SeekCommand(launcher, limelight, turret, aimCommand).withTimeout(0.4),
+
+                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
+                        limelight),
+
+                new StopLaunchCommand(launcher, indexer, chimney, turret))
+                        .andThen(() -> drivetrain.tankDriveVolts(0, 0));
 
         // return autoChooser.getSelected();
     }

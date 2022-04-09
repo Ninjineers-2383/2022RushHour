@@ -9,8 +9,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Turret;
 
 public class TurretSubsystem extends SubsystemBase {
+    public enum TurretBoundsState {
+        OverBounds,
+        UnderBounds
+    }
+
     private TalonSRX motor = new TalonSRX(Turret.PORT);
-    private boolean side = false;
+    private TurretBoundsState boundsState = TurretBoundsState.OverBounds;
 
     @Override
     public void periodic() {
@@ -38,23 +43,19 @@ public class TurretSubsystem extends SubsystemBase {
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
             power = 0.3;
-            this.side = true;
+            boundsState = TurretBoundsState.OverBounds;
         } else if (getCurrentPosition() <= -Turret.BOUNDS) {
             power = -0.3;
-            this.side = false;
+            boundsState = TurretBoundsState.UnderBounds;
         }
         motor.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("446pm", power);
-        SmartDashboard.putBoolean("Side", side);
+        SmartDashboard.putString("Side", boundsState.toString());
     }
 
     // Rotates til side flips, then rotates other direction
-    public void seek(boolean flipSides) {
-        if (flipSides) {
-            setPower(this.side ? -1 * Turret.SEEKING_POWER : 1 * Turret.SEEKING_POWER);
-        } else {
-            setPower(this.side ? 1 * Turret.SEEKING_POWER : -1 * Turret.SEEKING_POWER);
-        }
+    public void seek(boolean nothing) {
+        setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
     }
 
     public void runToPosition(int position) {

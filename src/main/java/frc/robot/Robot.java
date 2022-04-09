@@ -4,9 +4,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,9 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
 
+    private PowerDistribution pdp = new PowerDistribution();
+    private int channels = 0;
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any
@@ -39,9 +43,10 @@ public class Robot extends TimedRobot {
         m_robotContainer = new RobotContainer();
         // CameraServer.startAutomaticCapture(0);
         // CameraServer.startAutomaticCapture(1);
-        
+
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
+        channels = pdp.getNumChannels();
     }
 
     /**
@@ -65,6 +70,10 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+
+        for (Integer i = 0; i < channels; i++) {
+            SmartDashboard.putNumber("PDP Channel " + i.toString(), pdp.getCurrent(i));
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
