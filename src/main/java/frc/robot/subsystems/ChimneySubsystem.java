@@ -20,7 +20,7 @@ public class ChimneySubsystem extends SubsystemBase {
     }
 
     // method that returns nothing (void) but sets the kicker at a set power in the
-    // inverval of [-1, 1]
+    // interval of [-1, 1]
     public void setPower(Double power) {
         motor.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("Chimney Power", power);

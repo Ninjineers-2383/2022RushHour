@@ -24,7 +24,7 @@ public class IndexerSubsystem extends SubsystemBase {
     }
 
     // method that returns nothing (void) but sets the kicker at a set power in the
-    // inverval of [-1, 1]
+    // interval of [-1, 1]
     public void setPower(Double power) {
         indexer.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("Indexer power", power);

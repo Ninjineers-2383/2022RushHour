@@ -20,9 +20,9 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private final RelativeEncoder left_encoder;
     private final RelativeEncoder right_encoder;
-    private final int RIGHTLIMIT = 159;
-    private final int LEFTLIMIT = 157;
-    private final double PASSIVESPEED = -0.2;
+    private final int RIGHT_LIMIT = 159;
+    private final int LEFT_LIMIT = 157;
+    private final double PASSIVE_SPEED = -0.2;
 
     // Climber subsystem constructor
     public ClimberSubsystem() {
@@ -43,8 +43,8 @@ public class ClimberSubsystem extends SubsystemBase {
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
 
-        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, LEFTLIMIT);
-        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, RIGHTLIMIT);
+        left_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, LEFT_LIMIT);
+        right_climber.setSoftLimit(CANSparkMax.SoftLimitDirection.kForward, RIGHT_LIMIT);
 
         left_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
         right_climber.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
@@ -67,11 +67,11 @@ public class ClimberSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Left Climber pos", left_encoder.getPosition());
         SmartDashboard.putNumber("Right Climber pos", right_encoder.getPosition());
-        if (left_encoder.getPosition() > LEFTLIMIT) {
-            left_climber.set(PASSIVESPEED);
+        if (left_encoder.getPosition() > LEFT_LIMIT) {
+            left_climber.set(PASSIVE_SPEED);
         }
-        if (right_encoder.getPosition() > RIGHTLIMIT) {
-            right_climber.set(PASSIVESPEED);
+        if (right_encoder.getPosition() > RIGHT_LIMIT) {
+            right_climber.set(PASSIVE_SPEED);
         }
     }
 

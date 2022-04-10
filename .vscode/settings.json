@@ -39,5 +39,15 @@
     "editor.suggest.snippetsPreventQuickSuggestions": false,
     "editor.detectIndentation": false
   },
-  "wpilib.autoStartRioLog": false
+  "wpilib.autoStartRioLog": false,
+  "cSpell.words": [
+    "AHRS",
+    "Feedforward",
+    "odometry",
+    "pooper",
+    "Ramsete",
+    "teleop",
+    "teleoperated",
+    "Trackwidth"
+  ]
 }

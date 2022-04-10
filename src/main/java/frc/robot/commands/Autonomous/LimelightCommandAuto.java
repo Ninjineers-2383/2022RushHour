@@ -18,7 +18,6 @@ public class LimelightCommandAuto extends CommandBase {
     private boolean turretSeek = false;
 
     private boolean kickerOn = false;
-    private int seenCycles = 0;
 
     MedianFilter drivetrainVelocityF = new MedianFilter(10);
 
@@ -50,11 +49,11 @@ public class LimelightCommandAuto extends CommandBase {
         if (limelight.getTargetVisible()) {
             turretSeek = false;
             // limelight.setLimelight(true);
-            SmartDashboard.putBoolean("isfine", true);
+            SmartDashboard.putBoolean("Target Visible Auto", true);
             turretPower = -Turret.kP * error;
         } else {
             // no target present
-            SmartDashboard.putBoolean("isfine", false);
+            SmartDashboard.putBoolean("Target Visible Auto", false);
             turretSeek = true;
         }
     }

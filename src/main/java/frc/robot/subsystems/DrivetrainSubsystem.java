@@ -104,7 +104,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Stopped", Math.abs(getAverageVelocity().getAsDouble()) < 0.1);
 
         SmartDashboard.putNumber("Left Master Sensor Pos", leftMasterMotor.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Left Follower Senser Pos", leftFollowerMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Left Follower Sensor Pos", leftFollowerMotor.getSelectedSensorPosition());
         SmartDashboard.putNumber("Right Master Sensor Pos", rightMasterMotor.getSelectedSensorPosition());
         SmartDashboard.putNumber("Right Follower Sensor Pos", rightFollowerMotor.getSelectedSensorPosition());
     }

@@ -34,10 +34,10 @@ public class IntakeCommand extends CommandBase {
     public void execute() {
         // See FeederSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        double dpower = power.getAsDouble();
+        double dPower = power.getAsDouble();
 
-        if (Math.abs(dpower) > 0.09) {
-            intake.setPower(dpower);
+        if (Math.abs(dPower) > 0.09) {
+            intake.setPower(dPower);
         } else {
             intake.setPower(0.0);
         }

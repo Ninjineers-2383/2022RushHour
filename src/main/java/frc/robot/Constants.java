@@ -21,7 +21,7 @@ public final class Constants {
         public final static double kS = 0.05;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static int OFFSET_TICKS = -10000;
-        public final static int FOWARD_OFFSET_TICKS = 22000;
+        public final static int FORWARD_OFFSET_TICKS = 22000;
     }
 
     public static final class DriveConstants {
@@ -37,10 +37,10 @@ public final class Constants {
     }
 
     public final static class Drivetrain {
-        // average encoder ticks per foot travelled.
+        // average encoder ticks per foot traveled.
         public static final double TICKS_PER_FOOT = 16200;
         // PID thing
-        public static final double Ramset_kP = 0;
+        public static final double Ramsete_kP = 0;
         // PID Values
         // Before Big John touched this P=.01, I=.001, D=0
         public static final double Motor_kP = 0.069715;
@@ -56,7 +56,6 @@ public final class Constants {
         // 0.83 volts right side kv
         // 0.87 volts left side kv
 
-        // Before Big John touched this kV = .66, kVspm = .35, kvsspm = .1
         public static final double ksVolts = 0.24; // .78
         public static final double ksPercent = 0.29;
         public static final double ksPercentTurn = 0.35;
