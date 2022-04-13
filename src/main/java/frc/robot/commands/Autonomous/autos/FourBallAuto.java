@@ -61,20 +61,11 @@ public class FourBallAuto extends SequentialCommandGroup {
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                // new AutoAlign(drivetrain, rearCamera, 0.5).withTimeout(0.75) // drives back
-                                // and intakes
+                                // drives back and intakes
                                 new AutoTurn(drivetrain, 13.5, 8, -0.4, 5))),
                 // human player ball
-                // new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.8, 50),
-                // new AutoForward(drivetrain, 12, 2.5, 0.9, 5),
-                // new AutoTurn(drivetrain, 27, 10, 0.6, 5),
                 new AutoForward(drivetrain, 11.6, 2.5, 0.9, 5).withTimeout(5),
-                // new AutoTurn(drivetrain, 21, 10, 0.6, 5),
-                // new AutoForward(drivetrain, 0.8, 0.5, 0.45, 2).withTimeout(1),
-                // new AutoForwardAim(drivetrain, rearCamera, 0.8, 0.5,
-                // 0.45,2).withTimeout(1.7),
                 new WaitCommand(1.5),
-                // new AutoTurn(drivetrain, 21, 10, -0.6, 5),
                 new ParallelRaceGroup(
                         new LauncherCommand(launcher, () -> 16500),
                         new TurretCommand(turret,
