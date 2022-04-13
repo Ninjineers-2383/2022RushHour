@@ -1,3 +1,8 @@
+// JA 4/13 11:30am changed:
+// ClimberSubsytem to ClimberSubsystemNew
+// ClimberCommand to ClimberCommandNew
+// Added ClimberButtonAnalog
+
 package frc.robot;
 
 import java.util.function.DoubleSupplier;
@@ -16,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
-import frc.robot.commands.ClimberCommand;
+import frc.robot.commands.ClimberCommandNew;
 import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.DoubleShotCommand;
 import frc.robot.commands.DrivetrainCommand;
@@ -36,7 +41,7 @@ import frc.robot.commands.triggers.FeedIn;
 import frc.robot.commands.triggers.FeedOut;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.ClimberSubsystemNew;
 import frc.robot.subsystems.ColorSensorSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -63,7 +68,10 @@ public class RobotContainer {
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
-    private DoubleSupplier climberPower = () -> climberUp.get() ? 1 : climberDown.get() ? -1 : 0;
+    private DoubleSupplier climberPowerButton = () -> climberUp.get() ? .3 : climberDown.get() ? -.3 : 0;
+    private DoubleSupplier climberPowerAnalog = () -> Math.abs(operatorController.getLeftY()) > .1
+            ? operatorController.getLeftY()
+            : 0;
     private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : hookDown.get() ? -0.7 : -0.1;
 
     // Shooting
@@ -104,7 +112,7 @@ public class RobotContainer {
     public final IndexerSubsystem indexer = new IndexerSubsystem();
     public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     public final ChimneySubsystem chimney = new ChimneySubsystem();
-    public final ClimberSubsystem climber = new ClimberSubsystem();
+    public final ClimberSubsystemNew climber = new ClimberSubsystemNew();
     public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney); // was intake
                                                                                                // and
     // chimney subsystems
@@ -114,7 +122,7 @@ public class RobotContainer {
     private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(),
             drivetrain.getAverageVelocity());
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
-    private final ClimberCommand climberCommand = new ClimberCommand(climber, climberPower, hookPower);
+    private final ClimberCommandNew climberCommandNew = new ClimberCommandNew(climber, climberPowerAnalog, hookPower);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
@@ -122,7 +130,8 @@ public class RobotContainer {
     public final FeedIn pooperIn = new FeedIn(colorSensor);
     public final FeedOut pooperOut = new FeedOut(colorSensor);
     public final Trigger autoShoot = new Trigger(
-            () -> aimCommand.getLockedOn() && limelight.getTargetVisible() && launcher.isReady());
+            () -> aimCommand.getLockedOn() && limelight.getTargetVisible() && launcher.isReady()
+                    && Math.abs(drivetrain.getAverageVelocity().getAsDouble()) < 0.1);
 
     // Auto Chooser
     SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -148,7 +157,7 @@ public class RobotContainer {
                 new ChimneyCommand(chimney,
                         intakePower));
         intake.setDefaultCommand(intakeCommand);
-        climber.setDefaultCommand(climberCommand);
+        climber.setDefaultCommand(climberCommandNew);
         SmartDashboard.putBoolean("Aim Active", false);
 
         SetAutoCommands();
