@@ -68,11 +68,11 @@ public class RobotContainer {
     final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
-    private DoubleSupplier climberPowerButton = () -> climberUp.get() ? .3 : climberDown.get() ? -.3 : 0;
+    // private DoubleSupplier climberPowerButton = () -> climberUp.get() ? .3 :
+    // climberDown.get() ? -.3 : 0;
     private DoubleSupplier climberPowerAnalog = () -> Math.abs(operatorController.getLeftY()) > .1
             ? operatorController.getLeftY()
             : 0;
-    private DoubleSupplier hookPower = () -> hookUp.get() ? 0.7 : hookDown.get() ? -0.7 : -0.1;
 
     // Shooting
     // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
@@ -122,7 +122,7 @@ public class RobotContainer {
     private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(),
             drivetrain.getAverageVelocity());
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
-    private final ClimberCommandNew climberCommandNew = new ClimberCommandNew(climber, climberPowerAnalog, hookPower);
+    private final ClimberCommandNew climberCommandNew = new ClimberCommandNew(climber, climberPowerAnalog);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
@@ -216,10 +216,8 @@ public class RobotContainer {
                         () -> intakeCommand.setRearDown(false),
                         () -> intakeCommand.setRearDown(true)));
 
-        climberInvert.toggleWhenPressed(
-                new StartEndCommand(
-                        () -> climber.invertMotorPowers(),
-                        () -> climber.unInvertMotorPower()));
+        climberInvert.whenPressed(
+                () -> climber.invertMotorPowers());
 
         barfToggle.toggleWhenPressed(
                 new StartEndCommand(

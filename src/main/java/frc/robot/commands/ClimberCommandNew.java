@@ -9,18 +9,16 @@ public class ClimberCommandNew extends CommandBase {
 
     private final ClimberSubsystemNew subsystem;
     private final DoubleSupplier climbPower;
-    private final DoubleSupplier hookPower;
 
-    public ClimberCommandNew(ClimberSubsystemNew subsystem, DoubleSupplier climbPower, DoubleSupplier hookPower) {
+    public ClimberCommandNew(ClimberSubsystemNew subsystem, DoubleSupplier climbPower) {
         this.subsystem = subsystem;
         this.climbPower = climbPower;
-        this.hookPower = hookPower;
 
         addRequirements(subsystem);
     }
 
     @Override
     public void execute() {
-        subsystem.setPower(climbPower.getAsDouble(), climbPower.getAsDouble(), hookPower.getAsDouble());
+        subsystem.setPower(climbPower.getAsDouble(), climbPower.getAsDouble());
     }
 }
