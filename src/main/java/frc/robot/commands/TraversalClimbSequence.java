@@ -19,7 +19,7 @@ public class TraversalClimbSequence extends SequentialCommandGroup {
         this.climber = climber;
         this.drivetrain = drivetrain;
 
-        addRequirements(intake, climber);
+        addRequirements(intake, climber, drivetrain);
 
         drivetrain.toggleTippingDisabled();
 
@@ -30,10 +30,10 @@ public class TraversalClimbSequence extends SequentialCommandGroup {
                                 new AutoForward(drivetrain, 0.75, 1, 0.5, 2),
                                 new IntakeCommand(intake, () -> 0, true, false),
                                 new TraversalClimbAuto(climber, () -> climberPower, 250.0)),
-                        new TraversalClimbAuto(climber, () -> climberPower, 690.0).withTimeout(3), // swing to high
-                        new TraversalClimbAuto(climber, () -> -climberPower, 420.0).withTimeout(2), // unhook from mid
-                        new TraversalClimbAuto(climber, () -> climberPower, 666.0).withTimeout(3), // swing to traversal
-                        new TraversalClimbAuto(climber, () -> -climberPower, 999.0).withTimeout(2), // unhook from high
+                        new TraversalClimbAuto(climber, () -> climberPower, 690.0).withTimeout(2), // swing to high
+                        new TraversalClimbAuto(climber, () -> -climberPower, 420.0).withTimeout(3), // unhook from mid
+                        new TraversalClimbAuto(climber, () -> climberPower, 666.0).withTimeout(8), // swing to traversal
+                        new TraversalClimbAuto(climber, () -> -climberPower, 999.0).withTimeout(3), // unhook from high
                         new TraversalClimbAuto(climber, () -> climberPower, 179.0).withTimeout(0.987) // swing robot
                                                                                                       // straight
                 ));

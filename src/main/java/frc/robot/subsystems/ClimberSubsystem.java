@@ -1,8 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -16,7 +13,6 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private final CANSparkMax right_climber = new CANSparkMax(Constants.Climber.RIGHT_PORT, MotorType.kBrushless);
     private final CANSparkMax left_climber = new CANSparkMax(Constants.Climber.LEFT_PORT, MotorType.kBrushless);
-    private final TalonSRX hook = new TalonSRX(Constants.Climber.HOOK_PORT);
 
     private final RelativeEncoder left_encoder;
     private final RelativeEncoder right_encoder;
@@ -28,11 +24,9 @@ public class ClimberSubsystem extends SubsystemBase {
     public ClimberSubsystem() {
         right_climber.setInverted(true);
         left_climber.setInverted(true);
-        hook.setInverted(false);
 
         right_climber.setIdleMode(IdleMode.kBrake);
         left_climber.setIdleMode(IdleMode.kBrake);
-        hook.setNeutralMode(NeutralMode.Brake);
 
         left_encoder = left_climber.getEncoder();
         right_encoder = right_climber.getEncoder();
@@ -76,7 +70,6 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void setPower(double left, double right, double hookPower) {
-        hook.set(ControlMode.PercentOutput, hookPower);
         if (left_encoder.getPosition() < 3) {
             left_climber.set(left * 0.5);
             right_climber.set(right * 0.5);
@@ -90,6 +83,5 @@ public class ClimberSubsystem extends SubsystemBase {
         IdleMode mode = isBrake ? IdleMode.kBrake : IdleMode.kCoast;
         left_climber.setIdleMode(mode);
         right_climber.setIdleMode(mode);
-        hook.setNeutralMode(isBrake ? NeutralMode.Brake : NeutralMode.Coast);
     }
 }

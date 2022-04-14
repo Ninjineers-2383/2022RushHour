@@ -14,14 +14,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
-import frc.robot.commands.ClimberCommandNew;
 import frc.robot.commands.DoubleIntakeCommand;
 import frc.robot.commands.DoubleShotCommand;
 import frc.robot.commands.DrivetrainCommand;
@@ -30,16 +28,15 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.SeekCommand;
+import frc.robot.commands.TraversalClimbCommand;
+import frc.robot.commands.TraversalClimbSequence;
 import frc.robot.commands.TurretCommand;
-import frc.robot.commands.Autonomous.AutoAlign;
-import frc.robot.commands.Autonomous.AutoForwardAim;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
 import frc.robot.commands.Autonomous.autos.TwoBallAuto;
 import frc.robot.commands.triggers.FeedIn;
 import frc.robot.commands.triggers.FeedOut;
-import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystemNew;
 import frc.robot.subsystems.ColorSensorSubsystem;
@@ -84,7 +81,6 @@ public class RobotContainer {
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
     // final POVButton limelightYeet = new POVButton(operatorController, 90, 0);
     final POVButton fixedHighGoal = new POVButton(operatorController, 180, 0);
-    final POVButton testDoubleShot = new POVButton(operatorController, 90, 0);
 
     // Driver Controls - Driving, feeding
     // Feeders
@@ -96,6 +92,8 @@ public class RobotContainer {
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     final JoystickButton chimneyUp = new JoystickButton(driverController, Button.kY.value);
     final JoystickButton barfToggle = new JoystickButton(operatorController, Button.kStart.value);
+    final JoystickButton NinjaClimb = new JoystickButton(operatorController, Button.kA.value);
+
     public final IntakeSubsystem intake = new IntakeSubsystem();
     private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis() * -1
             + driverController.getRightTriggerAxis() * -1;
@@ -106,23 +104,19 @@ public class RobotContainer {
 
     // defining subsystems
     public final LimelightSubsystem limelight = new LimelightSubsystem();
-
     public final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
     public final IndexerSubsystem indexer = new IndexerSubsystem();
     public final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     public final ChimneySubsystem chimney = new ChimneySubsystem();
     public final ClimberSubsystemNew climber = new ClimberSubsystemNew();
-    public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney); // was intake
-                                                                                               // and
-    // chimney subsystems
-    public final CameraSubsystem rearCamera = new CameraSubsystem("rear");
+    public final ColorSensorSubsystem colorSensor = new ColorSensorSubsystem(intake, chimney);
 
     // defining premeditated commands
     private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(),
             drivetrain.getAverageVelocity());
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
-    private final ClimberCommandNew climberCommandNew = new ClimberCommandNew(climber, climberPowerAnalog);
+    private final TraversalClimbCommand traversalClimbCommand = new TraversalClimbCommand(climber, climberPowerAnalog);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
@@ -157,15 +151,13 @@ public class RobotContainer {
                 new ChimneyCommand(chimney,
                         intakePower));
         intake.setDefaultCommand(intakeCommand);
-        climber.setDefaultCommand(climberCommandNew);
+        climber.setDefaultCommand(traversalClimbCommand);
         SmartDashboard.putBoolean("Aim Active", false);
 
         SetAutoCommands();
     }
 
     private void configureButtonBindings() {
-
-        autoAlign.whileHeld(new AutoAlign(drivetrain, rearCamera, throttle, turn));
 
         pooperIn.whileActiveContinuous(colorSensor.loadIn(intake.getFrontUp(),
                 !intake.getRearUp()), false);
@@ -228,6 +220,8 @@ public class RobotContainer {
                 new StartEndCommand(
                         () -> drivetrain.toggleTippingEnabled(),
                         () -> drivetrain.toggleTippingDisabled()));
+
+        NinjaClimb.whenPressed(new TraversalClimbSequence(drivetrain, intake, climber));
     }
 
     public Command getAutonomousCommand() {
@@ -235,9 +229,7 @@ public class RobotContainer {
     }
 
     private Command getTestAuto() {
-        return new SequentialCommandGroup(
-                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.75),
-                new AutoForwardAim(drivetrain, rearCamera, 11.8, 2.3, 0.4, 50));
+        return null;
     }
 
     private void SetAutoCommands() {
