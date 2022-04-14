@@ -21,16 +21,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.DoubleIntakeCommand;
-import frc.robot.commands.DoubleShotCommand;
 import frc.robot.commands.DrivetrainCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
-import frc.robot.commands.SeekCommand;
-import frc.robot.commands.TraversalClimbCommand;
-import frc.robot.commands.TraversalClimbSequence;
+import frc.robot.commands.TraversalClimbManualCommand;
 import frc.robot.commands.TurretCommand;
+import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
+import frc.robot.commands.AutomatedCommands.SeekCommand;
+import frc.robot.commands.AutomatedCommands.TraversalClimbSequence;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
@@ -116,7 +116,8 @@ public class RobotContainer {
     private final LimelightCommand aimCommand = new LimelightCommand(limelight, () -> turret.getCurrentPosition(),
             drivetrain.getAverageVelocity());
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
-    private final TraversalClimbCommand traversalClimbCommand = new TraversalClimbCommand(climber, climberPowerAnalog);
+    private final TraversalClimbManualCommand traversalClimbCommand = new TraversalClimbManualCommand(climber,
+            climberPowerAnalog);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 

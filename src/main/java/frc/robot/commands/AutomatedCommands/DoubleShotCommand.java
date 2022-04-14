@@ -1,10 +1,15 @@
-package frc.robot.commands;
+package frc.robot.commands.AutomatedCommands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.ChimneyCommand;
+import frc.robot.commands.IndexerCommand;
+import frc.robot.commands.LauncherCommand;
+import frc.robot.commands.LimelightCommand;
+import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
