@@ -59,11 +59,15 @@ public class FiveBallAuto extends SequentialCommandGroup {
             DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
         }
 
-        // Reset odometry to the starting pose of the trajectory.
-        drivetrain.resetOdometry(trajectory1.getInitialPose());
+        final Trajectory traj1f = trajectory1;
 
         // Run path following command, then stop at the end.
         addCommands(
+                new InstantCommand(
+                        () -> {
+                            // Reset odometry to the starting pose of the trajectory.
+                            drivetrain.resetOdometry(traj1f.getInitialPose());
+                        }),
                 new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball

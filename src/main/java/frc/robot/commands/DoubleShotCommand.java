@@ -43,9 +43,9 @@ public class DoubleShotCommand extends SequentialCommandGroup {
                                 .getLaunchingVelocity()),
                         new ParallelCommandGroup(
                                 new TurretCommand(turret, () -> 0,
-                                        () -> false),
+                                        () -> false).perpetually(),
                                 new LauncherCommand(launcher,
                                         () -> (launchVelocity),
-                                        () -> true))));
+                                        () -> true).perpetually())));
     }
 }

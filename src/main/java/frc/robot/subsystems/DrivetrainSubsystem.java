@@ -135,8 +135,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     public void resetEncoders() {
-        leftMasterMotor.setSelectedSensorPosition(0);
-        rightMasterMotor.setSelectedSensorPosition(0);
+        SmartDashboard.putNumber("Right Master Reset", rightMasterMotor.setSelectedSensorPosition(0).value);
+        SmartDashboard.putNumber("Right Follower Reset", rightFollowerMotor.setSelectedSensorPosition(0).value);
+        SmartDashboard.putNumber("Left Master Reset", leftMasterMotor.setSelectedSensorPosition(0).value);
+        SmartDashboard.putNumber("Left Follower Reset", leftFollowerMotor.setSelectedSensorPosition(0).value);
     }
 
     public void tankDrive(double left, double right) {

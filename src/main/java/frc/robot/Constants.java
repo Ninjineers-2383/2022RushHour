@@ -16,7 +16,7 @@ public final class Constants {
         public final static int FULL_ROTATION = 30000;
         public final static int BOUNDS = 37600;
         public final static double SEEKING_POWER = 0.6;
-        public final static double kP = 0.012;
+        public final static double kP = 0.012; // 0.012
         public final static double kP_CENTER = 0.00005;
         public final static double kS = 0.05;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
@@ -68,10 +68,10 @@ public final class Constants {
         public final static double ENCODER_DISTANCE_PER_PULSE = (((WHEEL_DIAMETER_METERS * Math.PI)
                 / (double) ENCODER_CPR)) / DRIVETRAIN_GEAR_RATIO;
 
-        public final static int RIGHT_MASTER_PORT = 4;
-        public final static int LEFT_MASTER_PORT = 5;
-        public final static int RIGHT_FOLLOWER_PORT = 6;
-        public final static int LEFT_FOLLOWER_PORT = 7;
+        public final static int RIGHT_MASTER_PORT = 5;
+        public final static int LEFT_MASTER_PORT = 4;
+        public final static int RIGHT_FOLLOWER_PORT = 7;
+        public final static int LEFT_FOLLOWER_PORT = 6;
     }
 
     public static final class AutoConstants {

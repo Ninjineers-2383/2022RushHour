@@ -16,6 +16,7 @@ public class ClimberSubsystemNew extends SubsystemBase {
 
     private final RelativeEncoder left_encoder;
     private final RelativeEncoder right_encoder;
+    private boolean leftOffToggle = false;;
 
     // Climber subsystem constructor
     public ClimberSubsystemNew() {
@@ -33,20 +34,40 @@ public class ClimberSubsystemNew extends SubsystemBase {
     }
 
     public void invertMotorPowers() {
-        right_climber.setInverted(!right_climber.getInverted());
-        left_climber.setInverted(!left_climber.getInverted());
+        leftOffToggle = !leftOffToggle;
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Left Climber pos", left_encoder.getPosition());
         SmartDashboard.putNumber("Right Climber pos", right_encoder.getPosition());
+        SmartDashboard.putBoolean("leftClimberOff", leftOffToggle);
+        // if (Math.abs(right_encoder.getPosition() - left_encoder.getPosition()) > 10)
+        // {
+        // if (right_encoder.getPosition() > left_encoder.getPosition()) {
+        // setPower(0, -0.6);
+        // } else {
+        // setPower(-0.6, 0);
+        // }
+        // }
+    }
+
+    public double getLeftEncoderPos() {
+        return left_encoder.getPosition();
+    }
+
+    public double getRightEncoderPos() {
+        return right_encoder.getPosition();
+    }
+
+    public double getAverageEncoderPos() {
+        return (getLeftEncoderPos() + getRightEncoderPos()) / 2;
     }
 
     public void setPower(double left, double right) {
-        left_climber.set(left);
+        double leftPower = leftOffToggle ? 0 : left * 0.97;
+        left_climber.set(leftPower);
         right_climber.set(right);
-
     }
 
     public void switchBrakeCoast(boolean isBrake) {
