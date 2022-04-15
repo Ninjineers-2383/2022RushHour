@@ -47,21 +47,9 @@ public class LimelightSubsystem extends SubsystemBase {
     }
 
     public double getLaunchingVelocity() {
-        // furthest for OG curve: -1.437
-        // if (getY() < 5.96) {
-        // return 14152 - 236 * x + 22 * x * x;
-        // } else {
-        // return -200 * x + 14900;
-        // }
-        // if (getY() > -1.437 && getY() < 16.5) {
-        // return 14000 - 165 * getY();
-        // } else {
-        // return 15000 - 165 * getY();
-        // }
-
         double y = getY();
         // return -230 * y + 12500;
-        return 12801 + (-86.1 * y) + (8.22 * y * y);
+        return 12801 + (-86.1 * y) + (8.22 * y * y); // https://www.desmos.com/calculator/3hmh5agnm1
     }
 
     public boolean getTargetVisible() {
