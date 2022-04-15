@@ -48,17 +48,12 @@ public class LimelightCommand extends CommandBase {
 
         turretSeek = false;
 
-        final double CompensationAuthority = 0.0035;
-
-        double error = MathUtil
-                .clamp(limelightF.calculate(limelight.getX()) - CompensationAuthority * driveVelocity.getAsDouble()
-                        * Math.signum(turretTicks.getAsDouble() - Turret.OFFSET_TICKS), -25, 25);
-        SmartDashboard.putNumber("Compensation", error);
-        lockedOn = error < 0.5;
+        double error = limelightF.calculate(limelight.getX());
+        lockedOn = error < 0.5 && limelight.getTargetVisible();
         if (limelight.getTargetVisible()) {
             limelight.setLimelight(true);
-            turretPower = -MathUtil.clamp(((Math.abs(error) > 1) ? 1 : 0) * (Turret.kP * error), -Turret.SEEKING_POWER,
-                    Turret.SEEKING_POWER);
+            turretPower = -MathUtil.clamp(((Math.abs(error) > 0.4) ? 1 : 0) * (Turret.kP * error), -Turret.ADJUST_POWER,
+                    Turret.ADJUST_POWER);
         } else {
             // no target present
             turretSeek = true;
@@ -75,6 +70,10 @@ public class LimelightCommand extends CommandBase {
 
     public boolean getLockedOn() {
         return lockedOn;
+    }
+
+    public boolean getTurretRunning() {
+        return turretPower > 0.05;
     }
 
 }

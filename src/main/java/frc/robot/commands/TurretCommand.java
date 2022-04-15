@@ -62,6 +62,10 @@ public class TurretCommand extends CommandBase {
         this.shouldMove = () -> true;
         addRequirements(turret);
     }
+    @Override
+    public void initialize() {
+        turret.seekDirection(flipSeek);
+    }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
@@ -77,7 +81,7 @@ public class TurretCommand extends CommandBase {
                 }
             } else {
                 if (seek.getAsBoolean()) {
-                    turret.seek(flipSeek);
+                    turret.seek();
                 } else {
                     turret.setPower(speed.getAsDouble());
                 }
