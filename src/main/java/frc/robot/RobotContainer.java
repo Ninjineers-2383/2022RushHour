@@ -55,15 +55,11 @@ public class RobotContainer {
 
     // Operator Controls - Shooting, aiming, and climbing
     // Climber
-    final JoystickButton climberUp = new JoystickButton(operatorController, Button.kY.value);
-    final JoystickButton climberDown = new JoystickButton(operatorController, Button.kA.value);
     final JoystickButton climberInvert = new JoystickButton(operatorController, Button.kStart.value); // Right extra
                                                                                                       // button
     final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
 
     // Climber Hook
-    final JoystickButton hookUp = new JoystickButton(operatorController, Button.kX.value);
-    final JoystickButton hookDown = new JoystickButton(operatorController, Button.kB.value);
     final JoystickButton autoAlign = new JoystickButton(driverController, Button.kRightStick.value);
     // private DoubleSupplier climberPowerButton = () -> climberUp.get() ? .3 :
     // climberDown.get() ? -.3 : 0;
@@ -92,7 +88,7 @@ public class RobotContainer {
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     final JoystickButton chimneyUp = new JoystickButton(driverController, Button.kY.value);
     final JoystickButton barfToggle = new JoystickButton(operatorController, Button.kStart.value);
-    final JoystickButton NinjaClimb = new JoystickButton(operatorController, Button.kA.value);
+    final JoystickButton NinjaClimb = new JoystickButton(operatorController, Button.kY.value);
 
     public final IntakeSubsystem intake = new IntakeSubsystem();
     private DoubleSupplier intakePower = () -> driverController.getLeftTriggerAxis() * -1
