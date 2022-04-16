@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Intake;
 
 public class IntakeSubsystem extends SubsystemBase {
-    public final VictorSPX frontMotor = new VictorSPX(Intake.FRONT_INTAKE_PORT);
-    public final VictorSPX rearMotor = new VictorSPX(Intake.REAR_INTAKE_PORT);
+    private final VictorSPX frontMotor = new VictorSPX(Intake.FRONT_INTAKE_PORT);
+    private final VictorSPX rearMotor = new VictorSPX(Intake.REAR_INTAKE_PORT);
 
-    public final Compressor pump = new Compressor(PneumaticsModuleType.CTREPCM);
+    private final Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
     // public final DoubleSolenoid = new
     // DoubleSolenoid(PneumaticsModuleType.CTREPCM, Intake.FRONT_LEFT_SOLENOID_POR)
@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // frontMotor.setSafetyEnabled();
         frontMotor.setInverted(false);
         rearMotor.setInverted(false);
-        pump.enableDigital();
+        enableCompressor(true);
     }
 
     // deployed intakes turn on
@@ -80,5 +80,13 @@ public class IntakeSubsystem extends SubsystemBase {
         boolean rear = !rearUpSolenoid.get();
         SmartDashboard.putBoolean("get rear up", rear);
         return rear;
+    }
+
+    public void enableCompressor(boolean enable) {
+        if (enable) {
+            compressor.enableDigital();
+        } else {
+            compressor.disable();
+        }
     }
 }

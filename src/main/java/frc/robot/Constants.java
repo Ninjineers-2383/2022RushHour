@@ -14,11 +14,11 @@ public final class Constants {
     public final static class Turret {
         public final static int PORT = 3;
         public final static int FULL_ROTATION = 30000;
-        public final static int BOUNDS = 37600;
-        public final static double SEEKING_POWER = 0.6;
-        public final static double kP = 0.012; // 0.012
-        public final static double kP_CENTER = 0.00005;
-        public final static double kS = 0.05;
+        public final static int BOUNDS = 45000;
+        public final static double SEEKING_POWER = 5000;
+        public final static double ADJUST_POWER = 3000;
+        public final static double kP = 70; // 0.012
+        public final static double kP_CENTER = 0.21;
         public final static double DRIVE_VELOCITY_FACTOR = 0;
         public final static int OFFSET_TICKS = -10000;
         public final static int FORWARD_OFFSET_TICKS = 22000;

@@ -70,6 +70,9 @@ public class Robot extends TimedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        SmartDashboard.putNumber("Front Feeder Amp Draw: ", pdp.getCurrent(4));
+        SmartDashboard.putNumber("Back Feeder Amp Draw: ", pdp.getCurrent(5));
+        SmartDashboard.putNumber("Chimney Amp Draw: ", pdp.getCurrent(7));
 
         for (Integer i = 0; i < channels; i++) {
             SmartDashboard.putNumber("PDP Channel " + i.toString(), pdp.getCurrent(i));

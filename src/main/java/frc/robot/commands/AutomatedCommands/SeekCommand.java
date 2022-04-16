@@ -17,7 +17,7 @@ public class SeekCommand extends ParallelCommandGroup {
 
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public SeekCommand(LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+            LimelightCommand aimCommand, boolean seekDirection) {
         this.aimCommand = aimCommand;
         this.limelight = limelight;
         this.launcher = launcher;
@@ -28,7 +28,7 @@ public class SeekCommand extends ParallelCommandGroup {
                         () -> true),
                 new TurretCommand(turret, () -> aimCommand.getTurretPower(),
                         () -> aimCommand.getTurretSeek(),
-                        false),
+                        seekDirection),
                 new StartEndCommand(
                         () -> SmartDashboard.putBoolean("Aim Active", true),
                         () -> SmartDashboard.putBoolean("Aim Active", false)));

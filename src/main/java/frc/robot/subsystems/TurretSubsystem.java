@@ -24,8 +24,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem() {
         motor.setInverted(false);
+        motor.setSensorPhase(true);
         motor.setSelectedSensorPosition(0);
-        motor.setNeutralMode(NeutralMode.Coast);
+        brake();
     }
 
     public void setPosition(int pos) {
@@ -42,26 +43,34 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
-            power = 0.3;
-            boundsState = TurretBoundsState.OverBounds;
-        } else if (getCurrentPosition() <= -Turret.BOUNDS) {
-            power = -0.3;
+            power = -100.0;
             boundsState = TurretBoundsState.UnderBounds;
+        } else if (getCurrentPosition() < -Turret.BOUNDS) {
+            power = 100.0;
+            boundsState = TurretBoundsState.OverBounds;
         }
-        motor.set(ControlMode.PercentOutput, power);
+        motor.set(ControlMode.Velocity, power);
         SmartDashboard.putNumber("446pm", power);
         SmartDashboard.putString("Side", boundsState.toString());
     }
 
     // Rotates til side flips, then rotates other direction
-    public void seek(boolean nothing) {
+    public void seek() {
         setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
     }
 
+    public void seekDirection(boolean direction) {
+        if (direction) {
+            boundsState = TurretBoundsState.OverBounds;
+        } else {
+            boundsState = TurretBoundsState.UnderBounds;
+        }
+    }
+
     public void runToPosition(int position) {
-        double error = this.getCurrentPosition() - position;
+        double error = -this.getCurrentPosition() - position;
         if (Math.abs(error) > 100) {
-            setPower(Turret.kP_CENTER * error + Turret.kS * Math.signum(error));
+            setPower(Turret.kP_CENTER * error);
         } else {
             setPower(0.0);
         }

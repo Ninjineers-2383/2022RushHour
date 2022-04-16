@@ -35,6 +35,8 @@ import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
 import frc.robot.commands.Autonomous.autos.TwoBallAuto;
+import frc.robot.commands.Autonomous.autos.TwoBallAutoSimple;
+import frc.robot.commands.triggers.AutoShoot;
 import frc.robot.commands.triggers.FeedIn;
 import frc.robot.commands.triggers.FeedOut;
 import frc.robot.subsystems.ChimneySubsystem;
@@ -69,9 +71,10 @@ public class RobotContainer {
 
     // Shooting
     // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
-    final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
+    final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
     final JoystickButton indexerUpTwoBall = new JoystickButton(operatorController, Button.kRightBumper.value);
-    final POVButton indexerDown = new POVButton(operatorController, 0, 0);
+    final JoystickButton indexerUpTwoBallCC = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
@@ -114,15 +117,19 @@ public class RobotContainer {
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
     private final TraversalClimbManualCommand traversalClimbCommand = new TraversalClimbManualCommand(climber,
             climberPowerAnalog);
+    private final SeekCommand seekCommand = new SeekCommand(launcher, limelight, turret, aimCommand, false);
+    private final SeekCommand seekCommandCC = new SeekCommand(launcher, limelight, turret, aimCommand, true);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
     // Custom Triggers
     public final FeedIn pooperIn = new FeedIn(colorSensor);
     public final FeedOut pooperOut = new FeedOut(colorSensor);
-    public final Trigger autoShoot = new Trigger(
-            () -> aimCommand.getLockedOn() && limelight.getTargetVisible() && launcher.isReady()
-                    && Math.abs(drivetrain.getAverageVelocity().getAsDouble()) < 0.1);
+    public final Trigger autoShoot = new AutoShoot(() -> aimCommand.getLockedOn(), () -> launcher.isReady(),
+            drivetrain.getAverageVelocity());
+    public final Trigger runCompressor = new Trigger(
+            () -> intakeCommand.getFrontDown() || intakeCommand.getRearDown() || traversalClimbCommand.getClimberPower()
+                    || aimCommand.getTurretRunning());
 
     // Auto Chooser
     SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -173,7 +180,10 @@ public class RobotContainer {
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
         indexerUpTwoBall.and(autoShoot.negate())
-                .whileActiveContinuous(new SeekCommand(launcher, limelight, turret, aimCommand));
+                .whileActiveContinuous(seekCommand);
+
+        indexerUpTwoBallCC.and(autoShoot.negate())
+                .whileActiveContinuous(seekCommandCC);
 
         indexerUpTwoBall.and(autoShoot).whenActive(
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight),
@@ -242,10 +252,14 @@ public class RobotContainer {
 
         Command testAuto = getTestAuto();
 
+        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, intake, chimney, indexer, launcher, limelight, turret,
+         aimCommand);
+
         autoChooser.addOption("One Ball", oneBallAuto);
-        autoChooser.setDefaultOption("Two Ball", twoBallAuto);
+        autoChooser.addOption("Two Ball", twoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);
-        autoChooser.addOption("Five Ball", fiveBallAuto);
+        autoChooser.setDefaultOption("Five Ball", fiveBallAuto);
+        autoChooser.addOption("Two Ball Simple", simpleTwoBallAuto);
 
         autoChooser.addOption("Test Auto", testAuto);
         autoChooser.addOption("No Auto", nullAuto);

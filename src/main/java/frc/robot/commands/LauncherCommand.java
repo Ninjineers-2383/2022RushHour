@@ -80,4 +80,8 @@ public class LauncherCommand extends CommandBase {
     public boolean isFinished() {
         return false;
     }
+
+    public boolean launcherRunning() {
+        return m_speed.getAsDouble() > 50;
+    }
 }
