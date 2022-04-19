@@ -42,24 +42,23 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
         this.drivetrain = drivetrain;
 
         Trajectory trajectory1 = new Trajectory();
-        Trajectory trajectory2 = new Trajectory();
-        Trajectory trajectory3 = new Trajectory();
 
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath();
-            trajectory1 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/Two Ball First.wpilib.json"));
+            trajectory1 = TrajectoryUtil
+                    .fromPathweaverJson(trajectoryPath.resolve("output/Two Ball First.wpilib.json"));
         } catch (IOException ex) {
             DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
         }
 
-        final Trajectory traj1f = trajectory1;
+        final Trajectory trajectory1Final = trajectory1;
 
         // Run path following command, then stop at the end.
         addCommands(
                 new InstantCommand(
                         () -> {
                             // Reset odometry to the starting pose of the trajectory.
-                            drivetrain.resetOdometry(traj1f.getInitialPose());
+                            drivetrain.resetOdometry(trajectory1Final.getInitialPose());
                         }),
                 new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
 
@@ -71,8 +70,7 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
                         limelight),
 
-                new StopLaunchCommand(launcher, indexer, chimney, turret)
-            );
+                new StopLaunchCommand(launcher, indexer, chimney, turret));
 
     }
 
