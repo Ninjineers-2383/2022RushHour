@@ -73,8 +73,9 @@ public class RobotContainer {
     // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
     final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
-    final JoystickButton indexerUpTwoBall = new JoystickButton(operatorController, Button.kRightBumper.value);
-    final JoystickButton indexerUpTwoBallCC = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    final Trigger doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value)
+            .or(new JoystickButton(driverController, Button.kLeftBumper.value));
+    final JoystickButton doubleShotOnlySeek = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
@@ -87,7 +88,8 @@ public class RobotContainer {
     // Button.kBack.value); // left
     // special
     final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
-    final JoystickButton lowerBackFeeder = new JoystickButton(driverController, Button.kLeftBumper.value);
+    // final JoystickButton lowerBackFeeder = new JoystickButton(driverController,
+    // Button.kLeftBumper.value);
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     final JoystickButton chimneyUp = new JoystickButton(driverController, Button.kY.value);
     final JoystickButton barfToggle = new JoystickButton(operatorController, Button.kStart.value);
@@ -117,8 +119,8 @@ public class RobotContainer {
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
     private final TraversalClimbManualCommand traversalClimbCommand = new TraversalClimbManualCommand(climber,
             climberPowerAnalog);
-    private final SeekCommand seekCommand = new SeekCommand(launcher, limelight, turret, aimCommand, false);
-    private final SeekCommand seekCommandCC = new SeekCommand(launcher, limelight, turret, aimCommand, true);
+    private final SeekCommand seekAndShootCommand = new SeekCommand(launcher, limelight, turret, aimCommand, false);
+    private final SeekCommand seekButtonCommand = new SeekCommand(launcher, limelight, turret, aimCommand, true);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
@@ -179,13 +181,13 @@ public class RobotContainer {
 
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
-        indexerUpTwoBall.and(autoShoot.negate())
-                .whileActiveContinuous(seekCommand);
+        doubleShoot.and(autoShoot.negate())
+                .whenActive(seekAndShootCommand);
 
-        indexerUpTwoBallCC.and(autoShoot.negate())
-                .whileActiveContinuous(seekCommandCC);
+        doubleShotOnlySeek.and(autoShoot.negate())
+                .whenActive(seekButtonCommand);
 
-        indexerUpTwoBall.and(autoShoot).whenActive(
+        doubleShoot.and(autoShoot).whenActive(
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight),
                 false);
 
@@ -210,10 +212,10 @@ public class RobotContainer {
                         () -> intakeCommand.setFrontDown(false),
                         () -> intakeCommand.setFrontDown(true)));
 
-        lowerBackFeeder.toggleWhenPressed(
-                new StartEndCommand(
-                        () -> intakeCommand.setRearDown(false),
-                        () -> intakeCommand.setRearDown(true)));
+        // lowerBackFeeder.toggleWhenPressed(
+        // new StartEndCommand(
+        // () -> intakeCommand.setRearDown(false),
+        // () -> intakeCommand.setRearDown(true)));
 
         climberInvert.whenPressed(
                 () -> climber.invertMotorPowers());
@@ -252,14 +254,15 @@ public class RobotContainer {
 
         Command testAuto = getTestAuto();
 
-        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, intake, chimney, indexer, launcher, limelight, turret,
-         aimCommand);
+        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, intake, chimney, indexer, launcher, limelight,
+                turret,
+                aimCommand);
 
         autoChooser.addOption("One Ball", oneBallAuto);
         autoChooser.addOption("Two Ball", twoBallAuto);
+        autoChooser.addOption("Two Ball Simple", simpleTwoBallAuto);
         autoChooser.addOption("Four Ball", fourBallAuto);
         autoChooser.setDefaultOption("Five Ball", fiveBallAuto);
-        autoChooser.addOption("Two Ball Simple", simpleTwoBallAuto);
 
         autoChooser.addOption("Test Auto", testAuto);
         autoChooser.addOption("No Auto", nullAuto);
