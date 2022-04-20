@@ -123,8 +123,6 @@ public class RobotContainer {
     private final IntakeCommand intakeCommand = new IntakeCommand(intake, intakePower, false, false);
     private final TraversalClimbManualCommand traversalClimbCommand = new TraversalClimbManualCommand(climber,
             climberPowerAnalog);
-    private final SeekCommand seekAndShootCommand = new SeekCommand(launcher, limelight, turret, aimCommand, false);
-    private final SeekCommand seekButtonCommand = new SeekCommand(launcher, limelight, turret, aimCommand, true);
     private Trigger driverFrontFeed = new Trigger(() -> driverController.getRightTriggerAxis() > 0.1);
     private Trigger driverBackFeed = new Trigger(() -> driverController.getLeftTriggerAxis() > 0.1);
 
@@ -203,10 +201,12 @@ public class RobotContainer {
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
         doubleShoot.and(autoShoot.negate())
-                .whenActive(seekAndShootCommand);
+                .whenActive(
+                        new SeekCommand(launcher, limelight, turret, aimCommand, false));
 
         doubleShotOnlySeek.and(autoShoot.negate())
-                .whenActive(seekButtonCommand);
+                .whenActive(
+                        new SeekCommand(launcher, limelight, turret, aimCommand, true));
 
         doubleShoot.and(autoShoot).whenActive(
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight),
