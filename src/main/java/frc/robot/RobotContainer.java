@@ -1,5 +1,5 @@
 // JA 4/13 11:30am changed:
-// ClimberSubsytem to ClimberSubsystemNew
+// ClimberSubsystem to ClimberSubsystemNew
 // ClimberCommand to ClimberCommandNew
 // Added ClimberButtonAnalog
 
@@ -7,6 +7,10 @@ package frc.robot;
 
 import java.util.function.DoubleSupplier;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -161,6 +165,22 @@ public class RobotContainer {
         SmartDashboard.putBoolean("Aim Active", false);
 
         SetAutoCommands();
+
+        // Restart Photon Vision
+        try {
+            Unirest.setTimeouts(0, 0);
+            HttpResponse<String> response = Unirest.post("http://photonvision.local:5800/api/restartProgram")
+                    .header("Content-Type", "text/plain")
+                    .body("{}")
+                    .asString();
+
+            if (response.getStatus() != 200) {
+                DriverStation.reportError("PhotonVision returned non 200 code", false);
+            }
+
+        } catch (Exception e) {
+            DriverStation.reportError("Cannot restart Photon Vision", e.getStackTrace());
+        }
     }
 
     private void configureButtonBindings() {
