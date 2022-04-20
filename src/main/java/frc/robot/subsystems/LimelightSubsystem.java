@@ -20,6 +20,10 @@ public class LimelightSubsystem extends SubsystemBase {
     private double targetX;
     private double targetY;
 
+    public LimelightSubsystem() {
+        camera.setPipelineIndex(0); // Set the pipeline to 0, make sure the comp pipeline is the first pipeline
+    }
+
     @Override
     public void periodic() {
         PhotonPipelineResult res = camera.getLatestResult();
