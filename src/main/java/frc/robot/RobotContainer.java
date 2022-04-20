@@ -133,9 +133,10 @@ public class RobotContainer {
     public final FeedOut pooperOut = new FeedOut(colorSensor);
     public final Trigger autoShoot = new AutoShoot(() -> aimCommand.getLockedOn(), () -> launcher.isReady(),
             drivetrain.getAverageVelocity());
-    public final Trigger runCompressor = new Trigger(
-            () -> intakeCommand.getFrontDown() || intakeCommand.getRearDown() || traversalClimbCommand.getClimberPower()
-                    || aimCommand.getTurretRunning());
+    // public final Trigger runCompressor = new Trigger(
+    // () -> intakeCommand.getFrontDown(), () -> intakeCommand.getRearDown(), () ->
+    // traversalClimbCommand.getClimberPower(),
+    // () -> aimCommand.getTurretRunning());
 
     // Auto Chooser
     SendableChooser<Command> autoChooser = new SendableChooser<>();
