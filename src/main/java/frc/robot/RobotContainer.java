@@ -163,6 +163,8 @@ public class RobotContainer {
         climber.setDefaultCommand(traversalClimbCommand);
         SmartDashboard.putBoolean("Aim Active", false);
 
+        SmartDashboard.putString("Game Message", DriverStation.getGameSpecificMessage());
+
         SetAutoCommands();
 
         // Restart Photon Vision
