@@ -26,6 +26,8 @@ public class TurretCommand extends CommandBase {
         this.position = 6300;
         this.flipSeek = flipSeek;
         this.shouldMove = () -> true;
+
+        turret.seekDirection(flipSeek);
         addRequirements(turret);
     }
 
@@ -62,9 +64,10 @@ public class TurretCommand extends CommandBase {
         this.shouldMove = () -> true;
         addRequirements(turret);
     }
+
     @Override
     public void initialize() {
-        turret.seekDirection(flipSeek);
+
     }
 
     // Called every time the scheduler runs while the command is scheduled.
