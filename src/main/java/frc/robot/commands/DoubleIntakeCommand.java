@@ -15,9 +15,6 @@ public class DoubleIntakeCommand extends CommandBase {
     private boolean rearDown;
     private boolean movePistons = true;
 
-    private double previousFrontPower = Double.NaN;
-    private double previousRearPower = Double.NaN;
-
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a feeder command that takes in the feeder subsystem and runs
@@ -42,10 +39,6 @@ public class DoubleIntakeCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        if (movePistons) {
-            intake.setFrontDown(frontDown);
-            intake.setRearDown(rearDown);
-        }
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -53,14 +46,12 @@ public class DoubleIntakeCommand extends CommandBase {
     public void execute() {
         // See FeederSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        double d_frontPower = frontPower.getAsDouble();
-        double d_rearPower = rearPower.getAsDouble();
-        if (d_frontPower == previousFrontPower && d_rearPower == previousRearPower) {
-            return;
+        intake.setPower2(frontPower.getAsDouble(), rearPower.getAsDouble());
+        // m_subsystem.kickV(m_speed.getAsDouble());
+        if (movePistons) {
+            intake.setFrontDown(frontDown);
+            intake.setRearDown(rearDown);
         }
-        intake.setPower2(d_frontPower, d_rearPower);
-        previousFrontPower = d_frontPower;
-        previousRearPower = d_rearPower;
     }
 
     public void setFrontDown(boolean state) {

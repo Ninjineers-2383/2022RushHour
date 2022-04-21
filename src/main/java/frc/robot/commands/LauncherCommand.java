@@ -19,8 +19,6 @@ public class LauncherCommand extends CommandBase {
 
     double timeOut;
 
-    private double previousSpeed = Double.NaN;
-
     Timer timer = new Timer();
 
     // Creates a command that takes in a subsystem and speed and runs specific
@@ -63,12 +61,7 @@ public class LauncherCommand extends CommandBase {
     public void execute() {
         // see LauncherSubsystem.java for more details on how spin() method works
         if (m_shouldChangeSpeed.getAsBoolean()) {
-            double d_speed = m_speed.getAsDouble();
-            if (d_speed == previousSpeed) {
-                return;
-            }
-            m_subsystem.spin(d_speed);
-            previousSpeed = d_speed;
+            m_subsystem.spin(m_speed.getAsDouble());
         }
     }
 

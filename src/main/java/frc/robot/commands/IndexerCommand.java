@@ -11,8 +11,6 @@ public class IndexerCommand extends CommandBase {
     private final IndexerSubsystem indexer;
     private final DoubleSupplier power;
 
-    private double previousPower = Double.NaN;
-
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a kicker command that takes in the kicker subsystem and runs
@@ -28,12 +26,7 @@ public class IndexerCommand extends CommandBase {
     public void execute() {
         // See KickerSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        double d_power = power.getAsDouble();
-        if (d_power == previousPower) {
-            return;
-        }
-        indexer.setPower(d_power);
-        previousPower = d_power;
+        indexer.setPower(power.getAsDouble());
         // m_subsystem.kickV(m_speed.getAsDouble());
     }
 
