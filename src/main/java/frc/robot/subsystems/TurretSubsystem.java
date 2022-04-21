@@ -43,10 +43,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
-            power = -100.0;
+            power = -500.0;
             boundsState = TurretBoundsState.UnderBounds;
         } else if (getCurrentPosition() < -Turret.BOUNDS) {
-            power = 100.0;
+            power = 500.0;
             boundsState = TurretBoundsState.OverBounds;
         }
         motor.set(ControlMode.Velocity, power);
@@ -56,7 +56,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Rotates til side flips, then rotates other direction
     public void seek() {
-        setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
+        setPower(boundsState == TurretBoundsState.OverBounds ? -Turret.SEEKING_POWER : Turret.SEEKING_POWER);
     }
 
     public void seekDirection(boolean direction) {

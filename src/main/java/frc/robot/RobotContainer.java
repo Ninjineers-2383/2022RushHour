@@ -30,7 +30,6 @@ import frc.robot.commands.TraversalClimbManualCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
-import frc.robot.commands.AutomatedCommands.TraversalClimbSequence;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
@@ -227,8 +226,6 @@ public class RobotContainer {
                 new StartEndCommand(
                         () -> drivetrain.toggleTippingEnabled(),
                         () -> drivetrain.toggleTippingDisabled()));
-
-        NinjaClimb.whenPressed(new TraversalClimbSequence(drivetrain, intake, climber));
     }
 
     public Command getAutonomousCommand() {
@@ -252,8 +249,9 @@ public class RobotContainer {
 
         Command testAuto = getTestAuto();
 
-        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, intake, chimney, indexer, launcher, limelight, turret,
-         aimCommand);
+        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, intake, chimney, indexer, launcher, limelight,
+                turret,
+                aimCommand);
 
         autoChooser.addOption("One Ball", oneBallAuto);
         autoChooser.addOption("Two Ball", twoBallAuto);
