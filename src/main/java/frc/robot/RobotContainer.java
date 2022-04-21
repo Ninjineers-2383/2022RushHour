@@ -77,8 +77,7 @@ public class RobotContainer {
     // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
     final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
-    final Trigger doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value)
-            .or(new JoystickButton(driverController, Button.kLeftBumper.value));
+    final Trigger doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value);
     final JoystickButton doubleShotOnlySeek = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
     // Aiming
@@ -92,8 +91,8 @@ public class RobotContainer {
     // Button.kBack.value); // left
     // special
     final JoystickButton lowerFrontFeeder = new JoystickButton(driverController, Button.kRightBumper.value);
-    // final JoystickButton lowerBackFeeder = new JoystickButton(driverController,
-    // Button.kLeftBumper.value);
+    final JoystickButton lowerBackFeeder = new JoystickButton(driverController,
+            Button.kLeftBumper.value);
     final JoystickButton feedOut = new JoystickButton(driverController, Button.kA.value);
     final JoystickButton chimneyUp = new JoystickButton(driverController, Button.kY.value);
     final JoystickButton barfToggle = new JoystickButton(operatorController, Button.kStart.value);
@@ -203,11 +202,11 @@ public class RobotContainer {
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
         doubleShoot.and(autoShoot.negate())
-                .whenActive(
+                .whileActiveContinuous(
                         new SeekCommand(launcher, limelight, turret, aimCommand, false));
 
         doubleShotOnlySeek.and(autoShoot.negate())
-                .whenActive(
+                .whileActiveContinuous(
                         new SeekCommand(launcher, limelight, turret, aimCommand, true));
 
         doubleShoot.and(autoShoot).whenActive(
@@ -235,10 +234,10 @@ public class RobotContainer {
                         () -> intakeCommand.setFrontDown(false),
                         () -> intakeCommand.setFrontDown(true)));
 
-        // lowerBackFeeder.toggleWhenPressed(
-        // new StartEndCommand(
-        // () -> intakeCommand.setRearDown(false),
-        // () -> intakeCommand.setRearDown(true)));
+        lowerBackFeeder.toggleWhenPressed(
+                new StartEndCommand(
+                        () -> intakeCommand.setRearDown(false),
+                        () -> intakeCommand.setRearDown(true)));
 
         climberInvert.whenPressed(
                 () -> climber.invertMotorPowers());
