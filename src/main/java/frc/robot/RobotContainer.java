@@ -78,7 +78,7 @@ public class RobotContainer {
     final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
     final Trigger doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value);
-    final JoystickButton doubleShotOnlySeek = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    final JoystickButton doubleShotOverride = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
     // Aiming
     final POVButton limelightTarget = new POVButton(operatorController, 270, 0);
@@ -205,13 +205,8 @@ public class RobotContainer {
                 .whileActiveContinuous(
                         new SeekCommand(launcher, limelight, turret, aimCommand, false));
 
-        doubleShotOnlySeek.and(autoShoot.negate())
-                .whileActiveContinuous(
-                        new SeekCommand(launcher, limelight, turret, aimCommand, true));
-
-        doubleShoot.and(autoShoot).whenActive(
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight),
-                false);
+        doubleShoot.and(autoShoot).or(doubleShotOverride).whenActive(
+                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight).withTimeout(1.3));
 
         driverFrontFeed.whenActive(
                 new InstantCommand(
