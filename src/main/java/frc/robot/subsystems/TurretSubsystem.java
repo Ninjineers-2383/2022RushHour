@@ -56,7 +56,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // Rotates til side flips, then rotates other direction
     public void seek() {
-        setPower(boundsState == TurretBoundsState.OverBounds ? -Turret.SEEKING_POWER : Turret.SEEKING_POWER);
+        setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
     }
 
     public void seekDirection(boolean direction) {
