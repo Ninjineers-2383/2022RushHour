@@ -21,8 +21,4 @@ public class TraversalClimbManualCommand extends CommandBase {
     public void execute() {
         subsystem.setPower(climbPower.getAsDouble(), climbPower.getAsDouble());
     }
-
-    public boolean getClimberPower() {
-        return climbPower.getAsDouble() > 0.1;
-    }
 }

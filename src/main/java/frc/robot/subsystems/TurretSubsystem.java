@@ -43,10 +43,10 @@ public class TurretSubsystem extends SubsystemBase {
 
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
-            power = -100.0;
+            power = -500.0;
             boundsState = TurretBoundsState.UnderBounds;
         } else if (getCurrentPosition() < -Turret.BOUNDS) {
-            power = 100.0;
+            power = 500.0;
             boundsState = TurretBoundsState.OverBounds;
         }
         motor.set(ControlMode.Velocity, power);

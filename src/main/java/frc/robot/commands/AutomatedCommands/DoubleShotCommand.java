@@ -28,7 +28,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
         addCommands(
                 new LauncherCommand(launcher,
                         () -> limelight.getLaunchingVelocity(),
-                        () -> true).withTimeout(0),
+                        () -> true).withTimeout(0.1),
                 new InstantCommand(() -> launchVelocity = limelight
                         .getLaunchingVelocity()),
                 new ParallelDeadlineGroup(
