@@ -49,7 +49,7 @@ public class LimelightCommand extends CommandBase {
         turretSeek = false;
 
         double error = limelightF.calculate(limelight.getX());
-        lockedOn = error < 0.5 && limelight.getTargetVisible();
+        lockedOn = error < 3 && limelight.getTargetVisible();
         if (limelight.getTargetVisible()) {
             limelight.setLimelight(true);
             turretPower = -MathUtil.clamp(((Math.abs(error) > 0.4) ? 1 : 0) * (Turret.kP * error), -Turret.ADJUST_POWER,

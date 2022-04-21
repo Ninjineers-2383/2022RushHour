@@ -104,7 +104,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
                         getRamseteCommand(trajectory4),
                         new TurretCommand(turret, 19600)),
 
-                new SeekCommand(launcher, limelight, turret, aimCommand, false).withTimeout(0.4),
+                new SeekCommand(launcher, limelight, turret, aimCommand, true).withTimeout(0.4),
 
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
                         limelight),

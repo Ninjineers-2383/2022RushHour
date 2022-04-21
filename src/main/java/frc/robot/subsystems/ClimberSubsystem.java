@@ -70,6 +70,8 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void setPower(double left, double right, double hookPower) {
+        // double kP = 0.001;
+        // if ( )
         if (left_encoder.getPosition() < 3) {
             left_climber.set(left * 0.5);
             right_climber.set(right * 0.5);

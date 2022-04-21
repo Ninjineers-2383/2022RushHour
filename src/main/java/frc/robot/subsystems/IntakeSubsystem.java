@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // frontMotor.setSafetyEnabled();
         frontMotor.setInverted(false);
         rearMotor.setInverted(false);
-        enableCompressor(true);
+        compressor.enableDigital();
     }
 
     // deployed intakes turn on
@@ -80,13 +80,5 @@ public class IntakeSubsystem extends SubsystemBase {
         boolean rear = !rearUpSolenoid.get();
         SmartDashboard.putBoolean("get rear up", rear);
         return rear;
-    }
-
-    public void enableCompressor(boolean enable) {
-        if (enable) {
-            compressor.enableDigital();
-        } else {
-            compressor.disable();
-        }
     }
 }

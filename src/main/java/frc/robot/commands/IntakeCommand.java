@@ -42,12 +42,6 @@ public class IntakeCommand extends CommandBase {
             intake.setPower(0.0);
         }
 
-        if (frontDown || rearDown) {
-            intake.enableCompressor(false);
-        } else {
-            intake.enableCompressor(true);
-        }
-
         intake.setFrontDown(frontDown);
         intake.setRearDown(rearDown);
     }
