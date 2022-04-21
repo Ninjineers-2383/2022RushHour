@@ -98,7 +98,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
 
                 getRamseteCommand(trajectory3),
 
-                new WaitCommand(0.5),
+                new WaitCommand(0.8),
 
                 new ParallelDeadlineGroup(
                         getRamseteCommand(trajectory4),

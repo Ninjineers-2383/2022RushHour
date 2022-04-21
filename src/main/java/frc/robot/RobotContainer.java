@@ -70,8 +70,8 @@ public class RobotContainer {
 
     // Shooting
     // final POVButton launchLowButton = new POVButton(operatorController, 180, 0);
-    final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
-    final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
+    final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kY.value);
+    final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kX.value);
     final JoystickButton indexerUpTwoBall = new JoystickButton(operatorController, Button.kRightBumper.value);
     final JoystickButton indexerUpTwoBallCC = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
@@ -154,7 +154,8 @@ public class RobotContainer {
                 new ChimneyCommand(chimney,
                         intakePower));
         intake.setDefaultCommand(intakeCommand);
-        climber.setDefaultCommand(traversalClimbCommand);
+        climber.setDefaultCommand(new TraversalClimbManualCommand(climber,
+                climberPowerAnalog));
         SmartDashboard.putBoolean("Aim Active", false);
 
         SetAutoCommands();

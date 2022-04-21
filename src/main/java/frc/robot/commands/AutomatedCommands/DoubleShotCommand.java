@@ -33,7 +33,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
                         .getLaunchingVelocity()),
                 new ParallelDeadlineGroup(
                         new IndexerCommand(indexer, () -> 0.8).withTimeout(2),
-                        new ChimneyCommand(chimney, () -> -0.9),
+                        new ChimneyCommand(chimney, () -> -1),
                         new TurretCommand(turret, () -> 0,
                                 () -> false),
                         new LauncherCommand(launcher,
