@@ -204,7 +204,7 @@ public class RobotContainer {
         indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
 
         doubleShoot.and(autoShoot.negate())
-                .whenActive(seekAndShootCommand);
+                .whileActiveContinuous(seekAndShootCommand);
 
         doubleShoot.and(autoShoot).or(doubleShotOverride).whenActive(
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher, limelight).withTimeout(1.2),
