@@ -49,7 +49,7 @@ public class LimelightSubsystem extends SubsystemBase {
     public double getLaunchingVelocity() {
         double y = getY();
         // return -230 * y + 12500;
-        return 12801 + (-86.1 * y) + (8.22 * y * y); // https://www.desmos.com/calculator/3hmh5agnm1
+        return 12650 + (-86.1 * y) + (8.22 * y * y); // https://www.desmos.com/calculator/3hmh5agnm1
     }
 
     public boolean getTargetVisible() {

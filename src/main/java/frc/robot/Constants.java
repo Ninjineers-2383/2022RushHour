@@ -15,7 +15,7 @@ public final class Constants {
         public final static int PORT = 3;
         public final static int FULL_ROTATION = 30000;
         public final static int BOUNDS = 45000;
-        public final static double SEEKING_POWER = 5000;
+        public final static double SEEKING_POWER = 4000;
         public final static double ADJUST_POWER = 3000;
         public final static double kP = 70; // 0.012
         public final static double kP_CENTER = 0.21;

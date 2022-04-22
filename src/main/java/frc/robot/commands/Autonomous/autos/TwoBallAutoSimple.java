@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Turret;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LimelightCommand;
+import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
@@ -64,8 +66,11 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand, false))),
+                        new TurretCommand(turret, Turret.OFFSET_TICKS)),
+                        
+                        
+                new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
+                                aimCommand, false)).withTimeout(0.5),
 
                 new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
                         limelight),

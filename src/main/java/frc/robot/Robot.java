@@ -77,6 +77,8 @@ public class Robot extends TimedRobot {
         for (Integer i = 0; i < channels; i++) {
             SmartDashboard.putNumber("PDP Channel " + i.toString(), pdp.getCurrent(i));
         }
+
+        m_robotContainer.robotPeriodic();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

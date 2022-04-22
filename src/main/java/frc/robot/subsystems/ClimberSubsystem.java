@@ -70,15 +70,10 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public void setPower(double left, double right, double hookPower) {
-        // double kP = 0.001;
-        // if ( )
-        if (left_encoder.getPosition() < 3) {
-            left_climber.set(left * 0.5);
-            right_climber.set(right * 0.5);
-        } else {
-            left_climber.set(left);
-            right_climber.set(right);
-        }
+        double kP = 1;
+        double error = left_encoder.getPosition() - right_encoder.getPosition();
+        left_climber.set(left - error * kP);
+        right_climber.set(right + error * kP);
     }
 
     public void switchBrakeCoast(boolean isBrake) {
