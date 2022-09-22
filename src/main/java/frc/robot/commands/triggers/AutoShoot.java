@@ -27,6 +27,7 @@ public class AutoShoot extends Trigger {
     public boolean get() {
         SmartDashboard.putBoolean("lock Boolean", lock.getAsBoolean());
         SmartDashboard.putBoolean("spin Boolean", spin.getAsBoolean());
+        SmartDashboard.putNumber("autoShoot Timer", timer.get());
         if (lock.getAsBoolean() && spin.getAsBoolean() && Math.abs(driveSpeed.getAsDouble()) < 0.1) {
             if (!lockedOn) {
                 timer.reset();

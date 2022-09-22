@@ -30,6 +30,7 @@ import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TraversalClimbManualCommand;
+import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
@@ -85,7 +86,9 @@ public class RobotContainer {
     private final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
 
-    LimelightSubsystem limelight;
+    LimelightSubsystem limelight = new LimelightSubsystem();
+
+    public final SeekCommand seekCommand = new SeekCommand(launcher, limelight, turret, false);
 
     JoystickButton doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value);
     JoystickButton doubleShotOverride = new JoystickButton(operatorController, Button.kLeftBumper.value);
@@ -146,17 +149,19 @@ public class RobotContainer {
         limelight.setDefaultCommand(new LimelightCommand(limelight, turretTicks, driveTrainVelocity));
         climber.setDefaultCommand(new TraversalClimbManualCommand(climber, () -> operatorController.getLeftY(),
                 () -> operatorController.getRightY(), () -> operatorController.getYButton()));
+        turret.setDefaultCommand(new TurretCommand(turret, Constants.Turret.OFFSET_TICKS));
     }
 
     private void configureButtonBindings() {
         // backup kicker control if limelight fails
-        indexerUp.whileHeld(new IndexerCommand(indexer, () -> 1));
+        indexerUp.whenHeld(new IndexerCommand(indexer, () -> 1));
 
-        indexerDown.whileHeld(new IndexerCommand(indexer, () -> -1));
+        indexerDown.whenHeld(new IndexerCommand(indexer, () -> -1));
 
         doubleShoot.and(autoShoot.negate())
-                .whileActiveContinuous(
-                        new SeekCommand(launcher, limelight, turret, false));
+                .whenActive(seekCommand);
+
+        doubleShoot.negate().cancelWhenActive(seekCommand);
 
         doubleShoot.and(autoShoot).or(doubleShotOverride).whenActive(
                 new DoubleShotCommand(chimney, turret, indexer, launcher, limelight).withTimeout(1.3));
@@ -165,6 +170,8 @@ public class RobotContainer {
                 new StartEndCommand(
                         () -> drivetrain.toggleTippingEnabled(),
                         () -> drivetrain.toggleTippingDisabled()));
+
+        SmartDashboard.putData("Seek Command", seekCommand);
     }
 
     public Command getAutonomousCommand() {

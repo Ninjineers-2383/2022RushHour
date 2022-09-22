@@ -24,4 +24,9 @@ public class BrakeCoastSwitchCommand extends CommandBase {
         drivetrain.switchBrakeCoast(current);
         climber.switchBrakeCoast(current);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+
+    }
 }

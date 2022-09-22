@@ -38,7 +38,7 @@ public class LauncherSubsystem extends SubsystemBase {
     }
 
     public boolean isReady() {
-        final int THRESHOLD = 300;
+        final int THRESHOLD = 1000;
         boolean ready = false;
         if (masterMotor.getControlMode() == ControlMode.Velocity) {
             ready = masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - THRESHOLD

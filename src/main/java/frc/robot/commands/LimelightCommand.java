@@ -14,24 +14,17 @@ public class LimelightCommand extends CommandBase {
 
     private final LimelightSubsystem limelight;
 
-    MedianFilter limelightF = new MedianFilter(5);
+    private final MedianFilter limelightF = new MedianFilter(5);
 
-    DoubleSupplier driveVelocity;
+    private final DoubleSupplier turretTicks;
 
-    DoubleSupplier turretTicks;
-
-    public LimelightCommand(LimelightSubsystem limelight) {
-        this.limelight = limelight;
-        this.driveVelocity = () -> 0;
-        this.turretTicks = () -> 0;
-        addRequirements(limelight);
-    }
+    private final DoubleSupplier drivetrainVelocity;
 
     public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks,
             DoubleSupplier drivetrainVelocity) {
         this.limelight = limelight;
-        this.driveVelocity = drivetrainVelocity;
         this.turretTicks = turretTicks;
+        this.drivetrainVelocity = drivetrainVelocity;
         addRequirements(limelight);
     }
 
@@ -42,6 +35,7 @@ public class LimelightCommand extends CommandBase {
 
         double error = limelightF.calculate(limelight.getX());
         boolean lockedOn = error < 3 && limelight.getTargetVisible();
+        limelight.setLockedOn(lockedOn);
 
         SmartDashboard.putBoolean("Locked On", lockedOn);
 

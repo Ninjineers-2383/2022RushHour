@@ -31,7 +31,12 @@ public class ChimneyCommand extends CommandBase {
         if (b_power == previousPower) {
             return;
         }
-        chimney.setPower(b_power ? -1.0 : 0.0);
+        chimney.setPower(b_power ? 1.0 : 0.0);
         previousPower = b_power;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        chimney.setPower(0.0);
     }
 }

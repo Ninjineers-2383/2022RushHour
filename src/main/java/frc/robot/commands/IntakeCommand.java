@@ -39,10 +39,16 @@ public class IntakeCommand extends CommandBase {
         // 1 degree of rotation = 145.695364 ticks
         if (power.getAsBoolean()) {
             intake.setDown(true);
-            intake.setPower(1.0);
+            intake.setPower(-1.0);
         } else {
             intake.setDown(false);
             intake.setPower(0.0);
         }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.setDown(false);
+        intake.setPower(0.0);
     }
 }

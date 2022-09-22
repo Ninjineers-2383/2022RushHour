@@ -29,16 +29,13 @@ public class IndexerCommand extends CommandBase {
         // See KickerSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
         double d_power = power.getAsDouble();
-        if (d_power == previousPower) {
-            return;
-        }
         indexer.setPower(d_power);
-        previousPower = d_power;
         // m_subsystem.kickV(m_speed.getAsDouble());
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        indexer.setPower(0.0);
     }
 }
