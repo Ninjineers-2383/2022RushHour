@@ -9,7 +9,6 @@ import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.commands.Autonomous.AutoTurn;
@@ -24,40 +23,40 @@ import frc.robot.subsystems.TurretSubsystem;
 public class FourBallAuto extends SequentialCommandGroup {
 
     public FourBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
                 new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
-                        new ChimneyCommand(chimney, () -> -0.75).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> true).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
-                        new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+                        new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
                                 new TurretCommand(turret,
-                                        () -> aimCommand.getTurretPower(),
-                                        () -> aimCommand.getTurretSeek())
+                                        () -> limelight.getTurretPower(),
+                                        () -> limelight.getTurretSeek())
                                         .withTimeout(1.5)),
                         new SequentialCommandGroup(
                                 new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                         .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0)
+                                new ChimneyCommand(chimney, () -> false)
                                         .withTimeout(0.1),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.3),
                                 new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1)
+                                new ChimneyCommand(chimney, () -> true)
                                         .withTimeout(0.5),
-                                new ChimneyCommand(chimney, () -> -0.5)
+                                new ChimneyCommand(chimney, () -> true)
                                         .withTimeout(0.15),
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.4))),
                 new ParallelCommandGroup( // Stop launch system
                         new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                        new ChimneyCommand(chimney, () -> -0.8).withTimeout(0.1),
+                        new ChimneyCommand(chimney, () -> true).withTimeout(0.1),
                         new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
@@ -72,22 +71,22 @@ public class FourBallAuto extends SequentialCommandGroup {
                                 -18000),
                         new AutoForward(drivetrain, 11.5, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                                () -> aimCommand.getTurretSeek(), true)
+                        new TurretCommand(turret, () -> limelight.getTurretPower(),
+                                () -> limelight.getTurretSeek(), true)
                                 .withTimeout(1),
                         new LauncherCommand(launcher,
                                 () -> limelight.getLaunchingVelocity())),
-                new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                        () -> aimCommand.getTurretSeek(), true)
+                new TurretCommand(turret, () -> limelight.getTurretPower(),
+                        () -> limelight.getTurretSeek(), true)
                         .withTimeout(0.2),
-                new ChimneyCommand(chimney, () -> 0)
+                new ChimneyCommand(chimney, () -> false)
                         .withTimeout(0.1),
                 new IndexerCommand(indexer, () -> 0.75)
                         .withTimeout(0.3),
                 new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
-                new ChimneyCommand(chimney, () -> -1)
+                new ChimneyCommand(chimney, () -> true)
                         .withTimeout(0.2),
-                new ChimneyCommand(chimney, () -> 0)
+                new ChimneyCommand(chimney, () -> false)
                         .withTimeout(0.05),
                 new IndexerCommand(indexer, () -> 0.75)
                         .withTimeout(0.5));

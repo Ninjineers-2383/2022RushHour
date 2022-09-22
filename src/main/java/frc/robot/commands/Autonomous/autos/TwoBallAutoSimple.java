@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
@@ -36,8 +35,8 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
     private DrivetrainSubsystem drivetrain;
 
     public TwoBallAutoSimple(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            TurretSubsystem turret) {
 
         this.drivetrain = drivetrain;
 
@@ -60,15 +59,13 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(trajectory1Final.getInitialPose());
                         }),
-                new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+                new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand, false))),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
 
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
-                        limelight),
+                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
 
                 new StopLaunchCommand(launcher, indexer, chimney, turret));
 

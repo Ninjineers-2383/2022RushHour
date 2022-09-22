@@ -14,12 +14,6 @@ public class LimelightCommand extends CommandBase {
 
     private final LimelightSubsystem limelight;
 
-    private double turretPower = 0;
-
-    private boolean turretSeek = false;
-
-    private boolean lockedOn = false;
-
     MedianFilter limelightF = new MedianFilter(5);
 
     DoubleSupplier driveVelocity;
@@ -44,36 +38,22 @@ public class LimelightCommand extends CommandBase {
     // fix bounds issue!
     @Override
     public void execute() {
-        SmartDashboard.putBoolean("Locked On", lockedOn);
-
-        turretSeek = false;
+        limelight.setTurretSeek(false);
 
         double error = limelightF.calculate(limelight.getX());
-        lockedOn = error < 3 && limelight.getTargetVisible();
+        boolean lockedOn = error < 3 && limelight.getTargetVisible();
+
+        SmartDashboard.putBoolean("Locked On", lockedOn);
+
         if (limelight.getTargetVisible()) {
             limelight.setLimelight(true);
-            turretPower = -MathUtil.clamp(((Math.abs(error) > 0.4) ? 1 : 0) * (Turret.kP * error), -Turret.ADJUST_POWER,
+            double turretPower = -MathUtil.clamp(((Math.abs(error) > 0.4) ? 1 : 0) * (Turret.kP * error),
+                    -Turret.ADJUST_POWER,
                     Turret.ADJUST_POWER);
+            limelight.setTurretPower(turretPower);
         } else {
             // no target present
-            turretSeek = true;
+            limelight.setTurretSeek(true);
         }
     }
-
-    public double getTurretPower() {
-        return turretPower;
-    }
-
-    public boolean getTurretSeek() {
-        return turretSeek;
-    }
-
-    public boolean getLockedOn() {
-        return lockedOn;
-    }
-
-    public boolean getTurretRunning() {
-        return turretPower > 0.05;
-    }
-
 }

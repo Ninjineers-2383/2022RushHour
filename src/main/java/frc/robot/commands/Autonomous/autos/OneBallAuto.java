@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -18,8 +17,8 @@ import frc.robot.subsystems.TurretSubsystem;
 public class OneBallAuto extends SequentialCommandGroup {
 
     public OneBallAuto(DrivetrainSubsystem drivetrain,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
                 new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
@@ -30,8 +29,8 @@ public class OneBallAuto extends SequentialCommandGroup {
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
                                 .withTimeout(0.9),
-                        new TurretCommand(turret, () -> aimCommand.getTurretPower() * 1.5,
-                                () -> aimCommand.getTurretSeek())
+                        new TurretCommand(turret, () -> limelight.getTurretPower() * 1.5,
+                                () -> limelight.getTurretSeek())
                                 .withTimeout(1.2),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),

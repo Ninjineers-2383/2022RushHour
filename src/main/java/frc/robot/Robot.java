@@ -128,7 +128,8 @@ public class Robot extends TimedRobot {
         // Alliance alliance = DriverStation.getAlliance();
         // m_robotContainer.colorSensor.setColor(alliance == Alliance.Blue ? "blue" :
         // alliance == Alliance.Red ? "red" : "invalid");
-        m_robotContainer.intake.setPower(0.0);
+        m_robotContainer.frontIntake.setPower(0.0);
+        m_robotContainer.rearIntake.setPower(0.0);
     }
 
     public void brakeMotors() {

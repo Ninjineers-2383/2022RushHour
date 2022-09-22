@@ -4,21 +4,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class SeekCommand extends ParallelCommandGroup {
-    private final LimelightCommand aimCommand;
     private final LimelightSubsystem limelight;
     private final LauncherSubsystem launcher;
 
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public SeekCommand(LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand, boolean seekDirection) {
-        this.aimCommand = aimCommand;
+            boolean seekDirection) {
         this.limelight = limelight;
         this.launcher = launcher;
         addCommands(
@@ -26,8 +23,8 @@ public class SeekCommand extends ParallelCommandGroup {
                         () -> (limelight
                                 .getLaunchingVelocity()),
                         () -> true),
-                new TurretCommand(turret, () -> aimCommand.getTurretPower(),
-                        () -> aimCommand.getTurretSeek(),
+                new TurretCommand(turret, () -> limelight.getTurretPower(),
+                        () -> limelight.getTurretSeek(),
                         seekDirection),
                 new StartEndCommand(
                         () -> SmartDashboard.putBoolean("Aim Active", true),
@@ -36,6 +33,6 @@ public class SeekCommand extends ParallelCommandGroup {
 
     @Override
     public boolean isFinished() {
-        return aimCommand.getLockedOn() && limelight.getTargetVisible() && launcher.isReady();
+        return limelight.getLockedOn() && limelight.getTargetVisible() && launcher.isReady();
     }
 }

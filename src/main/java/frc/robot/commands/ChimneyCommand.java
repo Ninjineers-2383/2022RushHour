@@ -1,6 +1,6 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ChimneySubsystem;
@@ -9,14 +9,14 @@ public class ChimneyCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private final ChimneySubsystem chimney;
-    private final DoubleSupplier power;
-    private double previousPower = Double.NaN;
+    private final BooleanSupplier power;
+    private boolean previousPower = false;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs
     // Chimney subsystem actions.
-    public ChimneyCommand(ChimneySubsystem chimney, DoubleSupplier power) {
+    public ChimneyCommand(ChimneySubsystem chimney, BooleanSupplier power) {
         this.chimney = chimney;
         this.power = power;
         addRequirements(chimney);
@@ -27,12 +27,11 @@ public class ChimneyCommand extends CommandBase {
     public void execute() {
         // See ChimneySubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        double d_power = power.getAsDouble();
-        if (d_power == previousPower) {
+        boolean b_power = power.getAsBoolean();
+        if (b_power == previousPower) {
             return;
         }
-        chimney.setPower(-d_power);
-        previousPower = d_power;
-        // m_subsystem.kickV(m_speed.getAsDouble());
+        chimney.setPower(b_power ? -1.0 : 0.0);
+        previousPower = b_power;
     }
 }

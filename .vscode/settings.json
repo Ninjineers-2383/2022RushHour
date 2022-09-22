@@ -42,6 +42,7 @@
   "wpilib.autoStartRioLog": false,
   "cSpell.words": [
     "AHRS",
+    "CTREPCM",
     "Feedforward",
     "odometry",
     "pooper",

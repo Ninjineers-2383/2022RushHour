@@ -23,7 +23,6 @@ import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
@@ -41,8 +40,8 @@ public class TwoBallAuto extends SequentialCommandGroup {
     private DrivetrainSubsystem drivetrain;
 
     public TwoBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            TurretSubsystem turret) {
 
         this.drivetrain = drivetrain;
 
@@ -52,7 +51,8 @@ public class TwoBallAuto extends SequentialCommandGroup {
 
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath();
-            trajectory1 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/Two Ball First.wpilib.json"));
+            trajectory1 = TrajectoryUtil
+                    .fromPathweaverJson(trajectoryPath.resolve("output/Two Ball First.wpilib.json"));
             trajectory2 = TrajectoryUtil
                     .fromPathweaverJson(trajectoryPath.resolve("output/Screw Other Ball.wpilib.json"));
             trajectory3 = TrajectoryUtil
@@ -71,47 +71,44 @@ public class TwoBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+                new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand, false))),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
 
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
-                        limelight),
+                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
 
                 new StopLaunchCommand(launcher, indexer, chimney, turret),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory2),
-                        new IntakeCommand(intake, () -> -0.8, true, false)),
+                        new IntakeCommand(intake, () -> true, true, false)),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory3),
-                        new IntakeCommand(intake, () -> -0.8, false, true)),
+                        new IntakeCommand(intake, () -> true, false, true)),
 
                 new ParallelRaceGroup(
-                    new TurretCommand(turret, 25000),
-                    new LauncherCommand(launcher, () -> 6000)),
+                        new TurretCommand(turret, 25000),
+                        new LauncherCommand(launcher, () -> 6000)),
 
                 new SequentialCommandGroup(
-                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
-                                        .withTimeout(0.2),
-                                new ChimneyCommand(chimney, () -> 0)
-                                        .withTimeout(0.1),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.3),
-                                new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
-                                new ChimneyCommand(chimney, () -> -1)
-                                        .withTimeout(0.5),
-                                new ChimneyCommand(chimney, () -> -0.5)
-                                        .withTimeout(0.15),
-                                new IndexerCommand(indexer, () -> 0.75)
-                                        .withTimeout(0.4)),
+                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                .withTimeout(0.2),
+                        new ChimneyCommand(chimney, () -> false)
+                                .withTimeout(0.1),
+                        new IndexerCommand(indexer, () -> 0.75)
+                                .withTimeout(0.3),
+                        new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+                        new ChimneyCommand(chimney, () -> true)
+                                .withTimeout(0.5),
+                        new ChimneyCommand(chimney, () -> true)
+                                .withTimeout(0.15),
+                        new IndexerCommand(indexer, () -> 0.75)
+                                .withTimeout(0.4)),
 
-                new StopLaunchCommand(launcher, indexer, chimney, turret)
-            );
+                new StopLaunchCommand(launcher, indexer, chimney, turret));
 
     }
 

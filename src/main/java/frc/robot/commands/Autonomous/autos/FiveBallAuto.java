@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
@@ -36,9 +35,10 @@ import frc.robot.subsystems.TurretSubsystem;
 public class FiveBallAuto extends SequentialCommandGroup {
     private DrivetrainSubsystem drivetrain;
 
-    public FiveBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight, TurretSubsystem turret,
-            LimelightCommand aimCommand) {
+    public FiveBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem rearIntake,
+            ChimneySubsystem chimney,
+            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            TurretSubsystem turret) {
 
         this.drivetrain = drivetrain;
 
@@ -68,20 +68,19 @@ public class FiveBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                new IntakeCommand(intake, () -> -0.8, false, true).withTimeout(0.1),
+                // TODO: May be the wrong intake
+                new IntakeCommand(rearIntake, () -> true, false, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
-                                aimCommand, false))),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
 
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
-                        limelight),
+                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
 
                 new StopLaunchCommand(launcher, indexer, chimney, turret),
                 // new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
 
-                new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
+                new IntakeCommand(rearIntake, () -> true, true, false).withTimeout(0.1),
 
                 new ParallelDeadlineGroup(
                         getRamseteCommand(trajectory2),
@@ -89,10 +88,9 @@ public class FiveBallAuto extends SequentialCommandGroup {
                         // aimCommand))
                         new TurretCommand(turret, 10500)),
 
-                new SeekCommand(launcher, limelight, turret, aimCommand, false).withTimeout(0.4),
+                new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
-                        limelight),
+                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
 
                 new StopLaunchCommand(launcher, indexer, chimney, turret),
 
@@ -104,10 +102,9 @@ public class FiveBallAuto extends SequentialCommandGroup {
                         getRamseteCommand(trajectory4),
                         new TurretCommand(turret, 19600)),
 
-                new SeekCommand(launcher, limelight, turret, aimCommand, false).withTimeout(0.4),
+                new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 
-                new DoubleShotCommand(chimney, turret, aimCommand, indexer, launcher,
-                        limelight),
+                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
 
                 new StopLaunchCommand(launcher, indexer, chimney, turret),
 

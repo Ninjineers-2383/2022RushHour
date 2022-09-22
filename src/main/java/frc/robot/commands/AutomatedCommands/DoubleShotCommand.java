@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -23,7 +22,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
     // actions created in the subsystem.
     // In this case, a Chimney command that takes in the Chimney subsystem and runs
     // Chimney subsystem actions.
-    public DoubleShotCommand(ChimneySubsystem chimney, TurretSubsystem turret, LimelightCommand aimCommand,
+    public DoubleShotCommand(ChimneySubsystem chimney, TurretSubsystem turret,
             IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight) {
         addCommands(
                 new LauncherCommand(launcher,
@@ -33,7 +32,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
                         .getLaunchingVelocity()),
                 new ParallelDeadlineGroup(
                         new IndexerCommand(indexer, () -> 0.8).withTimeout(1.2),
-                        new ChimneyCommand(chimney, () -> -0.9),
+                        new ChimneyCommand(chimney, () -> true),
                         new TurretCommand(turret, () -> 0,
                                 () -> false),
                         new LauncherCommand(launcher,

@@ -62,6 +62,7 @@ public class TurretCommand extends CommandBase {
         this.shouldMove = () -> true;
         addRequirements(turret);
     }
+
     @Override
     public void initialize() {
         turret.seekDirection(flipSeek);

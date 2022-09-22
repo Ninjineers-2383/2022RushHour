@@ -19,6 +19,9 @@ public class LimelightSubsystem extends SubsystemBase {
     private boolean targetValid = false;
     private double targetX;
     private double targetY;
+    private boolean lockedOn = false;
+    private double turretPower = 0.0;
+    private boolean turretSeek = false;
 
     public LimelightSubsystem() {
         camera.setPipelineIndex(0); // Set the pipeline to 0, make sure the comp pipeline is the first pipeline
@@ -63,5 +66,29 @@ public class LimelightSubsystem extends SubsystemBase {
     public void setLimelight(boolean isOn) {
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
         table.getEntry("ledMode").setNumber(isOn ? 0 : 2);
+    }
+
+    public void setLockedOn(boolean lockedOn) {
+        this.lockedOn = lockedOn;
+    }
+
+    public boolean getLockedOn() {
+        return lockedOn;
+    }
+
+    public void setTurretPower(double turretPower) {
+        this.turretPower = turretPower;
+    }
+
+    public double getTurretPower() {
+        return turretPower;
+    }
+
+    public void setTurretSeek(boolean turretSeek) {
+        this.turretSeek = turretSeek;
+    }
+
+    public boolean getTurretSeek() {
+        return turretSeek;
     }
 }

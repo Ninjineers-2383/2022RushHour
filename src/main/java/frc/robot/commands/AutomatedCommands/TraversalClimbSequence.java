@@ -23,7 +23,7 @@ public class TraversalClimbSequence extends SequentialCommandGroup {
                                 drivetrain::toggleTippingDisabled),
                         new ParallelCommandGroup( // hooking on mid bar
                                 new AutoForward(drivetrain, 0.75, 1, 0.5, 2),
-                                new IntakeCommand(intake, () -> 0, true, false),
+                                new IntakeCommand(intake, () -> false, true, false),
                                 new TraversalClimbAutoCommand(climber, () -> climberPower, 250.0)),
                         new TraversalClimbAutoCommand(climber, () -> climberPower, 690.0).withTimeout(2), // swing to
                                                                                                           // high
