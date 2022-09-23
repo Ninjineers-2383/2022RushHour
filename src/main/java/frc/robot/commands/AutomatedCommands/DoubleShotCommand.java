@@ -34,7 +34,7 @@ public class DoubleShotCommand extends SequentialCommandGroup {
                         new IndexerCommand(indexer, () -> 0.8).withTimeout(1.2),
                         new ChimneyCommand(chimney, () -> true),
                         new TurretCommand(turret, () -> 0,
-                                () -> false),
+                                () -> false, false, 6300),
                         new LauncherCommand(launcher,
                                 () -> launchVelocity,
                                 () -> true)));

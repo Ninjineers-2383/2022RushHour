@@ -25,7 +25,7 @@ public class SeekCommand extends ParallelCommandGroup {
                         () -> true),
                 new TurretCommand(turret, () -> limelight.getTurretPower(),
                         () -> limelight.getTurretSeek(),
-                        seekDirection),
+                        seekDirection, 6300),
                 new StartEndCommand(
                         () -> SmartDashboard.putBoolean("Aim Active", true),
                         () -> SmartDashboard.putBoolean("Aim Active", false)));

@@ -90,11 +90,12 @@ public class TwoBallAuto extends SequentialCommandGroup {
                         new IntakeCommand(intake, () -> true, false, true)),
 
                 new ParallelRaceGroup(
-                        new TurretCommand(turret, 25000),
-                        new LauncherCommand(launcher, () -> 6000)),
+                        new TurretCommand(turret, () -> 0, () -> false, false,
+                                25000),
+                        new LauncherCommand(launcher, () -> 6000, () -> false)),
 
                 new SequentialCommandGroup(
-                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity(), () -> false)
                                 .withTimeout(0.2),
                         new ChimneyCommand(chimney, () -> false)
                                 .withTimeout(0.1),

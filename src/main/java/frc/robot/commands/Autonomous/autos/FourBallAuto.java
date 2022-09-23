@@ -27,20 +27,20 @@ public class FourBallAuto extends SequentialCommandGroup {
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
-                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new TurretCommand(turret, () -> 0, () -> false, false, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new ChimneyCommand(chimney, () -> true).withTimeout(0.1),
-                        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
+                        new LauncherCommand(launcher, () -> 15200, () -> false).withTimeout(0.1),
                         new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
                                 new TurretCommand(turret,
                                         () -> limelight.getTurretPower(),
-                                        () -> limelight.getTurretSeek())
+                                        () -> limelight.getTurretSeek(), false, 6300)
                                         .withTimeout(1.5)),
                         new SequentialCommandGroup(
-                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                                new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity(), () -> false)
                                         .withTimeout(0.2),
                                 new ChimneyCommand(chimney, () -> false)
                                         .withTimeout(0.1),
@@ -54,10 +54,10 @@ public class FourBallAuto extends SequentialCommandGroup {
                                 new IndexerCommand(indexer, () -> 0.75)
                                         .withTimeout(0.4))),
                 new ParallelCommandGroup( // Stop launch system
-                        new LauncherCommand(launcher, () -> 0).withTimeout(0.1),
+                        new LauncherCommand(launcher, () -> 0, () -> false).withTimeout(0.1),
                         new IndexerCommand(indexer, () -> 0).withTimeout(0.1),
                         new ChimneyCommand(chimney, () -> true).withTimeout(0.1),
-                        new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                        new TurretCommand(turret, () -> 0, () -> false, false, Turret.OFFSET_TICKS).withTimeout(0.5),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
                                 // drives back and intakes
@@ -66,18 +66,18 @@ public class FourBallAuto extends SequentialCommandGroup {
                 new AutoForward(drivetrain, 11.6, 2.5, 0.9, 5).withTimeout(5),
                 new WaitCommand(1.5),
                 new ParallelRaceGroup(
-                        new LauncherCommand(launcher, () -> 16500),
-                        new TurretCommand(turret,
+                        new LauncherCommand(launcher, () -> 16500, () -> false),
+                        new TurretCommand(turret, () -> 0, () -> false, false,
                                 -18000),
                         new AutoForward(drivetrain, 11.5, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
                         new TurretCommand(turret, () -> limelight.getTurretPower(),
-                                () -> limelight.getTurretSeek(), true)
+                                () -> limelight.getTurretSeek(), true, 6300)
                                 .withTimeout(1),
                         new LauncherCommand(launcher,
-                                () -> limelight.getLaunchingVelocity())),
+                                () -> limelight.getLaunchingVelocity(), () -> false)),
                 new TurretCommand(turret, () -> limelight.getTurretPower(),
-                        () -> limelight.getTurretSeek(), true)
+                        () -> limelight.getTurretSeek(), true, 6300)
                         .withTimeout(0.2),
                 new ChimneyCommand(chimney, () -> false)
                         .withTimeout(0.1),

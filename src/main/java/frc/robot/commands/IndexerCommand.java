@@ -11,7 +11,7 @@ public class IndexerCommand extends CommandBase {
     private final IndexerSubsystem indexer;
     private final DoubleSupplier power;
 
-    private double previousPower = Double.NaN;
+    // private double previousPower = Double.NaN;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.

@@ -21,16 +21,16 @@ public class OneBallAuto extends SequentialCommandGroup {
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
-                new TurretCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new TurretCommand(turret, () -> 0, () -> false, false, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
-                        new LauncherCommand(launcher, () -> 15200).withTimeout(0.1),
+                        new LauncherCommand(launcher, () -> 15200, () -> false).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.75, 5),
                         new WaitCommand(0.5)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
-                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity())
+                        new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity(), () -> false)
                                 .withTimeout(0.9),
                         new TurretCommand(turret, () -> limelight.getTurretPower() * 1.5,
-                                () -> limelight.getTurretSeek())
+                                () -> limelight.getTurretSeek(), false, 6300)
                                 .withTimeout(1.2),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),

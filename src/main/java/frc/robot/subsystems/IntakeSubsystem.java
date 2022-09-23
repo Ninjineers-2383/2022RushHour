@@ -14,11 +14,9 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Solenoid upSolenoid;
     private final Solenoid downSolenoid;
 
-    private final CompressorSubsystem compressor;
     private final CompressorCommand compressorCommand;
 
     public IntakeSubsystem(CompressorSubsystem compressor, int motorPort, int upSolenoidPort, int downSolenoidPort) {
-        this.compressor = compressor;
         this.compressorCommand = new CompressorCommand(compressor);
         intakeMotor = new VictorSPX(motorPort);
         upSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, upSolenoidPort);

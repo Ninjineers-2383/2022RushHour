@@ -86,7 +86,8 @@ public class FiveBallAuto extends SequentialCommandGroup {
                         getRamseteCommand(trajectory2),
                         // new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
                         // aimCommand))
-                        new TurretCommand(turret, 10500)),
+                        new TurretCommand(turret, () -> 0, () -> false, false,
+                                10500)),
 
                 new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 
@@ -100,7 +101,8 @@ public class FiveBallAuto extends SequentialCommandGroup {
 
                 new ParallelDeadlineGroup(
                         getRamseteCommand(trajectory4),
-                        new TurretCommand(turret, 19600)),
+                        new TurretCommand(turret, () -> 0, () -> false, false,
+                                19600)),
 
                 new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 

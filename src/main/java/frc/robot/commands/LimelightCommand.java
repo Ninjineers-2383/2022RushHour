@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,15 +14,8 @@ public class LimelightCommand extends CommandBase {
 
     private final MedianFilter limelightF = new MedianFilter(5);
 
-    private final DoubleSupplier turretTicks;
-
-    private final DoubleSupplier drivetrainVelocity;
-
-    public LimelightCommand(LimelightSubsystem limelight, DoubleSupplier turretTicks,
-            DoubleSupplier drivetrainVelocity) {
+    public LimelightCommand(LimelightSubsystem limelight) {
         this.limelight = limelight;
-        this.turretTicks = turretTicks;
-        this.drivetrainVelocity = drivetrainVelocity;
         addRequirements(limelight);
     }
 

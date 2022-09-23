@@ -13,7 +13,7 @@ public class StopLaunchCommand extends SequentialCommandGroup {
     public StopLaunchCommand(LauncherSubsystem launcher, IndexerSubsystem indexer, ChimneySubsystem chimney,
             TurretSubsystem turret) {
         addCommands(
-                new LauncherCommand(launcher, () -> 0).withTimeout(0.01),
+                new LauncherCommand(launcher, () -> 0, () -> false).withTimeout(0.01),
                 new IndexerCommand(indexer, () -> 0.0).withTimeout(0.01),
                 new ChimneyCommand(chimney, () -> true).withTimeout(0.01));
 

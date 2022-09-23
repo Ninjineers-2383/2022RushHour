@@ -8,23 +8,27 @@ import frc.robot.subsystems.ClimberSubsystemNew;
 
 public class TraversalClimbManualCommand extends CommandBase {
 
-    private final ClimberSubsystemNew subsystem;
+    private final ClimberSubsystemNew climber;
     private final DoubleSupplier power;
     private final DoubleSupplier rightPower;
     private final BooleanSupplier separate;
 
-    public TraversalClimbManualCommand(ClimberSubsystemNew subsystem, DoubleSupplier power, DoubleSupplier rightPower,
+    public TraversalClimbManualCommand(ClimberSubsystemNew climber, DoubleSupplier power, DoubleSupplier rightPower,
             BooleanSupplier separate) {
-        this.subsystem = subsystem;
+        this.climber = climber;
         this.power = power;
         this.rightPower = rightPower;
         this.separate = separate;
 
-        addRequirements(subsystem);
+        addRequirements(climber);
     }
 
     @Override
     public void execute() {
-        subsystem.setPower(power.getAsDouble(), power.getAsDouble());
+        if (!separate.getAsBoolean()) {
+            climber.setPower(power.getAsDouble(), power.getAsDouble());
+        } else {
+            climber.setPower(power.getAsDouble(), rightPower.getAsDouble());
+        }
     }
 }

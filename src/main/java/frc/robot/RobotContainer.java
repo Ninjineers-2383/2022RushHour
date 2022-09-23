@@ -80,9 +80,6 @@ public class RobotContainer {
     private final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
     private final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
 
-    private final DoubleSupplier turretTicks = () -> Turret.OFFSET_TICKS;
-    private final DoubleSupplier driveTrainVelocity = drivetrain.getAverageVelocity();
-
     private final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
 
@@ -145,11 +142,11 @@ public class RobotContainer {
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0.0));
         launcher.setDefaultCommand(
-                new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0)));
-        limelight.setDefaultCommand(new LimelightCommand(limelight, turretTicks, driveTrainVelocity));
+                new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0), () -> false));
+        limelight.setDefaultCommand(new LimelightCommand(limelight));
         climber.setDefaultCommand(new TraversalClimbManualCommand(climber, () -> operatorController.getLeftY(),
                 () -> operatorController.getRightY(), () -> operatorController.getYButton()));
-        turret.setDefaultCommand(new TurretCommand(turret, Constants.Turret.OFFSET_TICKS));
+        turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false, false, Turret.OFFSET_TICKS));
     }
 
     private void configureButtonBindings() {
