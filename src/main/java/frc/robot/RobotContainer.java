@@ -73,7 +73,7 @@ public class RobotContainer {
     private final ChimneySubsystem chimney = new ChimneySubsystem();
 
     private final BooleanSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
-            || driverJoystickTurn.getTrigger());
+            || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop());
 
     private final IndexerSubsystem indexer = new IndexerSubsystem();
 
@@ -155,10 +155,12 @@ public class RobotContainer {
 
         indexerDown.whenHeld(new IndexerCommand(indexer, () -> -1));
 
-        doubleShoot.and(autoShoot.negate())
-                .whenActive(seekCommand);
+        // doubleShoot.and(autoShoot.negate())
+        // .whenActive(seekCommand);
 
-        doubleShoot.negate().cancelWhenActive(seekCommand);
+        doubleShoot.toggleWhenPressed(seekCommand);
+
+        // doubleShoot.negate().cancelWhenActive(seekCommand);
 
         doubleShoot.and(autoShoot).or(doubleShotOverride).whenActive(
                 new DoubleShotCommand(chimney, turret, indexer, launcher, limelight).withTimeout(1.3));

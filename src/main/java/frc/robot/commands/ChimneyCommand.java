@@ -28,9 +28,6 @@ public class ChimneyCommand extends CommandBase {
         // See ChimneySubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
         boolean b_power = power.getAsBoolean();
-        if (b_power == previousPower) {
-            return;
-        }
         chimney.setPower(b_power ? 1.0 : 0.0);
         previousPower = b_power;
     }
