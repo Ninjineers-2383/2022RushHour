@@ -50,6 +50,8 @@
     "teleop",
     "teleoperated",
     "Trackwidth",
-    "Unirest"
+    "traj",
+    "Unirest",
+    "wpilib"
   ]
 }

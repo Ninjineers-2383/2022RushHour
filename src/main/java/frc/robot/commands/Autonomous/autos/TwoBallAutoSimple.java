@@ -34,7 +34,8 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
 
     private DrivetrainSubsystem drivetrain;
 
-    public TwoBallAutoSimple(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
+    public TwoBallAutoSimple(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
+            ChimneySubsystem chimney,
             IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
 
@@ -59,7 +60,7 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(trajectory1Final.getInitialPose());
                         }),
-                new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
+                new IntakeCommand(rearIntake, () -> true, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),

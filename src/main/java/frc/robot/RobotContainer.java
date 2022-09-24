@@ -140,9 +140,9 @@ public class RobotContainer {
     private void setDefaultCommands() {
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         frontIntake.setDefaultCommand(
-                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger(), false, true));
+                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger(), false));
         rearIntake.setDefaultCommand(
-                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), false, true));
+                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), false));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0.0));
         launcher.setDefaultCommand(
@@ -184,15 +184,19 @@ public class RobotContainer {
 
     private void SetAutoCommands() {
         Command oneBallAuto = new OneBallAuto(drivetrain, indexer, launcher, limelight, turret);
-        Command twoBallAuto = new TwoBallAuto(drivetrain, rearIntake, chimney, indexer, launcher, limelight, turret);
-        Command fourBallAuto = new FourBallAuto(drivetrain, rearIntake, chimney, indexer, launcher, limelight, turret);
-        Command fiveBallAuto = new FiveBallAuto(drivetrain, rearIntake, chimney, indexer, launcher, limelight, turret);
+        Command twoBallAuto = new TwoBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+                limelight, turret);
+        Command fourBallAuto = new FourBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+                limelight, turret);
+        Command fiveBallAuto = new FiveBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+                limelight, turret);
 
         Command nullAuto = null;
 
         Command testAuto = getTestAuto();
 
-        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, rearIntake, chimney, indexer, launcher, limelight,
+        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, frontIntake, rearIntake, chimney, indexer,
+                launcher, limelight,
                 turret);
 
         autoChooser.addOption("One Ball", oneBallAuto);

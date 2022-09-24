@@ -35,7 +35,7 @@ import frc.robot.subsystems.TurretSubsystem;
 public class FiveBallAuto extends SequentialCommandGroup {
     private DrivetrainSubsystem drivetrain;
 
-    public FiveBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem rearIntake,
+    public FiveBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
             ChimneySubsystem chimney,
             IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
@@ -53,8 +53,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
             trajectory2 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/Second Ball.wpilib.json"));
             trajectory3 = TrajectoryUtil
                     .fromPathweaverJson(trajectoryPath.resolve("output/Third and Fourth Ball.wpilib.json"));
-            trajectory4 = TrajectoryUtil
-                    .fromPathweaverJson(trajectoryPath.resolve("output/Final Shots.wpilib.json"));
+            trajectory4 = TrajectoryUtil.fromPathweaverJson(trajectoryPath.resolve("output/Final Shots.wpilib.json"));
         } catch (IOException ex) {
             DriverStation.reportError("Unable to open trajectory", ex.getStackTrace());
         }
@@ -68,8 +67,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                // TODO: May be the wrong intake
-                new IntakeCommand(rearIntake, () -> true, false, true).withTimeout(0.1),
+                new IntakeCommand(rearIntake, () -> true, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
@@ -80,7 +78,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
                 new StopLaunchCommand(launcher, indexer, chimney, turret),
                 // new IntakeCommand(intake, () -> -0.8, true, false).withTimeout(0.1),
 
-                new IntakeCommand(rearIntake, () -> true, true, false).withTimeout(0.1),
+                new IntakeCommand(frontIntake, () -> true, true).withTimeout(0.1),
 
                 new ParallelDeadlineGroup(
                         getRamseteCommand(trajectory2),

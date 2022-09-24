@@ -39,7 +39,8 @@ public class TwoBallAuto extends SequentialCommandGroup {
 
     private DrivetrainSubsystem drivetrain;
 
-    public TwoBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
+    public TwoBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
+            ChimneySubsystem chimney,
             IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
 
@@ -71,7 +72,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
+                new IntakeCommand(rearIntake, () -> true, false).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
@@ -83,11 +84,11 @@ public class TwoBallAuto extends SequentialCommandGroup {
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory2),
-                        new IntakeCommand(intake, () -> true, true, false)),
+                        new IntakeCommand(frontIntake, () -> true, true)),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory3),
-                        new IntakeCommand(intake, () -> true, false, true)),
+                        new IntakeCommand(rearIntake, () -> true, false)),
 
                 new ParallelRaceGroup(
                         new TurretCommand(turret, () -> 0, () -> false, false,

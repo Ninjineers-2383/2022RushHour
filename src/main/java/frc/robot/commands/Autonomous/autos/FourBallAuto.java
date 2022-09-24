@@ -22,7 +22,8 @@ import frc.robot.subsystems.TurretSubsystem;
 
 public class FourBallAuto extends SequentialCommandGroup {
 
-    public FourBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ChimneySubsystem chimney,
+    public FourBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
+            ChimneySubsystem chimney,
             IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
@@ -31,7 +32,7 @@ public class FourBallAuto extends SequentialCommandGroup {
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new ChimneyCommand(chimney, () -> true).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200, () -> false).withTimeout(0.1),
-                        new IntakeCommand(intake, () -> true, false, true).withTimeout(0.1),
+                        new IntakeCommand(rearIntake, () -> true, true).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.88, 10)),
                 new ParallelCommandGroup( // Shoot two balls after feeding one
                         new ParallelRaceGroup(
