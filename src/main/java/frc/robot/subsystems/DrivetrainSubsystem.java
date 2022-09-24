@@ -6,11 +6,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -18,6 +16,7 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Drivetrain;
+import frc.robot.helpers.SlewRateLimiter;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
@@ -243,38 +242,5 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     public DoubleSupplier getAverageVelocity() {
         return () -> (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
-    }
-
-    public class SlewRateLimiter {
-        private final double m_rateLimit;
-        private double m_prevVal;
-        private double m_prevTime;
-
-        public SlewRateLimiter(double rateLimit, double initialValue) {
-            m_rateLimit = rateLimit;
-            m_prevVal = initialValue;
-            m_prevTime = WPIUtilJNI.now() * 1e-6;
-        }
-
-        public SlewRateLimiter(double rateLimit) {
-            this(rateLimit, 0);
-        }
-
-        public double calculate(double input) {
-            double currentTime = WPIUtilJNI.now() * 1e-6;
-            double elapsedTime = currentTime - m_prevTime;
-            if (input > m_prevVal && m_prevVal > 0 || input < m_prevVal && m_prevVal < 0) {
-                m_prevVal += MathUtil.clamp(input - m_prevVal, 1.3 * -m_rateLimit * elapsedTime,
-                        1.3 * m_rateLimit * elapsedTime);
-            }
-            m_prevVal += MathUtil.clamp(input - m_prevVal, -m_rateLimit * elapsedTime, m_rateLimit * elapsedTime);
-            m_prevTime = currentTime;
-            return m_prevVal;
-        }
-
-        public void reset(double value) {
-            m_prevVal = value;
-            m_prevTime = WPIUtilJNI.now() * 1e-6;
-        }
     }
 }
