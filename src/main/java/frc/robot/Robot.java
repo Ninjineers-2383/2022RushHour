@@ -124,10 +124,6 @@ public class Robot extends TimedRobot {
         teamColorChooser.setDefaultOption("Blue", "blue");
         teamColorChooser.addOption("Red", "red");
         SmartDashboard.putData("teamColorChooser", teamColorChooser);
-        // m_robotContainer.colorSensor.setColor(teamColorChooser.getSelected());
-        // Alliance alliance = DriverStation.getAlliance();
-        // m_robotContainer.colorSensor.setColor(alliance == Alliance.Blue ? "blue" :
-        // alliance == Alliance.Red ? "red" : "invalid");
         m_robotContainer.frontIntake.setPower(0.0);
         m_robotContainer.rearIntake.setPower(0.0);
     }
