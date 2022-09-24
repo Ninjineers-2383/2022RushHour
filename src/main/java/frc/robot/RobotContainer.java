@@ -33,6 +33,7 @@ import frc.robot.commands.TraversalClimbManualCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
+import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
@@ -52,48 +53,51 @@ import frc.robot.subsystems.TurretSubsystem;
 public class RobotContainer {
 
     // Controllers and ports
-    final Joystick driverJoystickForward = new Joystick(0);
-    final Joystick driverJoystickTurn = new Joystick(1);
-    final XboxController operatorController = new XboxController(2);
+    private final Joystick driverJoystickForward = new Joystick(0);
+    private final Joystick driverJoystickTurn = new Joystick(1);
+    private final XboxController operatorController = new XboxController(2);
 
-    private DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-
-    private DoubleSupplier throttle = () -> driverJoystickForward.getY();
-    private DoubleSupplier turn = () -> driverJoystickTurn.getX() * 0.5;
-
+    // initializing subsystems
+    private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     private final CompressorSubsystem compressor = new CompressorSubsystem();
+    private final ChimneySubsystem chimney = new ChimneySubsystem();
+    private final IndexerSubsystem indexer = new IndexerSubsystem();
+    private final LauncherSubsystem launcher = new LauncherSubsystem();
+    public final TurretSubsystem turret = new TurretSubsystem();
+    private final LimelightSubsystem limelight = new LimelightSubsystem();
+    private final ClimberSubsystemNew climber = new ClimberSubsystemNew();
 
     public final IntakeSubsystem frontIntake = new IntakeSubsystem(compressor, Intake.FRONT_INTAKE_PORT,
             Intake.FRONT_LEFT_SOLENOID_PORT, Intake.FRONT_RIGHT_SOLENOID_PORT);
+
     public final IntakeSubsystem rearIntake = new IntakeSubsystem(compressor, Intake.REAR_INTAKE_PORT,
             Intake.REAR_LEFT_SOLENOID_PORT, Intake.REAR_RIGHT_SOLENOID_PORT);
 
-    private final boolean down = false;
+    // drive controls
+    private DoubleSupplier throttle = () -> driverJoystickForward.getY();
+    private DoubleSupplier turn = () -> driverJoystickTurn.getX() * 0.5;
 
-    private final ChimneySubsystem chimney = new ChimneySubsystem();
-
+    // chimney controls
     private final BooleanSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
             || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop());
 
-    private final IndexerSubsystem indexer = new IndexerSubsystem();
-
+    // manual kicker controls
     private final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
     private final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
 
-    private final LauncherSubsystem launcher = new LauncherSubsystem();
-    public final TurretSubsystem turret = new TurretSubsystem();
+    // seek button
+    private final JoystickButton seekButton = new JoystickButton(operatorController, Button.kRightBumper.value);
 
-    LimelightSubsystem limelight = new LimelightSubsystem();
+    // don't shoot button
+    private final JoystickButton doNotShootButton = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
-    public final SeekCommand seekCommand = new SeekCommand(launcher, limelight, turret, false);
+    // sets drivetrain and climber to coast
+    private final JoystickButton coastToggle = new JoystickButton(operatorController, Button.kBack.value);
 
-    JoystickButton doubleShoot = new JoystickButton(operatorController, Button.kRightBumper.value);
-    JoystickButton doubleShotOverride = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    // cancels the seek command
+    private final JoystickButton cancelSeek = new JoystickButton(operatorController, Button.kStart.value);
 
-    private final ClimberSubsystemNew climber = new ClimberSubsystemNew();
-
-    final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
-
+    // determines whether or not to shoot
     public final Trigger autoShoot = new AutoShoot(() -> limelight.getLockedOn(), () -> launcher.isReady(),
             drivetrain.getAverageVelocity());
 
@@ -136,9 +140,9 @@ public class RobotContainer {
     private void setDefaultCommands() {
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         frontIntake.setDefaultCommand(
-                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger(), down, true));
+                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger(), false, true));
         rearIntake.setDefaultCommand(
-                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), down, true));
+                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), false, true));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0.0));
         launcher.setDefaultCommand(
@@ -155,22 +159,19 @@ public class RobotContainer {
 
         indexerDown.whenHeld(new IndexerCommand(indexer, () -> -1));
 
-        // doubleShoot.and(autoShoot.negate())
-        // .whenActive(seekCommand);
+        seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false));
 
-        doubleShoot.toggleWhenPressed(seekCommand);
+        cancelSeek.whileHeld(new StopLaunchCommand(launcher, indexer, chimney, turret));
 
-        // doubleShoot.negate().cancelWhenActive(seekCommand);
-
-        doubleShoot.and(autoShoot).or(doubleShotOverride).whenActive(
+        autoShoot.and(doNotShootButton.negate()).whenActive(
                 new DoubleShotCommand(chimney, turret, indexer, launcher, limelight).withTimeout(1.3));
 
-        tippingToggle.toggleWhenPressed(
+        coastToggle.toggleWhenPressed(
                 new StartEndCommand(
                         () -> drivetrain.toggleTippingEnabled(),
                         () -> drivetrain.toggleTippingDisabled()));
 
-        SmartDashboard.putData("Seek Command", seekCommand);
+        SmartDashboard.putData("Seek Command", new SeekCommand(launcher, limelight, turret, false));
     }
 
     public Command getAutonomousCommand() {

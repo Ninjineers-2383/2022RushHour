@@ -10,7 +10,6 @@ public class ChimneyCommand extends CommandBase {
 
     private final ChimneySubsystem chimney;
     private final BooleanSupplier power;
-    private boolean previousPower = false;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
@@ -29,7 +28,6 @@ public class ChimneyCommand extends CommandBase {
         // 1 degree of rotation = 145.695364 ticks
         boolean b_power = power.getAsBoolean();
         chimney.setPower(b_power ? 1.0 : 0.0);
-        previousPower = b_power;
     }
 
     @Override
