@@ -4,16 +4,16 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ClimberSubsystemNew;
+import frc.robot.subsystems.ClimberSubsystem;
 
 public class TraversalClimbManualCommand extends CommandBase {
 
-    private final ClimberSubsystemNew climber;
+    private final ClimberSubsystem climber;
     private final DoubleSupplier power;
     private final DoubleSupplier rightPower;
     private final BooleanSupplier separate;
 
-    public TraversalClimbManualCommand(ClimberSubsystemNew climber, DoubleSupplier power, DoubleSupplier rightPower,
+    public TraversalClimbManualCommand(ClimberSubsystem climber, DoubleSupplier power, DoubleSupplier rightPower,
             BooleanSupplier separate) {
         this.climber = climber;
         this.power = power;

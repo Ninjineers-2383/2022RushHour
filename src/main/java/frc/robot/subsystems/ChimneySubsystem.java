@@ -9,18 +9,23 @@ import frc.robot.Constants.Chimney;
 
 public class ChimneySubsystem extends SubsystemBase {
 
-    // create motor instance that uses a TalonSRX motor controller.
+    // create motor instance that uses a VictorSPX motor controller.
     private final VictorSPX motor;
 
-    // Chimney subsystem constructor
+    /**
+     * Chimney subsystem constructor
+     */
     public ChimneySubsystem() {
         motor = new VictorSPX(Chimney.PORT);
         motor.setInverted(true);
 
     }
 
-    // method that returns nothing (void) but sets the kicker at a set power in the
-    // interval of [-1, 1]
+    /**
+     * Sets the power of the chimney
+     * 
+     * @param power the power of the chimney
+     */
     public void setPower(Double power) {
         motor.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("Chimney Power", power);

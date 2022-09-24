@@ -4,12 +4,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.Turret;
-import frc.robot.commands.IndexerCommand;
+import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.Autonomous.AutoForward;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -17,7 +17,7 @@ import frc.robot.subsystems.TurretSubsystem;
 public class OneBallAuto extends SequentialCommandGroup {
 
     public OneBallAuto(DrivetrainSubsystem drivetrain,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            KickerSubsystem kicker, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
@@ -34,7 +34,7 @@ public class OneBallAuto extends SequentialCommandGroup {
                                 .withTimeout(1.2),
                         new SequentialCommandGroup(
                                 new WaitCommand(0.3),
-                                new IndexerCommand(indexer, () -> 0.75)
+                                new KickerCommand(kicker, () -> 0.75)
                                         .withTimeout(2))));
     }
 }

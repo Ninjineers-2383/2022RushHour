@@ -24,8 +24,8 @@ import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -36,7 +36,7 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
 
     public TwoBallAutoSimple(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
             ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            KickerSubsystem kicker, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
 
         this.drivetrain = drivetrain;
@@ -66,9 +66,9 @@ public class TwoBallAutoSimple extends SequentialCommandGroup {
                         getRamseteCommand(trajectory1),
                         new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
 
-                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
+                new DoubleShotCommand(chimney, turret, kicker, launcher, limelight),
 
-                new StopLaunchCommand(launcher, indexer, chimney, turret));
+                new StopLaunchCommand(launcher, kicker, chimney, turret));
 
     }
 

@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.ChimneyCommand;
-import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.TurretCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
@@ -29,8 +29,8 @@ import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -41,7 +41,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
 
     public TwoBallAuto(DrivetrainSubsystem drivetrain, IntakeSubsystem frontIntake, IntakeSubsystem rearIntake,
             ChimneySubsystem chimney,
-            IndexerSubsystem indexer, LauncherSubsystem launcher, LimelightSubsystem limelight,
+            KickerSubsystem kicker, LauncherSubsystem launcher, LimelightSubsystem limelight,
             TurretSubsystem turret) {
 
         this.drivetrain = drivetrain;
@@ -78,9 +78,9 @@ public class TwoBallAuto extends SequentialCommandGroup {
                         getRamseteCommand(trajectory1),
                         new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
 
-                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight),
+                new DoubleShotCommand(chimney, turret, kicker, launcher, limelight),
 
-                new StopLaunchCommand(launcher, indexer, chimney, turret),
+                new StopLaunchCommand(launcher, kicker, chimney, turret),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory2),
@@ -100,17 +100,17 @@ public class TwoBallAuto extends SequentialCommandGroup {
                                 .withTimeout(0.2),
                         new ChimneyCommand(chimney, () -> false)
                                 .withTimeout(0.1),
-                        new IndexerCommand(indexer, () -> 0.75)
+                        new KickerCommand(kicker, () -> 0.75)
                                 .withTimeout(0.3),
-                        new IndexerCommand(indexer, () -> 0).withTimeout(0.05),
+                        new KickerCommand(kicker, () -> 0).withTimeout(0.05),
                         new ChimneyCommand(chimney, () -> true)
                                 .withTimeout(0.5),
                         new ChimneyCommand(chimney, () -> true)
                                 .withTimeout(0.15),
-                        new IndexerCommand(indexer, () -> 0.75)
+                        new KickerCommand(kicker, () -> 0.75)
                                 .withTimeout(0.4)),
 
-                new StopLaunchCommand(launcher, indexer, chimney, turret));
+                new StopLaunchCommand(launcher, kicker, chimney, turret));
 
     }
 

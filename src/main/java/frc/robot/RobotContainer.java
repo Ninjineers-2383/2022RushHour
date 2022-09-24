@@ -25,8 +25,8 @@ import frc.robot.Constants.Intake;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.DrivetrainCommand;
-import frc.robot.commands.IndexerCommand;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TraversalClimbManualCommand;
@@ -41,11 +41,11 @@ import frc.robot.commands.Autonomous.autos.TwoBallAuto;
 import frc.robot.commands.Autonomous.autos.TwoBallAutoSimple;
 import frc.robot.commands.triggers.AutoShoot;
 import frc.robot.subsystems.ChimneySubsystem;
-import frc.robot.subsystems.ClimberSubsystemNew;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CompressorSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -61,11 +61,11 @@ public class RobotContainer {
     private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
     private final CompressorSubsystem compressor = new CompressorSubsystem();
     private final ChimneySubsystem chimney = new ChimneySubsystem();
-    private final IndexerSubsystem indexer = new IndexerSubsystem();
+    private final KickerSubsystem kicker = new KickerSubsystem();
     private final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
     private final LimelightSubsystem limelight = new LimelightSubsystem();
-    private final ClimberSubsystemNew climber = new ClimberSubsystemNew();
+    private final ClimberSubsystem climber = new ClimberSubsystem();
 
     public final IntakeSubsystem frontIntake = new IntakeSubsystem(compressor, Intake.FRONT_INTAKE_PORT,
             Intake.FRONT_LEFT_SOLENOID_PORT, Intake.FRONT_RIGHT_SOLENOID_PORT);
@@ -82,8 +82,8 @@ public class RobotContainer {
             || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop());
 
     // manual kicker controls
-    private final JoystickButton indexerUp = new JoystickButton(operatorController, Button.kX.value);
-    private final JoystickButton indexerDown = new JoystickButton(operatorController, Button.kY.value);
+    private final JoystickButton kickerUp = new JoystickButton(operatorController, Button.kX.value);
+    private final JoystickButton kickerDown = new JoystickButton(operatorController, Button.kY.value);
 
     // seek button
     private final JoystickButton seekButton = new JoystickButton(operatorController, Button.kRightBumper.value);
@@ -144,7 +144,7 @@ public class RobotContainer {
         rearIntake.setDefaultCommand(
                 new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), false));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
-        indexer.setDefaultCommand(new IndexerCommand(indexer, () -> 0.0));
+        kicker.setDefaultCommand(new KickerCommand(kicker, () -> 0.0));
         launcher.setDefaultCommand(
                 new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0), () -> false));
         limelight.setDefaultCommand(new LimelightCommand(limelight));
@@ -155,16 +155,16 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         // backup kicker control if limelight fails
-        indexerUp.whenHeld(new IndexerCommand(indexer, () -> 1));
+        kickerUp.whenHeld(new KickerCommand(kicker, () -> 1));
 
-        indexerDown.whenHeld(new IndexerCommand(indexer, () -> -1));
+        kickerDown.whenHeld(new KickerCommand(kicker, () -> -1));
 
         seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false));
 
-        cancelSeek.whileHeld(new StopLaunchCommand(launcher, indexer, chimney, turret));
+        cancelSeek.whileHeld(new StopLaunchCommand(launcher, kicker, chimney, turret));
 
         autoShoot.and(doNotShootButton.negate()).whenActive(
-                new DoubleShotCommand(chimney, turret, indexer, launcher, limelight).withTimeout(1.3));
+                new DoubleShotCommand(chimney, turret, kicker, launcher, limelight).withTimeout(1.3));
 
         coastToggle.toggleWhenPressed(
                 new StartEndCommand(
@@ -183,19 +183,19 @@ public class RobotContainer {
     }
 
     private void SetAutoCommands() {
-        Command oneBallAuto = new OneBallAuto(drivetrain, indexer, launcher, limelight, turret);
-        Command twoBallAuto = new TwoBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+        Command oneBallAuto = new OneBallAuto(drivetrain, kicker, launcher, limelight, turret);
+        Command twoBallAuto = new TwoBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
                 limelight, turret);
-        Command fourBallAuto = new FourBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+        Command fourBallAuto = new FourBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
                 limelight, turret);
-        Command fiveBallAuto = new FiveBallAuto(drivetrain, frontIntake, rearIntake, chimney, indexer, launcher,
+        Command fiveBallAuto = new FiveBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
                 limelight, turret);
 
         Command nullAuto = null;
 
         Command testAuto = getTestAuto();
 
-        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, frontIntake, rearIntake, chimney, indexer,
+        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, frontIntake, rearIntake, chimney, kicker,
                 launcher, limelight,
                 turret);
 

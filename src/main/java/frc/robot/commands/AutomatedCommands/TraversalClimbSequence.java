@@ -6,14 +6,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TraversalClimbAutoCommand;
 import frc.robot.commands.Autonomous.AutoForward;
-import frc.robot.subsystems.ClimberSubsystemNew;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class TraversalClimbSequence extends SequentialCommandGroup {
     private double climberPower = 0.75;
 
-    public TraversalClimbSequence(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ClimberSubsystemNew climber) {
+    public TraversalClimbSequence(DrivetrainSubsystem drivetrain, IntakeSubsystem intake, ClimberSubsystem climber) {
         addRequirements(intake, climber, drivetrain);
 
         // Run path following command, then stop at the end.

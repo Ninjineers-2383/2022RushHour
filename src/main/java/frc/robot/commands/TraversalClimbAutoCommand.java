@@ -3,27 +3,27 @@ package frc.robot.commands;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ClimberSubsystemNew;
+import frc.robot.subsystems.ClimberSubsystem;
 
 public class TraversalClimbAutoCommand extends CommandBase {
 
-    private final ClimberSubsystemNew subsystem;
+    private final ClimberSubsystem climber;
     private final DoubleSupplier climbPower;
     private final double finalPosition;
     private final double startingPosition;
 
-    public TraversalClimbAutoCommand(ClimberSubsystemNew subsystem, DoubleSupplier climbPower, double finalPosition) {
-        this.subsystem = subsystem;
+    public TraversalClimbAutoCommand(ClimberSubsystem climber, DoubleSupplier climbPower, double finalPosition) {
+        this.climber = climber;
         this.climbPower = climbPower;
         this.finalPosition = finalPosition;
-        this.startingPosition = subsystem.getAverageEncoderPos();
+        this.startingPosition = climber.getAverageEncoderPos();
 
-        addRequirements(subsystem);
+        addRequirements(climber);
     }
 
     @Override
     public boolean isFinished() {
-        if (subsystem.getAverageEncoderPos() - startingPosition >= finalPosition) {
+        if (climber.getAverageEncoderPos() - startingPosition >= finalPosition) {
             return true;
         }
         return false;
@@ -31,6 +31,6 @@ public class TraversalClimbAutoCommand extends CommandBase {
 
     @Override
     public void execute() {
-        subsystem.setPower(climbPower.getAsDouble(), climbPower.getAsDouble());
+        climber.setPower(climbPower.getAsDouble(), climbPower.getAsDouble());
     }
 }
