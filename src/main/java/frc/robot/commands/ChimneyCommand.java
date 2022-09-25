@@ -8,13 +8,18 @@ import frc.robot.subsystems.ChimneySubsystem;
 public class ChimneyCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
+    // Creates an instance of ChimneySubsystem
     private final ChimneySubsystem chimney;
+
+    // Creates a double supplier for the power of the Chimney
     private final DoubleSupplier power;
 
-    // Creates a command that takes in a subsystem and speed and runs specific
-    // actions created in the subsystem.
-    // In this case, a Chimney command that takes in the Chimney subsystem and runs
-    // Chimney subsystem actions.
+    /**
+     * Takes in the chimney subsystem and runs chimney actions
+     * 
+     * @param chimney instance of ChimneySubsystem
+     * @param power   power of the chimney from -1 to 1
+     */
     public ChimneyCommand(ChimneySubsystem chimney, DoubleSupplier power) {
         this.chimney = chimney;
         this.power = power;
@@ -30,6 +35,7 @@ public class ChimneyCommand extends CommandBase {
         chimney.setPower(d_power);
     }
 
+    // Called once when the command ends
     @Override
     public void end(boolean interrupted) {
         chimney.setPower(0.0);

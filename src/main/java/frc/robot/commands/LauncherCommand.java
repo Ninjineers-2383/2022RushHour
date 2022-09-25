@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.LauncherSubsystem;
 
@@ -11,29 +10,33 @@ public class LauncherCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     // Defines instance of the launcher subsystem from LauncherSubsystem.java
-    private final LauncherSubsystem m_subsystem;
+    private final LauncherSubsystem launcher;
 
-    private final DoubleSupplier m_speed;
+    private final DoubleSupplier speed;
 
-    private final BooleanSupplier m_shouldChangeSpeed;
+    private final BooleanSupplier shouldChangeSpeed;
 
-    double timeOut;
-
-    private double previousSpeed = Double.NaN;
-
-    Timer timer = new Timer();
+    private double previousSpeed;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a launcher command that takes in the launcher subsystem and
     // runs launcher subsystem actions.
 
-    public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed) {
-        m_subsystem = subsystem;
-        m_speed = speed;
-        m_shouldChangeSpeed = shouldChangeSpeed;
-        // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(subsystem);
+    /**
+     * A launcher command that takes in the launcher subsystem and runs launcher
+     * subsystem actions.
+     * 
+     * @param launcher          instance of launcher
+     * @param speed             speed of launcher
+     * @param shouldChangeSpeed whether or not the launcher should change its speed
+     */
+    public LauncherCommand(LauncherSubsystem launcher, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed) {
+        this.launcher = launcher;
+        this.speed = speed;
+        this.shouldChangeSpeed = shouldChangeSpeed;
+        previousSpeed = Double.NaN;
+        addRequirements(launcher);
     }
 
     // Called when the command is initially scheduled.
@@ -45,34 +48,25 @@ public class LauncherCommand extends CommandBase {
     @Override
     public void execute() {
         // see LauncherSubsystem.java for more details on how spin() method works
-        if (m_shouldChangeSpeed.getAsBoolean()) {
-            double d_speed = m_speed.getAsDouble();
+        if (shouldChangeSpeed.getAsBoolean()) {
+            double d_speed = speed.getAsDouble();
             if (d_speed == previousSpeed) {
                 return;
             }
-            m_subsystem.spin(d_speed);
+            launcher.spin(d_speed);
             previousSpeed = d_speed;
         }
-    }
-
-    public double speed() {
-        // a public method that returns the speed as a double
-        return m_speed.getAsDouble();
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_subsystem.spin(0.0);
+        launcher.spin(0.0);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;
-    }
-
-    public boolean launcherRunning() {
-        return m_speed.getAsDouble() > 50;
     }
 }

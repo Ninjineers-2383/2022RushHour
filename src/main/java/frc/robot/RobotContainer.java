@@ -80,6 +80,10 @@ public class RobotContainer {
     private final DoubleSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
             || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop()) ? 1 : 0;
 
+    // private final DoubleSupplier climberPowerAnalog = () ->
+    // -operatorController.getLeftTriggerAxis()
+    // + -operatorController.getRightTriggerAxis();
+
     // manual kicker controls
     private final JoystickButton kickerUp = new JoystickButton(operatorController, Button.kX.value);
     private final JoystickButton kickerDown = new JoystickButton(operatorController, Button.kY.value);
