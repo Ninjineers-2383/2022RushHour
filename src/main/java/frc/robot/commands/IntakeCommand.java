@@ -16,6 +16,14 @@ public class IntakeCommand extends CommandBase {
     // actions created in the subsystem.
     // In this case, a feeder command that takes in the feeder subsystem and runs
     // feeder subsystem actions.
+    /**
+     * A feeder command that takes in the feeder subsystem and runs feeder subsystem
+     * actions.
+     * 
+     * @param intake the instance of the feeder
+     * @param power  the power of the intake motors
+     * @param down   whether or not the intakes are down
+     */
     public IntakeCommand(IntakeSubsystem intake, DoubleSupplier power, boolean down) {
         this.intake = intake;
         this.power = power;
@@ -23,6 +31,7 @@ public class IntakeCommand extends CommandBase {
         addRequirements(intake);
     }
 
+    // Called once when the command gets scheduled
     @Override
     public void initialize() {
         intake.setDown(down);
@@ -38,6 +47,7 @@ public class IntakeCommand extends CommandBase {
         intake.setPower(d_power);
     }
 
+    // Called once when the command ends
     @Override
     public void end(boolean interrupted) {
         intake.setDown(false);

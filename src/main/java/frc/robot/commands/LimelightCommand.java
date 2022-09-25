@@ -10,16 +10,24 @@ import frc.robot.subsystems.LimelightSubsystem;
 public class LimelightCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
+    // Instance of the limelight
     private final LimelightSubsystem limelight;
 
-    private final MedianFilter limelightF = new MedianFilter(5);
+    // Instance of the median filter to remove noise in the image
+    private final MedianFilter limelightF;
 
+    /**
+     * A limelight command that takes in a limelight subsystem
+     * 
+     * @param limelight instance of limelight
+     */
     public LimelightCommand(LimelightSubsystem limelight) {
         this.limelight = limelight;
+        limelightF = new MedianFilter(5);
         addRequirements(limelight);
     }
 
-    // fix bounds issue!
+    // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         limelight.setTurretSeek(false);

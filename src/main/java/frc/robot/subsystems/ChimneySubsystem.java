@@ -22,7 +22,7 @@ public class ChimneySubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the power of the chimney
+     * Sets the power of the chimney from -1 to 1
      * 
      * @param power the power of the chimney
      */

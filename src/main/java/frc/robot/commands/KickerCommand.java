@@ -8,15 +8,19 @@ import frc.robot.subsystems.KickerSubsystem;
 public class KickerCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
+    // Creates an instance of the kicker
     private final KickerSubsystem kicker;
+
+    // The power of the kicker motors
     private final DoubleSupplier power;
 
-    // private double previousPower = Double.NaN;
-
-    // Creates a command that takes in a subsystem and speed and runs specific
-    // actions created in the subsystem.
-    // In this case, a kicker command that takes in the kicker subsystem and runs
-    // kicker subsystem actions.
+    /**
+     * A kicker command that takes in the kicker subsystem and runs
+     * kicker subsystem actions.
+     * 
+     * @param kicker instance of kicker
+     * @param power  power of kicker
+     */
     public KickerCommand(KickerSubsystem kicker, DoubleSupplier power) {
         this.kicker = kicker;
         this.power = power;
@@ -30,7 +34,6 @@ public class KickerCommand extends CommandBase {
         // 1 degree of rotation = 145.695364 ticks
         double d_power = power.getAsDouble();
         kicker.setPower(d_power);
-        // m_subsystem.kickV(m_speed.getAsDouble());
     }
 
     // Called once the command ends or is interrupted.

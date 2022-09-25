@@ -97,8 +97,7 @@
       "guid": "Keyboard1"
     },
     {
-      "guid": "03000000000000000000000000000000",
-      "useGamepad": true
+      "guid": "Keyboard2"
     }
   ]
 }

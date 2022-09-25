@@ -27,6 +27,14 @@ public class LauncherCommand extends CommandBase {
         this(subsystem, speed, shouldChangeSpeed, true);
     }
 
+    /**
+     * A launcher command that takes in the launcher subsystem and runs launcher
+     * subsystem actions.
+     * 
+     * @param launcher          instance of launcher
+     * @param speed             speed of launcher
+     * @param shouldChangeSpeed whether or not the launcher should change its speed
+     */
     public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed,
             boolean stopOnEnd) {
         m_subsystem = subsystem;
@@ -48,12 +56,8 @@ public class LauncherCommand extends CommandBase {
         // see LauncherSubsystem.java for more details on how spin() method works
         if (m_shouldChangeSpeed.getAsBoolean()) {
             m_subsystem.spin(m_speed.getAsDouble());
-        }
-    }
 
-    public double speed() {
-        // a public method that returns the speed as a double
-        return m_speed.getAsDouble();
+        }
     }
 
     // Called once the command ends or is interrupted.
@@ -62,9 +66,5 @@ public class LauncherCommand extends CommandBase {
         if (m_stopOnEnd) {
             m_subsystem.spin(0);
         }
-    }
-
-    public boolean launcherRunning() {
-        return m_speed.getAsDouble() > 50;
     }
 }

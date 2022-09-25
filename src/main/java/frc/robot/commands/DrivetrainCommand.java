@@ -5,26 +5,29 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
-/** An example command that uses an example subsystem. */
 public class DrivetrainCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-    private final DrivetrainSubsystem drivetrainSubsystem;
+    // Creates an instance of the drivetrain
+    private final DrivetrainSubsystem drivetrain;
+
+    // This is the forward parameter
     private DoubleSupplier throttle;
+
+    // This is the turn parameter
     private DoubleSupplier turn;
 
     /**
-     * Creates a new ExampleCommand.
+     * Takes in a drivetrain subsystem and forward and turn inputs for drive
      *
      * @param subsystem The subsystem used by this command.
      */
-    public DrivetrainCommand(DrivetrainSubsystem subsystem, DoubleSupplier throttle, DoubleSupplier turn) {
-        drivetrainSubsystem = subsystem;
+    public DrivetrainCommand(DrivetrainSubsystem drivetrain, DoubleSupplier throttle, DoubleSupplier turn) {
+        this.drivetrain = drivetrain;
         this.throttle = throttle;
         this.turn = turn;
-        // Use addRequirements() here to declare subsystem dependencies.
 
-        addRequirements(subsystem);
+        addRequirements(drivetrain);
     }
 
     // Called when the command is initially scheduled.
@@ -35,14 +38,15 @@ public class DrivetrainCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // See DriveTrainSubsystem.java for more details how the arcade() method works.
-        drivetrainSubsystem.drive(throttle.getAsDouble(), turn.getAsDouble());
+        // See drivetrain.java for more details how the arcade() method works.
+        drivetrain.drive(throttle.getAsDouble(), turn.getAsDouble());
     }
 
     // Called once the command ends or is interrupted.
+    // Stops the drivetrain once the command ends
     @Override
     public void end(boolean interrupted) {
-        drivetrainSubsystem.drive(0, 0);
+        drivetrain.drive(0, 0);
     }
 
     // Returns true when the command should end.

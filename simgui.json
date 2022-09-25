@@ -1,13 +1,24 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "Talon FX[5]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
       "/LiveWindow/ChimneySubsystem": "Subsystem",
+      "/LiveWindow/ClimberSubsystem": "Subsystem",
       "/LiveWindow/ClimberSubsystemNew": "Subsystem",
       "/LiveWindow/CompressorSubsystem": "Subsystem",
       "/LiveWindow/DrivetrainSubsystem": "Subsystem",
       "/LiveWindow/IndexerSubsystem": "Subsystem",
       "/LiveWindow/IntakeSubsystem": "Subsystem",
+      "/LiveWindow/KickerSubsystem": "Subsystem",
       "/LiveWindow/LauncherSubsystem": "Subsystem",
       "/LiveWindow/LimelightSubsystem": "Subsystem",
       "/LiveWindow/TurretSubsystem": "Subsystem",
