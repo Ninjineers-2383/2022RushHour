@@ -55,6 +55,19 @@ public final class Constants {
         public final static int MASTER_PORT = 1;
         public final static int FOLLOWER_PORT = 2;
         public final static int THRESHOLD = 1000;
+
+        // TODO: Physical values
+
+        public final static double kGearRatio = 1.0 / 1.0;
+        public final static double kWheelDiameterMeters = 0.1016;
+
+        public final static double kP = 0.0001;
+        public final static double kI = 0.0;
+        public final static double kD = 0.0;
+
+        public final static double kS = 0;
+        public final static double kV = 0;
+        public final static double kA = 0;
     }
 
     public final static class Intake {

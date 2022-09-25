@@ -4,6 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Launcher;
@@ -12,6 +14,10 @@ public class LauncherSubsystem extends SubsystemBase {
     // creates two motor instances using a TalonFX motor controller
     private final WPI_TalonFX masterMotor = new WPI_TalonFX(Launcher.MASTER_PORT);
     private final WPI_TalonFX followerMotor = new WPI_TalonFX(Launcher.FOLLOWER_PORT);
+
+    private final PIDController pidController = new PIDController(Launcher.kP, Launcher.kI, Launcher.kD);
+    private final SimpleMotorFeedforward ffController = new SimpleMotorFeedforward(Launcher.kS, Launcher.kV,
+            Launcher.kA);
 
     /**
      * Launcher subsystem constructor
@@ -39,10 +45,22 @@ public class LauncherSubsystem extends SubsystemBase {
      */
     public void spin(double velocity) {
         if (velocity == 0) {
-            masterMotor.set(ControlMode.PercentOutput, 0);
+            masterMotor.setVoltage(pidController.calculate(getVelocity(), velocity) + ffController.calculate(velocity));
         } else {
             masterMotor.set(ControlMode.Velocity, velocity);
         }
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public double getVelocity() {
+        return masterMotor.getSelectedSensorVelocity()
+                * (1 / 2048)
+                * 10
+                * Launcher.kGearRatio
+                * Launcher.kWheelDiameterMeters * Math.PI;
     }
 
     /**
