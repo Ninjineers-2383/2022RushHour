@@ -11,14 +11,13 @@ public class CompressorSubsystem extends SubsystemBase {
     // this is the counter for the compressor subsystem
     // counts up when the compressor is used
     // counts down when the compressor stops being used
-    private int counter;
+    private int counter = 0;
 
     /**
      * Compressor subsystem constructor
      */
     public CompressorSubsystem() {
         compressor = new Compressor(PneumaticsModuleType.CTREPCM);
-        counter = 0;
     }
 
     /**
@@ -26,6 +25,9 @@ public class CompressorSubsystem extends SubsystemBase {
      */
     public void countUp() {
         counter++;
+        if (counter > 0) {
+            enableCompressor();
+        }
     }
 
     /**
@@ -33,6 +35,10 @@ public class CompressorSubsystem extends SubsystemBase {
      */
     public void countDown() {
         counter--;
+        if (counter <= 0) {
+            counter = 0;
+            disableCompressor();
+        }
     }
 
     /**

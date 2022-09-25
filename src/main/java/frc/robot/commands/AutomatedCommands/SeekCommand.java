@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.TurretSeekCommand;
 import frc.robot.subsystems.LauncherSubsystem;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -22,10 +22,10 @@ public class SeekCommand extends ParallelCommandGroup {
                 new LauncherCommand(launcher,
                         () -> (limelight
                                 .getLaunchingVelocity()),
-                        () -> true),
-                new TurretCommand(turret, () -> limelight.getTurretPower(),
+                        () -> true).perpetually(),
+                new TurretSeekCommand(turret, () -> limelight.getTurretPower(),
                         () -> limelight.getTurretSeek(),
-                        seekDirection, 6300),
+                        seekDirection),
                 new StartEndCommand(
                         () -> SmartDashboard.putBoolean("Aim Active", true),
                         () -> SmartDashboard.putBoolean("Aim Active", false)));

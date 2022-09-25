@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.TurretSeekCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
@@ -27,14 +27,16 @@ public class DoubleShotCommand extends SequentialCommandGroup {
         addCommands(
                 new LauncherCommand(launcher,
                         () -> limelight.getLaunchingVelocity(),
-                        () -> true).withTimeout(0.1),
+                        () -> true, false)
+                        .withInterrupt(() -> launcher.isReady())
+                        .withTimeout(0.3),
                 new InstantCommand(() -> launchVelocity = limelight
                         .getLaunchingVelocity()),
                 new ParallelDeadlineGroup(
                         new KickerCommand(kicker, () -> 0.8).withTimeout(1.2),
-                        new ChimneyCommand(chimney, () -> 1).withTimeout(2.0),
-                        new TurretCommand(turret, () -> 0,
-                                () -> false, false, 6300),
+                        new ChimneyCommand(chimney, () -> 1).perpetually(),
+                        new TurretSeekCommand(turret, () -> 0,
+                                () -> false, false),
                         new LauncherCommand(launcher,
                                 () -> launchVelocity,
                                 () -> true)));

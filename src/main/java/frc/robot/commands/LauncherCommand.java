@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.LauncherSubsystem;
 
@@ -17,22 +16,24 @@ public class LauncherCommand extends CommandBase {
 
     private final BooleanSupplier m_shouldChangeSpeed;
 
-    double timeOut;
-
-    private double previousSpeed = Double.NaN;
-
-    Timer timer = new Timer();
+    private final boolean m_stopOnEnd;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a launcher command that takes in the launcher subsystem and
     // runs launcher subsystem actions.
+    public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed,
+            BooleanSupplier shouldChangeSpeed) {
+        this(subsystem, speed, shouldChangeSpeed, true);
+    }
 
-    public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed) {
+    public LauncherCommand(LauncherSubsystem subsystem, DoubleSupplier speed, BooleanSupplier shouldChangeSpeed,
+            boolean stopOnEnd) {
         m_subsystem = subsystem;
         m_speed = speed;
         m_shouldChangeSpeed = shouldChangeSpeed;
-        // Use addRequirements() here to declare subsystem dependencies.
+        m_stopOnEnd = stopOnEnd;
+
         addRequirements(subsystem);
     }
 
@@ -46,12 +47,7 @@ public class LauncherCommand extends CommandBase {
     public void execute() {
         // see LauncherSubsystem.java for more details on how spin() method works
         if (m_shouldChangeSpeed.getAsBoolean()) {
-            double d_speed = m_speed.getAsDouble();
-            if (d_speed == previousSpeed) {
-                return;
-            }
-            m_subsystem.spin(d_speed);
-            previousSpeed = d_speed;
+            m_subsystem.spin(m_speed.getAsDouble());
         }
     }
 
@@ -63,13 +59,9 @@ public class LauncherCommand extends CommandBase {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        m_subsystem.spin(0.0);
-    }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-        return false;
+        if (m_stopOnEnd) {
+            m_subsystem.spin(0);
+        }
     }
 
     public boolean launcherRunning() {

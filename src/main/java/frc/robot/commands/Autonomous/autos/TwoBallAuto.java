@@ -23,7 +23,7 @@ import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.TurretPositionCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
@@ -91,8 +91,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
                         new IntakeCommand(rearIntake, () -> -0.8, false)),
 
                 new ParallelRaceGroup(
-                        new TurretCommand(turret, () -> 0, () -> false, false,
-                                25000),
+                        new TurretPositionCommand(turret, 25000),
                         new LauncherCommand(launcher, () -> 6000, () -> false)),
 
                 new SequentialCommandGroup(

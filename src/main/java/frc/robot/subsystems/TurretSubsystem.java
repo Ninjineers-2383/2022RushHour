@@ -94,13 +94,16 @@ public class TurretSubsystem extends SubsystemBase {
      * Runs the turret to a specific position
      * 
      * @param position position in encoder ticks
+     * @return whether or not the turret is at the position
      */
-    public void runToPosition(int position) {
+    public boolean runToPosition(int position) {
         double error = -this.getCurrentPosition() - position;
         if (Math.abs(error) > 100) {
             setPower(Turret.kP_CENTER * error);
+            return false;
         } else {
             setPower(0.0);
+            return true;
         }
     }
 

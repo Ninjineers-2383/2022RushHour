@@ -16,6 +16,5 @@ public class StopLaunchCommand extends SequentialCommandGroup {
                 new LauncherCommand(launcher, () -> 0, () -> false).withTimeout(0.01),
                 new KickerCommand(kicker, () -> 0.0).withTimeout(0.01),
                 new ChimneyCommand(chimney, () -> 1).withTimeout(0.01));
-
     }
 }

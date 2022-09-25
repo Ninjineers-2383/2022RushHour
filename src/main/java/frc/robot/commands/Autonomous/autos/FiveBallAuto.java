@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.TurretPositionCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
@@ -84,8 +84,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
                         getRamseteCommand(trajectory2),
                         // new PerpetualCommand(new SeekCommand(launcher, limelight, turret,
                         // aimCommand))
-                        new TurretCommand(turret, () -> 0, () -> false, false,
-                                10500)),
+                        new TurretPositionCommand(turret, 10500)),
 
                 new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 
@@ -99,8 +98,7 @@ public class FiveBallAuto extends SequentialCommandGroup {
 
                 new ParallelDeadlineGroup(
                         getRamseteCommand(trajectory4),
-                        new TurretCommand(turret, () -> 0, () -> false, false,
-                                19600)),
+                        new TurretPositionCommand(turret, 19600)),
 
                 new SeekCommand(launcher, limelight, turret, false).withTimeout(0.4),
 

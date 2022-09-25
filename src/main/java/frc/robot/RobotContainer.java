@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
@@ -29,7 +28,7 @@ import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
 import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TraversalClimbManualCommand;
-import frc.robot.commands.TurretCommand;
+import frc.robot.commands.TurretPositionCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
 import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
@@ -65,10 +64,8 @@ public class RobotContainer {
     public final TurretSubsystem turret = new TurretSubsystem();
     private final LimelightSubsystem limelight = new LimelightSubsystem();
     private final ClimberSubsystem climber = new ClimberSubsystem();
-
     public final IntakeSubsystem frontIntake = new IntakeSubsystem(compressor, Intake.FRONT_INTAKE_PORT,
             Intake.FRONT_LEFT_SOLENOID_PORT, Intake.FRONT_RIGHT_SOLENOID_PORT);
-
     public final IntakeSubsystem rearIntake = new IntakeSubsystem(compressor, Intake.REAR_INTAKE_PORT,
             Intake.REAR_LEFT_SOLENOID_PORT, Intake.REAR_RIGHT_SOLENOID_PORT);
 
@@ -90,14 +87,14 @@ public class RobotContainer {
     // don't shoot button
     private final JoystickButton doNotShootButton = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
-    // sets drivetrain and climber to coast
-    private final JoystickButton coastToggle = new JoystickButton(operatorController, Button.kBack.value);
+    // toggles drivetrain roll protection
+    private final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
 
     // cancels the seek command
     private final JoystickButton cancelSeek = new JoystickButton(operatorController, Button.kStart.value);
 
     // determines whether or not to shoot
-    public final Trigger autoShoot = new AutoShoot(() -> limelight.getLockedOn(), () -> launcher.isReady(),
+    public final AutoShoot autoShoot = new AutoShoot(() -> limelight.getLockedOn(), () -> launcher.isReady(),
             drivetrain.getAverageVelocity());
 
     // Auto Chooser
@@ -149,7 +146,7 @@ public class RobotContainer {
         limelight.setDefaultCommand(new LimelightCommand(limelight));
         climber.setDefaultCommand(new TraversalClimbManualCommand(climber, () -> operatorController.getLeftY(),
                 () -> operatorController.getRightY(), () -> operatorController.getYButton()));
-        turret.setDefaultCommand(new TurretCommand(turret, () -> 0, () -> false, false, Turret.OFFSET_TICKS));
+        turret.setDefaultCommand(new TurretPositionCommand(turret, Turret.OFFSET_TICKS));
     }
 
     private void configureButtonBindings() {
@@ -160,17 +157,15 @@ public class RobotContainer {
 
         seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false));
 
-        cancelSeek.whileHeld(new StopLaunchCommand(launcher, kicker, chimney, turret));
+        cancelSeek.whenPressed(new StopLaunchCommand(launcher, kicker, chimney, turret));
 
         autoShoot.and(doNotShootButton.negate()).whenActive(
                 new DoubleShotCommand(chimney, turret, kicker, launcher, limelight).withTimeout(1.3));
 
-        coastToggle.toggleWhenPressed(
+        tippingToggle.toggleWhenPressed(
                 new StartEndCommand(
-                        () -> drivetrain.toggleTippingEnabled(),
-                        () -> drivetrain.toggleTippingDisabled()));
-
-        SmartDashboard.putData("Seek Command", new SeekCommand(launcher, limelight, turret, false));
+                        () -> drivetrain.toggleTippingDisabled(),
+                        () -> drivetrain.toggleTippingEnabled()));
     }
 
     public Command getAutonomousCommand() {

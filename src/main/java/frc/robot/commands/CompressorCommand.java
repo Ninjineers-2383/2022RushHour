@@ -14,15 +14,9 @@ public class CompressorCommand extends CommandBase {
 
     public void useCompressor() {
         compressor.countUp();
-        if (compressor.getCount() == 1) {
-            compressor.enableCompressor();
-        }
     }
 
     public void stopUsingCompressor() {
         compressor.countDown();
-        if (compressor.getCount() == 0) {
-            compressor.disableCompressor();
-        }
     }
 }
