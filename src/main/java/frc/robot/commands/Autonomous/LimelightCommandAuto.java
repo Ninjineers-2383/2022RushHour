@@ -48,11 +48,9 @@ public class LimelightCommandAuto extends CommandBase {
 
         if (limelight.getTargetVisible()) {
             turretSeek = false;
-            // limelight.setLimelight(true);
             SmartDashboard.putBoolean("Target Visible Auto", true);
             turretPower = -Turret.kP * error;
         } else {
-            // no target present
             SmartDashboard.putBoolean("Target Visible Auto", false);
             turretSeek = true;
         }

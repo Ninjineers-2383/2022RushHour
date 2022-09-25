@@ -1,6 +1,6 @@
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -9,14 +9,14 @@ public class IntakeCommand extends CommandBase {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
     private final IntakeSubsystem intake;
-    private BooleanSupplier power;
+    private DoubleSupplier power;
     private boolean down;
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
     // In this case, a feeder command that takes in the feeder subsystem and runs
     // feeder subsystem actions.
-    public IntakeCommand(IntakeSubsystem intake, BooleanSupplier power, boolean down) {
+    public IntakeCommand(IntakeSubsystem intake, DoubleSupplier power, boolean down) {
         this.intake = intake;
         this.power = power;
         this.down = down;
@@ -33,13 +33,9 @@ public class IntakeCommand extends CommandBase {
     public void execute() {
         // See FeederSubsystem.java for more details.
         // 1 degree of rotation = 145.695364 ticks
-        if (power.getAsBoolean()) {
-            intake.setDown(true);
-            intake.setPower(-0.8);
-        } else {
-            intake.setDown(false);
-            intake.setPower(0.0);
-        }
+        double d_power = power.getAsDouble();
+        intake.setDown(Math.abs(d_power) > 0.2);
+        intake.setPower(d_power);
     }
 
     @Override

@@ -5,7 +5,6 @@
 
 package frc.robot;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -78,8 +77,8 @@ public class RobotContainer {
     private DoubleSupplier turn = () -> driverJoystickTurn.getX() * 0.5;
 
     // chimney controls
-    private final BooleanSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
-            || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop());
+    private final DoubleSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
+            || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop()) ? 1 : 0;
 
     // manual kicker controls
     private final JoystickButton kickerUp = new JoystickButton(operatorController, Button.kX.value);
@@ -140,9 +139,9 @@ public class RobotContainer {
     private void setDefaultCommands() {
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         frontIntake.setDefaultCommand(
-                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger(), false));
+                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger() ? -0.8 : 0, false));
         rearIntake.setDefaultCommand(
-                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger(), false));
+                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger() ? -0.8 : 0, false));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         kicker.setDefaultCommand(new KickerCommand(kicker, () -> 0.0));
         launcher.setDefaultCommand(

@@ -72,7 +72,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                new IntakeCommand(rearIntake, () -> true, false).withTimeout(0.1),
+                new IntakeCommand(rearIntake, () -> -0.8, false).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
@@ -84,11 +84,11 @@ public class TwoBallAuto extends SequentialCommandGroup {
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory2),
-                        new IntakeCommand(frontIntake, () -> true, true)),
+                        new IntakeCommand(frontIntake, () -> -0.8, true)),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory3),
-                        new IntakeCommand(rearIntake, () -> true, false)),
+                        new IntakeCommand(rearIntake, () -> -0.8, false)),
 
                 new ParallelRaceGroup(
                         new TurretCommand(turret, () -> 0, () -> false, false,
@@ -98,14 +98,14 @@ public class TwoBallAuto extends SequentialCommandGroup {
                 new SequentialCommandGroup(
                         new LauncherCommand(launcher, () -> limelight.getLaunchingVelocity(), () -> false)
                                 .withTimeout(0.2),
-                        new ChimneyCommand(chimney, () -> false)
+                        new ChimneyCommand(chimney, () -> 0)
                                 .withTimeout(0.1),
                         new KickerCommand(kicker, () -> 0.75)
                                 .withTimeout(0.3),
                         new KickerCommand(kicker, () -> 0).withTimeout(0.05),
-                        new ChimneyCommand(chimney, () -> true)
+                        new ChimneyCommand(chimney, () -> 1)
                                 .withTimeout(0.5),
-                        new ChimneyCommand(chimney, () -> true)
+                        new ChimneyCommand(chimney, () -> 0)
                                 .withTimeout(0.15),
                         new KickerCommand(kicker, () -> 0.75)
                                 .withTimeout(0.4)),
