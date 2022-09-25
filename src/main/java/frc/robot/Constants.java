@@ -54,6 +54,7 @@ public final class Constants {
     public final static class Launcher {
         public final static int MASTER_PORT = 1;
         public final static int FOLLOWER_PORT = 2;
+        public final static int THRESHOLD = 1000;
     }
 
     public final static class Intake {

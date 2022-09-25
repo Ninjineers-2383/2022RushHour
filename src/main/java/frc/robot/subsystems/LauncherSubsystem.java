@@ -9,9 +9,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Launcher;
 
 public class LauncherSubsystem extends SubsystemBase {
+    // creates two motor instances using a TalonFX motor controller
     private final WPI_TalonFX masterMotor = new WPI_TalonFX(Launcher.MASTER_PORT);
     private final WPI_TalonFX followerMotor = new WPI_TalonFX(Launcher.FOLLOWER_PORT);
 
+    /**
+     * Launcher subsystem constructor
+     */
     public LauncherSubsystem() {
         masterMotor.setNeutralMode(NeutralMode.Coast);
         followerMotor.setNeutralMode(NeutralMode.Coast);
@@ -28,7 +32,11 @@ public class LauncherSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Shooter Target", masterMotor.getClosedLoopTarget());
     }
 
-    // spin up flywheels
+    /**
+     * Spins the flywheels at a certain velocity
+     * 
+     * @param velocity the velocity of the launcher
+     */
     public void spin(double velocity) {
         if (velocity == 0) {
             masterMotor.set(ControlMode.PercentOutput, 0);
@@ -37,12 +45,18 @@ public class LauncherSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Determines whether or not the launcher is ready to receive a ball from the
+     * kicker
+     * 
+     * @return whether or not the launcher is ready
+     */
     public boolean isReady() {
-        final int THRESHOLD = 1000;
         boolean ready = false;
         if (masterMotor.getControlMode() == ControlMode.Velocity) {
-            ready = masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - THRESHOLD
-                    && masterMotor.getSelectedSensorVelocity() <= masterMotor.getClosedLoopTarget() + THRESHOLD;
+            ready = masterMotor.getSelectedSensorVelocity() >= masterMotor.getClosedLoopTarget() - Launcher.THRESHOLD
+                    && masterMotor.getSelectedSensorVelocity() <= masterMotor.getClosedLoopTarget()
+                            + Launcher.THRESHOLD;
         }
         SmartDashboard.putBoolean("Launcher Is Ready", ready);
         return ready;

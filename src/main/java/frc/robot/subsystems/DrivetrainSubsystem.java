@@ -20,32 +20,56 @@ import frc.robot.helpers.SlewRateLimiter;
 
 public class DrivetrainSubsystem extends SubsystemBase {
 
-    private final WPI_TalonFX rightMasterMotor = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
-    private final WPI_TalonFX rightFollowerMotor = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
-    private final WPI_TalonFX leftMasterMotor = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
-    private final WPI_TalonFX leftFollowerMotor = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+    // creates four motor instances with a Talon FX motor controller
+    private final WPI_TalonFX rightMasterMotor;
+    private final WPI_TalonFX rightFollowerMotor;
+    private final WPI_TalonFX leftMasterMotor;
+    private final WPI_TalonFX leftFollowerMotor;
 
-    private final MotorControllerGroup leftMotors = new MotorControllerGroup(
-            leftMasterMotor,
-            leftFollowerMotor);
-    private final MotorControllerGroup rightMotors = new MotorControllerGroup(
-            rightMasterMotor,
-            rightFollowerMotor);
+    // creates two motor groups
+    private final MotorControllerGroup leftMotors;
+    private final MotorControllerGroup rightMotors;
 
-    private final DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+    // creates an instance of differential drive using the two motor groups
+    private final DifferentialDrive drive;
 
-    private boolean tippingProtectionEnabled = true;
+    // boolean that tells if the slew rates are enabled or not
+    private boolean tippingProtectionEnabled;
 
-    SlewRateLimiter throttleF = new SlewRateLimiter(3);
-    SlewRateLimiter turnF = new SlewRateLimiter(2);
+    // creates the slew rate instances for forward and turn
+    private final SlewRateLimiter throttleF;
+    private final SlewRateLimiter turnF;
 
+    // creates an instance of differential drive odometry
     private final DifferentialDriveOdometry odometry;
 
     // The gyro sensor
-    private final AHRS rawGyro = new AHRS(SPI.Port.kMXP);
-    public final Gyro m_gyro = rawGyro;
+    private final AHRS rawGyro;
+    public final Gyro m_gyro;
 
+    /**
+     * Constructor for the drivetrain subsystem
+     */
     public DrivetrainSubsystem() {
+        rightMasterMotor = new WPI_TalonFX(Drivetrain.RIGHT_MASTER_PORT);
+        rightFollowerMotor = new WPI_TalonFX(Drivetrain.RIGHT_FOLLOWER_PORT);
+        leftMasterMotor = new WPI_TalonFX(Drivetrain.LEFT_MASTER_PORT);
+        leftFollowerMotor = new WPI_TalonFX(Drivetrain.LEFT_FOLLOWER_PORT);
+
+        leftMotors = new MotorControllerGroup(
+                leftMasterMotor,
+                leftFollowerMotor);
+        rightMotors = new MotorControllerGroup(
+                rightMasterMotor,
+                rightFollowerMotor);
+
+        drive = new DifferentialDrive(leftMotors, rightMotors);
+
+        tippingProtectionEnabled = true;
+
+        throttleF = new SlewRateLimiter(3);
+        turnF = new SlewRateLimiter(2);
+
         rightMasterMotor.configFactoryDefault();
         rightFollowerMotor.configFactoryDefault();
         leftMasterMotor.configFactoryDefault();
@@ -67,21 +91,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
         rightFollowerMotor.follow(rightMasterMotor);
         leftFollowerMotor.follow(leftMasterMotor);
 
+        rawGyro = new AHRS(SPI.Port.kMXP);
+        m_gyro = rawGyro;
+
         odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
     }
 
-    public void driveFeed() {
-        drive.feed();
-    }
-
-    public void switchBrakeCoast(boolean isBrake) {
-        NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
-        leftFollowerMotor.setNeutralMode(mode);
-        leftMasterMotor.setNeutralMode(mode);
-        rightMasterMotor.setNeutralMode(mode);
-        rightFollowerMotor.setNeutralMode(mode);
-    }
-
+    @Override
     public void periodic() {
         odometry.update(
                 m_gyro.getRotation2d(), encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()),
@@ -108,31 +124,58 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right Follower Sensor Pos", rightFollowerMotor.getSelectedSensorPosition());
     }
 
+    /**
+     * 
+     * @param isBrake toggles the drivetrain between coast and brake
+     */
+    public void switchBrakeCoast(boolean isBrake) {
+        NeutralMode mode = isBrake ? NeutralMode.Brake : NeutralMode.Coast;
+        leftFollowerMotor.setNeutralMode(mode);
+        leftMasterMotor.setNeutralMode(mode);
+        rightMasterMotor.setNeutralMode(mode);
+        rightFollowerMotor.setNeutralMode(mode);
+    }
+
+    /**
+     * 
+     * @return the odometry pose in meters
+     */
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }
 
+    /**
+     * 
+     * @return the wheel speeds
+     */
     public DifferentialDriveWheelSpeeds getWheelSpeeds() {
         return new DifferentialDriveWheelSpeeds(
                 encoderTicksToMeters(leftMasterMotor.getSelectedSensorVelocity()),
                 -encoderTicksToMeters(rightMasterMotor.getSelectedSensorVelocity()));
     }
 
+    /**
+     * 
+     * @param ticks raw encoder ticks
+     * @return meters based on the gear ratios of the drivetrain
+     */
     public double encoderTicksToMeters(double ticks) {
         return ticks / 8.33 / 2048 * 0.3204;
     }
 
+    /**
+     * Resets the odometry to a given pose
+     * 
+     * @param pose the pose of the robot
+     */
     public void resetOdometry(Pose2d pose) {
         resetEncoders();
         odometry.resetPosition(pose, m_gyro.getRotation2d());
     }
 
-    public void tankDriveVolts(double leftVolts, double rightVolts) {
-        leftMotors.setVoltage(leftVolts);
-        rightMotors.setVoltage(rightVolts);
-        drive.feed();
-    }
-
+    /**
+     * Resets the encoders of the robot
+     */
     public void resetEncoders() {
         SmartDashboard.putNumber("Right Master Reset", rightMasterMotor.setSelectedSensorPosition(0).value);
         SmartDashboard.putNumber("Right Follower Reset", rightFollowerMotor.setSelectedSensorPosition(0).value);
@@ -140,10 +183,33 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Left Follower Reset", leftFollowerMotor.setSelectedSensorPosition(0).value);
     }
 
+    /**
+     * Drives the robot in tank drive fashion
+     * 
+     * @param left  runs the left motors at this speed
+     * @param right runs the right motors at this speed
+     */
     public void tankDrive(double left, double right) {
         drive.tankDrive(left, right);
     }
 
+    /**
+     * Drives the robot in tank drive fashion but uses motor voltages as inputs
+     * 
+     * @param leftVolts  the volts of the left side
+     * @param rightVolts the volts of the right side
+     */
+    public void tankDriveVolts(double leftVolts, double rightVolts) {
+        leftMotors.setVoltage(leftVolts);
+        rightMotors.setVoltage(rightVolts);
+        drive.feed();
+    }
+
+    /**
+     * Gets the average of the encoder ticks in meters
+     * 
+     * @return the average encoder distance
+     */
     public double getAverageEncoderDistance() {
         return (encoderTicksToMeters(leftMasterMotor.getSelectedSensorPosition()) +
                 -encoderTicksToMeters(rightMasterMotor.getSelectedSensorPosition())) / 2.0;
@@ -159,7 +225,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
         drive.setMaxOutput(maxOutput);
     }
 
-    /** Zeroes the heading of the robot. */
+    /**
+     * Zeroes the heading of the robot.
+     */
     public void zeroHeading() {
         m_gyro.reset();
     }
@@ -182,19 +250,33 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return -m_gyro.getRate();
     }
 
+    /**
+     * Gets the pitch of the gyro
+     * 
+     * @return the pitch of the gyro
+     */
     public double getPitch() {
         return rawGyro.getPitch();
     }
 
+    /**
+     * Gets the roll of the gyro
+     * 
+     * @return the roll of the gyro
+     */
     public double getRoll() {
         return rawGyro.getRoll();
     }
 
-    // Arcade drive method. Forward and backward on left joystick and turn on right
-    // joystick.
-    public void drive(double power, double turn) {
+    /**
+     * Drives the robot using differential drive controls
+     * 
+     * @param throttle the forward component of the drive
+     * @param turn     the turn component of the drive
+     */
+    public void drive(double throttle, double turn) {
 
-        double driveOutput = throttleF.calculate(power);
+        double driveOutput = throttleF.calculate(throttle);
         double kP = 0.02;
         double turnOutput = turnF.calculate(turn * 0.9);
         double roll = getRoll() * (Math.abs(getRoll()) > 2 ? kP : 0);
@@ -204,42 +286,43 @@ public class DrivetrainSubsystem extends SubsystemBase {
         } else {
             drive.arcadeDrive(driveOutput, turnOutput, false);
         }
-        // drive.arcadeDrive(power, 0.9 * turn);
     }
 
+    /**
+     * Enables tipping protection
+     */
     public void toggleTippingEnabled() {
         tippingProtectionEnabled = true;
     }
 
+    /**
+     * Disables tipping protection
+     */
     public void toggleTippingDisabled() {
         tippingProtectionEnabled = false;
     }
 
-    public void driveSquared(double power, double turn) {
-
-        double driveOutput = throttleF.calculate(power);
-        double turnOutput = turnF.calculate(turn * 0.9);
-
-        drive.arcadeDrive(driveOutput, turnOutput);
-        // drive.arcadeDrive(power, 0.9 * turn);
-    }
-
-    // reset encoder positions to 0,
-    public void zeroEncoders() {
-        leftMasterMotor.setSelectedSensorPosition(0);
-        rightMasterMotor.setSelectedSensorPosition(0);
-    }
-
+    /**
+     * Gets the position of the left drivetrain
+     */
     public double getLeftPosition() {
         SmartDashboard.putNumber("left pos", leftMasterMotor.getSelectedSensorPosition());
         return leftMasterMotor.getSelectedSensorPosition();
     }
 
+    /**
+     * Gets the position of the right drivetrain
+     */
     public double getRightPosition() {
         SmartDashboard.putNumber("right pos", rightMasterMotor.getSelectedSensorPosition());
         return rightMasterMotor.getSelectedSensorPosition();
     }
 
+    /**
+     * Gets the average velocity of both sides of the drivetrain
+     * 
+     * @return the average velocity of the right and left side of the drivetrain
+     */
     public DoubleSupplier getAverageVelocity() {
         return () -> (rightMasterMotor.getSelectedSensorVelocity(0) + leftMasterMotor.getSelectedSensorVelocity(0)) / 2;
     }

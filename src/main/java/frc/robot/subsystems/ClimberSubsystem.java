@@ -12,8 +12,8 @@ import frc.robot.Constants;
 public class ClimberSubsystem extends SubsystemBase {
 
     // creates two motor instances with a SparkMax motor controller
-    private final CANSparkMax right_climber = new CANSparkMax(Constants.Climber.RIGHT_PORT, MotorType.kBrushless);
-    private final CANSparkMax left_climber = new CANSparkMax(Constants.Climber.LEFT_PORT, MotorType.kBrushless);
+    private final CANSparkMax right_climber;
+    private final CANSparkMax left_climber;
 
     // creates two encoder instances
     private final RelativeEncoder left_encoder;
@@ -26,6 +26,9 @@ public class ClimberSubsystem extends SubsystemBase {
      * Climber subsystem constructor
      */
     public ClimberSubsystem() {
+        right_climber = new CANSparkMax(Constants.Climber.RIGHT_PORT, MotorType.kBrushless);
+        left_climber = new CANSparkMax(Constants.Climber.LEFT_PORT, MotorType.kBrushless);
+
         right_climber.setInverted(false);
         left_climber.setInverted(true);
 

@@ -9,19 +9,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Turret;
 
 public class TurretSubsystem extends SubsystemBase {
+    // changes states based on whether or not the turret is over bounds or under
+    // bounds
     public enum TurretBoundsState {
         OverBounds,
         UnderBounds
     }
 
+    // creates a motor instance using a TalonSRX motor controller
     private TalonSRX motor = new TalonSRX(Turret.PORT);
+
+    // the state of the bounds
     private TurretBoundsState boundsState = TurretBoundsState.OverBounds;
 
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Turret pos", getCurrentPosition());
-    }
-
+    /**
+     * Turret subsystem constructor
+     */
     public TurretSubsystem() {
         motor.setInverted(false);
         motor.setSensorPhase(true);
@@ -29,18 +32,30 @@ public class TurretSubsystem extends SubsystemBase {
         brake();
     }
 
-    public void setPosition(int pos) {
-        motor.setSelectedSensorPosition(pos);
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Turret pos", getCurrentPosition());
     }
 
+    /**
+     * Sets the turret to coast
+     */
     public void coast() {
         motor.setNeutralMode(NeutralMode.Coast);
     }
 
+    /**
+     * Sets the turret to brake
+     */
     public void brake() {
         motor.setNeutralMode(NeutralMode.Brake);
     }
 
+    /**
+     * Sets the power of the turret
+     * 
+     * @param power power of the turret in velocity
+     */
     public void setPower(Double power) {
         if (getCurrentPosition() > Turret.BOUNDS) {
             power = -500.0;
@@ -54,11 +69,19 @@ public class TurretSubsystem extends SubsystemBase {
         SmartDashboard.putString("Side", boundsState.toString());
     }
 
-    // Rotates til side flips, then rotates other direction
+    /**
+     * Rotates the turret until it hits the bound, and rotates the other way until
+     * it hits that bound
+     */
     public void seek() {
         setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
     }
 
+    /**
+     * Sets the direction of the turret
+     * 
+     * @param direction direction of the turret
+     */
     public void seekDirection(boolean direction) {
         if (direction) {
             boundsState = TurretBoundsState.OverBounds;
@@ -67,6 +90,11 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Runs the turret to a specific position
+     * 
+     * @param position position in encoder ticks
+     */
     public void runToPosition(int position) {
         double error = -this.getCurrentPosition() - position;
         if (Math.abs(error) > 100) {
@@ -76,6 +104,11 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Gets the current position of the turret
+     * 
+     * @return current position of the turret
+     */
     public double getCurrentPosition() {
         return motor.getSelectedSensorPosition(0);
     }

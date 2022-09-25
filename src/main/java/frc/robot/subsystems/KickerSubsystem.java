@@ -9,10 +9,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Kicker;
 
 public class KickerSubsystem extends SubsystemBase {
-    // create kicker instance that uses a TalonSRX motor controller.
+    // create motor instance that uses a TalonSRX motor controller
     private final VictorSPX kicker = new VictorSPX(Kicker.PORT);
 
-    // Kicker subsystem defined
+    /**
+     * Kicker subsystem constructor
+     */
     public KickerSubsystem() {
         kicker.setInverted(false);
         kicker.setNeutralMode(NeutralMode.Brake);
@@ -23,16 +25,13 @@ public class KickerSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("kicker Velocity", kicker.getSelectedSensorVelocity());
     }
 
-    // method that returns nothing (void) but sets the kicker at a set power in the
-    // interval of [-1, 1]
+    /**
+     * Sets the power of the kicker from -1 to 1
+     * 
+     * @param power power of the kicker
+     */
     public void setPower(Double power) {
         kicker.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("kicker power", power);
-    }
-
-    // method that returns nothing (void) but sets the kicker at a set velocity.
-    public void setVelocity(Double velocity) {
-        kicker.set(ControlMode.Velocity, velocity);
-        System.out.println(velocity);
     }
 }
