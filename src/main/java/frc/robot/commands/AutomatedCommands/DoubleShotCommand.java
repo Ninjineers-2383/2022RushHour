@@ -20,8 +20,6 @@ public class DoubleShotCommand extends SequentialCommandGroup {
 
     // Creates a command that takes in a subsystem and speed and runs specific
     // actions created in the subsystem.
-    // In this case, a Chimney command that takes in the Chimney subsystem and runs
-    // Chimney subsystem actions.
     public DoubleShotCommand(ChimneySubsystem chimney, TurretSubsystem turret,
             KickerSubsystem kicker, LauncherSubsystem launcher, LimelightSubsystem limelight) {
         addCommands(

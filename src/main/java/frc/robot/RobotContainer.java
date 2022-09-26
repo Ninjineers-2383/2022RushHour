@@ -30,8 +30,8 @@ import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TraversalClimbManualCommand;
 import frc.robot.commands.TurretPositionCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
+import frc.robot.commands.AutomatedCommands.RejectBallCommand;
 import frc.robot.commands.AutomatedCommands.SeekCommand;
-import frc.robot.commands.AutomatedCommands.StopLaunchCommand;
 import frc.robot.commands.Autonomous.autos.FiveBallAuto;
 import frc.robot.commands.Autonomous.autos.FourBallAuto;
 import frc.robot.commands.Autonomous.autos.OneBallAuto;
@@ -91,11 +91,11 @@ public class RobotContainer {
     // don't shoot button
     private final JoystickButton doNotShootButton = new JoystickButton(operatorController, Button.kLeftBumper.value);
 
+    // reject ball button
+    private final JoystickButton rejectBall = new JoystickButton(operatorController, Button.kLeftStick.value);
+
     // toggles drivetrain roll protection
     private final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
-
-    // cancels the seek command
-    private final JoystickButton cancelSeek = new JoystickButton(operatorController, Button.kStart.value);
 
     // determines whether or not to shoot
     public final AutoShoot autoShoot = new AutoShoot(() -> limelight.getLockedOn(), () -> launcher.isReady(),
@@ -148,8 +148,9 @@ public class RobotContainer {
         launcher.setDefaultCommand(
                 new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0), () -> false));
         limelight.setDefaultCommand(new LimelightCommand(limelight));
-        climber.setDefaultCommand(new TraversalClimbManualCommand(climber, () -> operatorController.getLeftY(),
-                () -> operatorController.getRightY(), () -> operatorController.getYButton()));
+        climber.setDefaultCommand(
+                new TraversalClimbManualCommand(climber, () -> operatorController.getLeftTriggerAxis(),
+                        () -> operatorController.getRightTriggerAxis(), () -> operatorController.getPOV() == 0));
         turret.setDefaultCommand(new TurretPositionCommand(turret, Turret.OFFSET_TICKS));
     }
 
@@ -161,10 +162,10 @@ public class RobotContainer {
 
         seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false));
 
-        cancelSeek.whenPressed(new StopLaunchCommand(launcher, kicker, chimney, turret));
-
         autoShoot.and(doNotShootButton.negate()).whenActive(
                 new DoubleShotCommand(chimney, turret, kicker, launcher, limelight).withTimeout(1.3));
+
+        rejectBall.whenActive(new RejectBallCommand(chimney, turret, kicker, launcher, limelight));
 
         tippingToggle.toggleWhenPressed(
                 new StartEndCommand(
