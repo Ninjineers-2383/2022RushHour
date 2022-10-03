@@ -41,4 +41,9 @@ public class TurretSeekCommand extends CommandBase {
     public void end(boolean force) {
         turret.setPower(0.0);
     }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
 }

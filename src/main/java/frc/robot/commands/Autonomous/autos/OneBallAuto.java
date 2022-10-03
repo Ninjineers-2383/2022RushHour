@@ -22,7 +22,7 @@ public class OneBallAuto extends SequentialCommandGroup {
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
-                new TurretPositionCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new TurretPositionCommand(turret, limelight, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new LauncherCommand(launcher, () -> 15200, () -> false).withTimeout(0.1),
                         new AutoForward(drivetrain, 5.3, 2, 0.75, 5),

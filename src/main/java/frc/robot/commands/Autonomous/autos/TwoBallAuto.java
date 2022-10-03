@@ -91,7 +91,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
                         new IntakeCommand(rearIntake, () -> -0.8, false)),
 
                 new ParallelRaceGroup(
-                        new TurretPositionCommand(turret, 25000),
+                        new TurretPositionCommand(turret, limelight, 25000),
                         new LauncherCommand(launcher, () -> 6000, () -> false)),
 
                 new SequentialCommandGroup(

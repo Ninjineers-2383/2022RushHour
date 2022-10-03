@@ -17,7 +17,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Solenoid downSolenoid;
 
     // creates an instance of the compressor command
-    private final CompressorCommand compressorCommand;
+    public final CompressorCommand compressorCommand;
 
     /**
      * Intake subsystem constructor
