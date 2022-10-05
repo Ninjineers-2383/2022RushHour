@@ -140,16 +140,17 @@ public class RobotContainer {
     private void setDefaultCommands() {
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         frontIntake.setDefaultCommand(
-                new IntakeCommand(frontIntake, () -> driverJoystickForward.getTrigger() ? -0.8 : 0, false));
+                new IntakeCommand(frontIntake, () -> driverJoystickTurn.getTrigger() ? -0.8 : 0, false));
         rearIntake.setDefaultCommand(
-                new IntakeCommand(rearIntake, () -> driverJoystickTurn.getTrigger() ? -0.8 : 0, false));
+                new IntakeCommand(rearIntake, () -> driverJoystickForward.getTrigger() ? -0.8 : 0, false));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         kicker.setDefaultCommand(new KickerCommand(kicker, () -> 0.0));
         launcher.setDefaultCommand(
                 new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0), () -> false));
         limelight.setDefaultCommand(new LimelightCommand(limelight));
         climber.setDefaultCommand(
-                new TraversalClimbManualCommand(climber, () -> operatorController.getLeftTriggerAxis(),
+                new TraversalClimbManualCommand(climber,
+                        () -> (operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis()),
                         () -> operatorController.getRightTriggerAxis(), () -> operatorController.getPOV() == 0));
         turret.setDefaultCommand(new TurretPositionCommand(turret, Turret.OFFSET_TICKS));
     }
@@ -160,7 +161,7 @@ public class RobotContainer {
 
         kickerDown.whenHeld(new KickerCommand(kicker, () -> -1));
 
-        seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false));
+        seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false).perpetually());
 
         autoShoot.and(doNotShootButton.negate()).whenActive(
                 new DoubleShotCommand(chimney, turret, kicker, launcher, limelight).withTimeout(1.3));

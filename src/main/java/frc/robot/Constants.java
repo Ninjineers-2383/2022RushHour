@@ -14,7 +14,7 @@ public final class Constants {
     public final static class Turret {
         public final static int PORT = 3;
         public final static int BOUNDS = 45000;
-        public final static double SEEKING_POWER = 5000;
+        public final static double SEEKING_POWER = 1000;
         public final static double ADJUST_POWER = 3000;
         public final static double kP = 70; // 0.012
         public final static double kP_CENTER = 0.21;
@@ -72,8 +72,8 @@ public final class Constants {
 
     public final static class Intake {
         // solenoid ports on pcm
-        public final static int FRONT_LEFT_SOLENOID_PORT = 1;
-        public final static int REAR_LEFT_SOLENOID_PORT = 6;
+        public final static int FRONT_LEFT_SOLENOID_PORT = 6;
+        public final static int REAR_LEFT_SOLENOID_PORT = 1;
         public final static int FRONT_RIGHT_SOLENOID_PORT = 0;
         public final static int REAR_RIGHT_SOLENOID_PORT = 7;
         public final static int FRONT_INTAKE_PORT = 11;
