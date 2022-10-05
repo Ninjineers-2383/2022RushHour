@@ -15,7 +15,7 @@ public final class Constants {
         public final static int PORT = 3;
         public final static int BOUNDS = 45000;
         public final static double SEEKING_POWER = 1000;
-        public final static double ADJUST_POWER = 3000;
+        public final static double ADJUST_POWER = 1000;
         public final static double kP = 70; // 0.012
         public final static double kP_CENTER = 0.21;
         public final static int OFFSET_TICKS = -10000;

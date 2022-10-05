@@ -72,11 +72,11 @@ public class TwoBallAuto extends SequentialCommandGroup {
                             // Reset odometry to the starting pose of the trajectory.
                             drivetrain.resetOdometry(traj1f.getInitialPose());
                         }),
-                new IntakeCommand(rearIntake, () -> -0.8, false).withTimeout(0.1),
 
                 new ParallelDeadlineGroup( // Intake system activate and intake first ball
                         getRamseteCommand(trajectory1),
-                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false))),
+                        new PerpetualCommand(new SeekCommand(launcher, limelight, turret, false)),
+                        new IntakeCommand(rearIntake, () -> -0.8, true)),
 
                 new DoubleShotCommand(chimney, turret, kicker, launcher, limelight),
 
