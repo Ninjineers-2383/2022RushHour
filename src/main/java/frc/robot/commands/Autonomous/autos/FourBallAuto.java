@@ -29,7 +29,7 @@ public class FourBallAuto extends SequentialCommandGroup {
             TurretSubsystem turret) {
         // Run path following command, then stop at the end.
         addCommands(
-                new TurretPositionCommand(turret, Turret.OFFSET_TICKS).withTimeout(0.5),
+                new TurretPositionCommand(turret, limelight, Turret.OFFSET_TICKS).withTimeout(0.5),
                 new ParallelCommandGroup( // Intake system activate and intake first ball
                         new ChimneyCommand(chimney, () -> 1).withTimeout(0.1),
                         new LauncherCommand(launcher, () -> 15200, () -> false).withTimeout(0.1),
@@ -70,7 +70,7 @@ public class FourBallAuto extends SequentialCommandGroup {
                 new WaitCommand(1.5),
                 new ParallelRaceGroup(
                         new LauncherCommand(launcher, () -> 16500, () -> false),
-                        new TurretPositionCommand(turret, -18000),
+                        new TurretPositionCommand(turret, limelight, -18000),
                         new AutoForward(drivetrain, 11.5, 1.7, -0.88, 20)),
                 new ParallelRaceGroup(
                         new TurretSeekCommand(turret, () -> limelight.getTurretPower(),

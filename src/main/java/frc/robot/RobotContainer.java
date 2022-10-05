@@ -57,7 +57,7 @@ public class RobotContainer {
 
     // initializing subsystems
     private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-    private final CompressorSubsystem compressor = new CompressorSubsystem();
+    public final CompressorSubsystem compressor = new CompressorSubsystem();
     private final ChimneySubsystem chimney = new ChimneySubsystem();
     private final KickerSubsystem kicker = new KickerSubsystem();
     private final LauncherSubsystem launcher = new LauncherSubsystem();
@@ -152,7 +152,8 @@ public class RobotContainer {
                 new TraversalClimbManualCommand(climber,
                         () -> (operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis()),
                         () -> operatorController.getRightTriggerAxis(), () -> operatorController.getPOV() == 0));
-        turret.setDefaultCommand(new TurretPositionCommand(turret, Turret.OFFSET_TICKS));
+        turret.setDefaultCommand(new TurretPositionCommand(turret, limelight,
+                Turret.OFFSET_TICKS).perpetually());
     }
 
     private void configureButtonBindings() {

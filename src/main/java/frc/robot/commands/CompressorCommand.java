@@ -16,6 +16,7 @@ public class CompressorCommand extends CommandBase {
      */
     public CompressorCommand(CompressorSubsystem compressor) {
         this.compressor = compressor;
+
     }
 
     /**
