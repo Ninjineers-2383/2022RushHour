@@ -11,7 +11,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,24 +19,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake;
-import frc.robot.Constants.Turret;
 import frc.robot.commands.ChimneyCommand;
 import frc.robot.commands.DrivetrainCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.KickerCommand;
 import frc.robot.commands.LauncherCommand;
-import frc.robot.commands.LimelightCommand;
 import frc.robot.commands.TraversalClimbManualCommand;
-import frc.robot.commands.TurretPositionCommand;
+import frc.robot.commands.TurretPowerCommand;
 import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.RejectBallCommand;
-import frc.robot.commands.AutomatedCommands.SeekCommand;
-import frc.robot.commands.Autonomous.autos.FiveBallAuto;
-import frc.robot.commands.Autonomous.autos.FourBallAuto;
-import frc.robot.commands.Autonomous.autos.OneBallAuto;
-import frc.robot.commands.Autonomous.autos.TwoBallAuto;
-import frc.robot.commands.Autonomous.autos.TwoBallAutoSimple;
-import frc.robot.commands.triggers.AutoShoot;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CompressorSubsystem;
@@ -45,15 +35,12 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.LauncherSubsystem;
-import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
 
     // Controllers and ports
-    private final Joystick driverJoystickForward = new Joystick(0);
-    private final Joystick driverJoystickTurn = new Joystick(1);
-    private final XboxController operatorController = new XboxController(2);
+    private final XboxController driverController = new XboxController(0);
 
     // initializing subsystems
     private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
@@ -62,44 +49,40 @@ public class RobotContainer {
     private final KickerSubsystem kicker = new KickerSubsystem();
     private final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
-    private final LimelightSubsystem limelight = new LimelightSubsystem();
     private final ClimberSubsystem climber = new ClimberSubsystem();
     public final IntakeSubsystem frontIntake = new IntakeSubsystem(compressor, Intake.FRONT_INTAKE_PORT,
             Intake.FRONT_LEFT_SOLENOID_PORT, Intake.FRONT_RIGHT_SOLENOID_PORT);
-    public final IntakeSubsystem rearIntake = new IntakeSubsystem(compressor, Intake.REAR_INTAKE_PORT,
-            Intake.REAR_LEFT_SOLENOID_PORT, Intake.REAR_RIGHT_SOLENOID_PORT);
 
     // drive controls
-    private DoubleSupplier throttle = () -> driverJoystickForward.getY();
-    private DoubleSupplier turn = () -> driverJoystickTurn.getX() * 0.5;
+    private DoubleSupplier throttle = () -> driverController.getLeftY();
+    private DoubleSupplier turn = () -> driverController.getLeftX() * 0.5;
 
     // chimney controls
-    private final DoubleSupplier chimneyPower = () -> (driverJoystickForward.getTrigger()
-            || driverJoystickTurn.getTrigger() || driverJoystickTurn.getTop()) ? 1 : 0;
+    private final DoubleSupplier chimneyPower = () -> (driverController.getAButton()) ? 1 : 0;
 
     // private final DoubleSupplier climberPowerAnalog = () ->
     // -operatorController.getLeftTriggerAxis()
     // + -operatorController.getRightTriggerAxis();
 
     // manual kicker controls
-    private final JoystickButton kickerUp = new JoystickButton(operatorController, Button.kX.value);
-    private final JoystickButton kickerDown = new JoystickButton(operatorController, Button.kY.value);
+    private final JoystickButton kickerUp = new JoystickButton(driverController, Button.kX.value);
+    private final JoystickButton kickerDown = new JoystickButton(driverController, Button.kY.value);
 
     // seek button
-    private final JoystickButton seekButton = new JoystickButton(operatorController, Button.kRightBumper.value);
+    private final JoystickButton turretRight = new JoystickButton(driverController, Button.kRightBumper.value);
+
+    private final JoystickButton turretLeft = new JoystickButton(driverController, Button.kLeftBumper.value);
 
     // don't shoot button
-    private final JoystickButton doNotShootButton = new JoystickButton(operatorController, Button.kLeftBumper.value);
+    private final JoystickButton shootButton = new JoystickButton(driverController, Button.kB.value);
 
     // reject ball button
-    private final JoystickButton rejectBall = new JoystickButton(operatorController, Button.kLeftStick.value);
+    private final JoystickButton rejectBall = new JoystickButton(driverController, Button.kLeftStick.value);
 
     // toggles drivetrain roll protection
-    private final JoystickButton tippingToggle = new JoystickButton(operatorController, Button.kBack.value);
+    private final JoystickButton tippingToggle = new JoystickButton(driverController, Button.kBack.value);
 
-    // determines whether or not to shoot
-    public final AutoShoot autoShoot = new AutoShoot(() -> limelight.getLockedOn(), () -> launcher.isReady(),
-            drivetrain.getAverageVelocity());
+    private final JoystickButton engageFlywheels = new JoystickButton(driverController, Button.kStart.value);
 
     // Auto Chooser
     SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -118,7 +101,7 @@ public class RobotContainer {
 
         setDefaultCommands();
 
-        SetAutoCommands();
+        // SetAutoCommands();
 
         // Restart Photon Vision
         try {
@@ -140,20 +123,16 @@ public class RobotContainer {
     private void setDefaultCommands() {
         drivetrain.setDefaultCommand(new DrivetrainCommand(drivetrain, throttle, turn));
         frontIntake.setDefaultCommand(
-                new IntakeCommand(frontIntake, () -> driverJoystickTurn.getTrigger() ? -0.8 : 0, false));
-        rearIntake.setDefaultCommand(
-                new IntakeCommand(rearIntake, () -> driverJoystickForward.getTrigger() ? -0.8 : 0, false));
+                new IntakeCommand(frontIntake, () -> driverController.getAButton() ? -0.8 : 0, false));
         chimney.setDefaultCommand(new ChimneyCommand(chimney, chimneyPower));
         kicker.setDefaultCommand(new KickerCommand(kicker, () -> 0.0));
         launcher.setDefaultCommand(
                 new LauncherCommand(launcher, () -> SmartDashboard.getNumber("LauncherVelocity", 0.0), () -> false));
-        limelight.setDefaultCommand(new LimelightCommand(limelight));
         climber.setDefaultCommand(
                 new TraversalClimbManualCommand(climber,
-                        () -> (operatorController.getRightTriggerAxis() - operatorController.getLeftTriggerAxis()),
-                        () -> operatorController.getRightTriggerAxis(), () -> operatorController.getPOV() == 0));
-        turret.setDefaultCommand(new TurretPositionCommand(turret, limelight,
-                Turret.OFFSET_TICKS).perpetually());
+                        () -> (driverController.getRightTriggerAxis() - driverController.getLeftTriggerAxis()),
+                        () -> driverController.getRightTriggerAxis(), () -> driverController.getPOV() == 0));
+        turret.setDefaultCommand(new TurretPowerCommand(turret, () -> 0));
     }
 
     private void configureButtonBindings() {
@@ -162,53 +141,19 @@ public class RobotContainer {
 
         kickerDown.whenHeld(new KickerCommand(kicker, () -> -1));
 
-        seekButton.toggleWhenPressed(new SeekCommand(launcher, limelight, turret, false).perpetually());
+        turretLeft.toggleWhenPressed(new TurretPowerCommand(turret, () -> -1));
+        turretRight.toggleWhenPressed(new TurretPowerCommand(turret, () -> 1));
 
-        autoShoot.and(doNotShootButton.negate()).whenActive(
-                new DoubleShotCommand(chimney, turret, kicker, launcher, limelight).withTimeout(1.3));
+        shootButton.whenActive(
+                new DoubleShotCommand(chimney, turret, kicker, launcher).withTimeout(1.3));
 
-        rejectBall.whenActive(new RejectBallCommand(chimney, turret, kicker, launcher, limelight));
+        rejectBall.whenActive(new RejectBallCommand(chimney, turret, kicker, launcher));
 
         tippingToggle.toggleWhenPressed(
                 new StartEndCommand(
                         () -> drivetrain.toggleTippingDisabled(),
                         () -> drivetrain.toggleTippingEnabled()));
-    }
 
-    public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-    }
-
-    private Command getTestAuto() {
-        return null;
-    }
-
-    private void SetAutoCommands() {
-        Command oneBallAuto = new OneBallAuto(drivetrain, kicker, launcher, limelight, turret);
-        Command twoBallAuto = new TwoBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
-                limelight, turret);
-        Command fourBallAuto = new FourBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
-                limelight, turret);
-        Command fiveBallAuto = new FiveBallAuto(drivetrain, frontIntake, rearIntake, chimney, kicker, launcher,
-                limelight, turret);
-
-        Command nullAuto = null;
-
-        Command testAuto = getTestAuto();
-
-        Command simpleTwoBallAuto = new TwoBallAutoSimple(drivetrain, frontIntake, rearIntake, chimney, kicker,
-                launcher, limelight,
-                turret);
-
-        autoChooser.addOption("One Ball", oneBallAuto);
-        autoChooser.addOption("Two Ball", twoBallAuto);
-        autoChooser.addOption("Two Ball Simple", simpleTwoBallAuto);
-        autoChooser.addOption("Four Ball", fourBallAuto);
-        autoChooser.setDefaultOption("Five Ball", fiveBallAuto);
-
-        autoChooser.addOption("Test Auto", testAuto);
-        autoChooser.addOption("No Auto", nullAuto);
-
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        engageFlywheels.toggleWhenPressed(new LauncherCommand(launcher, () -> 10000, () -> true, true));
     }
 }

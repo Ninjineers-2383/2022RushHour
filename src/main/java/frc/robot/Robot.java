@@ -96,12 +96,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         brakeMotors();
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-        // schedule the autonomous command (example)
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
-        }
     }
 
     /** This function is called periodically during autonomous. */
@@ -125,7 +119,6 @@ public class Robot extends TimedRobot {
         teamColorChooser.addOption("Red", "red");
         SmartDashboard.putData("teamColorChooser", teamColorChooser);
         m_robotContainer.frontIntake.setPower(0.0);
-        m_robotContainer.rearIntake.setPower(0.0);
     }
 
     public void brakeMotors() {

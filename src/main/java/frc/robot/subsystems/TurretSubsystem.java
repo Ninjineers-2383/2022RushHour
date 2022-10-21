@@ -9,18 +9,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Turret;
 
 public class TurretSubsystem extends SubsystemBase {
-    // changes states based on whether or not the turret is over bounds or under
-    // bounds
-    public enum TurretBoundsState {
-        OverBounds,
-        UnderBounds
-    }
-
     // creates a motor instance using a TalonSRX motor controller
     private TalonSRX motor = new TalonSRX(Turret.PORT);
-
-    // the state of the bounds
-    private TurretBoundsState boundsState = TurretBoundsState.OverBounds;
 
     /**
      * Turret subsystem constructor
@@ -57,37 +47,8 @@ public class TurretSubsystem extends SubsystemBase {
      * @param power power of the turret in velocity
      */
     public void setPower(Double power) {
-        if (getCurrentPosition() > Turret.BOUNDS) {
-            power = -500.0;
-            boundsState = TurretBoundsState.UnderBounds;
-        } else if (getCurrentPosition() < -Turret.BOUNDS) {
-            power = 500.0;
-            boundsState = TurretBoundsState.OverBounds;
-        }
         motor.set(ControlMode.Velocity, power);
         SmartDashboard.putNumber("446pm", power);
-        SmartDashboard.putString("Side", boundsState.toString());
-    }
-
-    /**
-     * Rotates the turret until it hits the bound, and rotates the other way until
-     * it hits that bound
-     */
-    public void seek() {
-        setPower(boundsState == TurretBoundsState.OverBounds ? Turret.SEEKING_POWER : -Turret.SEEKING_POWER);
-    }
-
-    /**
-     * Sets the direction of the turret
-     * 
-     * @param direction direction of the turret
-     */
-    public void seekDirection(boolean direction) {
-        if (direction) {
-            boundsState = TurretBoundsState.OverBounds;
-        } else {
-            boundsState = TurretBoundsState.UnderBounds;
-        }
     }
 
     /**
