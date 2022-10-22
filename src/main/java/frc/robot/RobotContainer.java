@@ -55,7 +55,7 @@ public class RobotContainer {
 
     // drive controls
     private DoubleSupplier throttle = () -> driverController.getLeftY();
-    private DoubleSupplier turn = () -> driverController.getLeftX() * 0.5;
+    private DoubleSupplier turn = () -> driverController.getRightX() * 0.5;
 
     // chimney controls
     private final DoubleSupplier chimneyPower = () -> (driverController.getAButton()) ? 1 : 0;
@@ -141,8 +141,8 @@ public class RobotContainer {
 
         kickerDown.whenHeld(new KickerCommand(kicker, () -> -1));
 
-        turretLeft.toggleWhenPressed(new TurretPowerCommand(turret, () -> -1));
-        turretRight.toggleWhenPressed(new TurretPowerCommand(turret, () -> 1));
+        turretLeft.whenHeld(new TurretPowerCommand(turret, () -> -0.6));
+        turretRight.whenHeld(new TurretPowerCommand(turret, () -> 0.6));
 
         shootButton.whenActive(
                 new DoubleShotCommand(chimney, turret, kicker, launcher).withTimeout(1.3));

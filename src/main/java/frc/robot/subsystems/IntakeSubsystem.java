@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -10,7 +10,7 @@ import frc.robot.commands.CompressorCommand;
 
 public class IntakeSubsystem extends SubsystemBase {
     // create motor instance using a VictorSPX motor controller
-    private final VictorSPX intakeMotor;
+    private final TalonSRX intakeMotor;
 
     // creates two solenoid instances
     private final Solenoid upSolenoid;
@@ -29,11 +29,11 @@ public class IntakeSubsystem extends SubsystemBase {
      */
     public IntakeSubsystem(CompressorSubsystem compressor, int motorPort, int upSolenoidPort, int downSolenoidPort) {
         this.compressorCommand = new CompressorCommand(compressor);
-        intakeMotor = new VictorSPX(motorPort);
+        intakeMotor = new TalonSRX(motorPort);
         upSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, upSolenoidPort);
         downSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, downSolenoidPort);
 
-        intakeMotor.setInverted(false);
+        intakeMotor.setInverted(true);
     }
 
     /**

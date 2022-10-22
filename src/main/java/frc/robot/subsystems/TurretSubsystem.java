@@ -47,7 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
      * @param power power of the turret in velocity
      */
     public void setPower(Double power) {
-        motor.set(ControlMode.Velocity, power);
+        motor.set(ControlMode.PercentOutput, power);
         SmartDashboard.putNumber("446pm", power);
     }
 

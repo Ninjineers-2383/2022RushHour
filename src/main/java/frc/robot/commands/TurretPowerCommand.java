@@ -15,6 +15,8 @@ public class TurretPowerCommand extends CommandBase {
     public TurretPowerCommand(TurretSubsystem turret, DoubleSupplier power) {
         this.turret = turret;
         this.power = power;
+
+        addRequirements(turret);
     }
 
     @Override
