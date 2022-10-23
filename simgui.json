@@ -1,7 +1,7 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "Talon FX[5]": {
+      "Talon FX[7]/Fwd Limit": {
         "header": {
           "open": true
         }

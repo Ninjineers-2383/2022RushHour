@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.CompressorCommand;
 
 public class IntakeSubsystem extends SubsystemBase {
     // create motor instance using a VictorSPX motor controller
@@ -16,9 +15,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private final Solenoid upSolenoid;
     private final Solenoid downSolenoid;
 
-    // creates an instance of the compressor command
-    public final CompressorCommand compressorCommand;
-
     /**
      * Intake subsystem constructor
      * 
@@ -27,8 +23,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param upSolenoidPort   the port of the up solenoid
      * @param downSolenoidPort the port of the down solenoid
      */
-    public IntakeSubsystem(CompressorSubsystem compressor, int motorPort, int upSolenoidPort, int downSolenoidPort) {
-        this.compressorCommand = new CompressorCommand(compressor);
+    public IntakeSubsystem(int motorPort, int upSolenoidPort, int downSolenoidPort) {
         intakeMotor = new TalonSRX(motorPort);
         upSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, upSolenoidPort);
         downSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, downSolenoidPort);
@@ -53,11 +48,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setDown(Boolean down) {
         upSolenoid.set(down);
         downSolenoid.set(!down);
-        if (down) {
-            compressorCommand.useCompressor();
-        } else {
-            compressorCommand.stopUsingCompressor();
-        }
     }
 
     /**

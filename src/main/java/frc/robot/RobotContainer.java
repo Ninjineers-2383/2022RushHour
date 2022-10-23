@@ -30,7 +30,6 @@ import frc.robot.commands.AutomatedCommands.DoubleShotCommand;
 import frc.robot.commands.AutomatedCommands.RejectBallCommand;
 import frc.robot.subsystems.ChimneySubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.CompressorSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
@@ -44,13 +43,12 @@ public class RobotContainer {
 
     // initializing subsystems
     private final DrivetrainSubsystem drivetrain = new DrivetrainSubsystem();
-    public final CompressorSubsystem compressor = new CompressorSubsystem();
     private final ChimneySubsystem chimney = new ChimneySubsystem();
     private final KickerSubsystem kicker = new KickerSubsystem();
     private final LauncherSubsystem launcher = new LauncherSubsystem();
     public final TurretSubsystem turret = new TurretSubsystem();
     private final ClimberSubsystem climber = new ClimberSubsystem();
-    public final IntakeSubsystem frontIntake = new IntakeSubsystem(compressor, Intake.FRONT_INTAKE_PORT,
+    public final IntakeSubsystem frontIntake = new IntakeSubsystem(Intake.FRONT_INTAKE_PORT,
             Intake.FRONT_LEFT_SOLENOID_PORT, Intake.FRONT_RIGHT_SOLENOID_PORT);
 
     // drive controls
